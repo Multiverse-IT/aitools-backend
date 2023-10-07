@@ -10,11 +10,34 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+# The root of the git repo - Could be ~/project or ~/repo
+REPO_DIR = os.path.realpath(os.path.join(BASE_DIR, ".."))
+# The directory of the current user ie /home/django a.k.a. ~
+HOME_DIR = os.path.realpath(os.path.join(REPO_DIR, ".."))
+# The directory where collectstatic command copies/symlinks the files to
+# This can/should be located at ~/staticfiles, preferrably outside the git repo
+STATIC_DIR = os.path.realpath(os.path.join(HOME_DIR, "staticfiles"))
+# The directory where different applications uploads media files to
+# This can/should be located at ~/media, preferrably outside the git repo
+MEDIA_DIR = os.path.realpath(os.path.join(HOME_DIR, "media"))
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.8/howto/static-files/
+
+STATIC_ROOT = STATIC_DIR
+STATIC_URL = "/static/"
+
+MEDIA_ROOT = MEDIA_DIR
+MEDIA_URL = "/media/"
+
+
+STATICFILES_DIRS = [os.path.join(REPO_DIR, "assets")]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -30,14 +53,34 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework'
 ]
+PROJECT_APPS = [
+    "core",
+]
+
+THIRD_PARTY_APPS = [
+    "drf_yasg",
+]
+INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
+
+# swagger settings
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {"basic": {"type": "basic"}},
+}
+
+REDOC_SETTINGS = {
+    "LAZY_RENDERING": False,
+}
+
+AUTH_USER_MODEL = "core.User"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -54,7 +97,7 @@ ROOT_URLCONF = 'projectile.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -111,11 +154,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
