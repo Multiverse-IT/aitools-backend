@@ -71,6 +71,7 @@ THIRD_PARTY_APPS = [
     "drf_yasg",
     "rest_framework",
     "social_django",
+    "versatileimagefield",
     "rest_framework_simplejwt",
     "corsheaders",
 ]
@@ -212,3 +213,6 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '654201802529-h3l30nfnnjr5oahptsjcq6j7oume7fbn.a
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+APPEND_SLASH = False
