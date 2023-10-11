@@ -36,6 +36,7 @@ class Tool(BaseModelWithUID):
 
     class Meta:
         ordering = ("-created_at",)
+        verbose_name_plural = "Tools"
 
     def __str__(self):
         return (
@@ -55,6 +56,8 @@ class Rating(BaseModelWithUID):
 
     class Meta:
         ordering = ("created_at",)
+        verbose_name_plural = "Ratings"
+
 
 
 class Feature(BaseModelWithUID):
@@ -64,7 +67,9 @@ class Feature(BaseModelWithUID):
         return f"UID: {self.uid}, Title: {self.title}"
 
     class Meta:
-        ordering = ("created_at",)
+        ordering = ("-created_at",)
+        verbose_name_plural = "Features"
+
 
 
 class ToolsConnector(BaseModelWithUID):
@@ -77,6 +82,9 @@ class ToolsConnector(BaseModelWithUID):
     def __str__(self):
         return f"UID: {self.uid}"
 
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name_plural = "ToolsConnector"
 
 class Category(BaseModelWithUID):
     title = models.CharField(max_length=255)
@@ -84,12 +92,20 @@ class Category(BaseModelWithUID):
     def __str__(self):
         return f"UID: {self.uid}"
 
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name_plural = "Categories"
 
 class SubCategory(BaseModelWithUID):
     title = models.CharField(max_length=255)
 
     def __str__(self):
         return f"UID: {self.uid}"
+    
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name_plural = "Sub Categories"
+
 
 
 class CategoryConnector(BaseModelWithUID):
@@ -99,3 +115,8 @@ class CategoryConnector(BaseModelWithUID):
 
     def __str__(self):
         return f"UID: {self.uid}"
+    
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name_plural = "CategoryConnector"
+
