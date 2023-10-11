@@ -112,23 +112,12 @@ class SubCategory(BaseModelWithUID):
     slug = AutoSlugField(
         populate_from=get_sub_category_slug, unique=True, db_index=True
     )
+    # FK 
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"UID: {self.uid}"
-
+    
     class Meta:
         ordering = ("-created_at",)
         verbose_name_plural = "Sub Categories"
-
-
-class CategoryConnector(BaseModelWithUID):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
-    tool = models.ForeignKey(Tool, on_delete=models.CASCADE, blank=True, null=True)
-
-    def __str__(self):
-        return f"UID: {self.uid}"
-
-    class Meta:
-        ordering = ("-created_at",)
-        verbose_name_plural = "CategoryConnector"
