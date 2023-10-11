@@ -3,7 +3,14 @@ from common.models import BaseModelWithUID
 from django.db import models
 from versatileimagefield.fields import VersatileImageField
 
-from .utils import get_tool_slug, get_tools_media_path_prefix
+from .choices import ToolStatus
+from .utils import (
+    get_category_slug,
+    get_feature_slug,
+    get_sub_category_slug,
+    get_tool_slug,
+    get_tools_media_path_prefix,
+)
 
 
 class Tool(BaseModelWithUID):
@@ -18,14 +25,16 @@ class Tool(BaseModelWithUID):
     is_editor = models.BooleanField(default=False)
     is_trending = models.BooleanField(default=False)
     is_new = models.BooleanField(default=True)
-    save = models.PositiveBigIntegerField()
+    save_count = models.PositiveBigIntegerField(default=0)
     image = VersatileImageField(
         "Avatar",
         upload_to=get_tools_media_path_prefix,
         blank=True,
     )
     short_description = models.CharField(max_length=255)
-
+    status = models.CharField(
+        max_length=30, choices=ToolStatus.choices, default=ToolStatus.ACTIVE
+    )
     # Links to other external urls
     website_url = models.URLField(blank=True)
     blog_url = models.URLField(blank=True)
@@ -40,7 +49,7 @@ class Tool(BaseModelWithUID):
 
     def __str__(self):
         return (
-            f"UID: {self.uid}, Verified:{self.is_verified}, Created: {self.created_at}"
+            f"UID: {self.uid}, Created: {self.created_at}"
         )
 
 
@@ -59,9 +68,9 @@ class Rating(BaseModelWithUID):
         verbose_name_plural = "Ratings"
 
 
-
 class Feature(BaseModelWithUID):
     title = models.CharField(max_length=255)
+    slug = AutoSlugField(populate_from=get_feature_slug, unique=True, db_index=True)
 
     def __str__(self):
         return f"UID: {self.uid}, Title: {self.title}"
@@ -69,7 +78,6 @@ class Feature(BaseModelWithUID):
     class Meta:
         ordering = ("-created_at",)
         verbose_name_plural = "Features"
-
 
 
 class ToolsConnector(BaseModelWithUID):
@@ -86,8 +94,10 @@ class ToolsConnector(BaseModelWithUID):
         ordering = ("-created_at",)
         verbose_name_plural = "ToolsConnector"
 
+
 class Category(BaseModelWithUID):
     title = models.CharField(max_length=255)
+    slug = AutoSlugField(populate_from=get_category_slug, unique=True, db_index=True)
 
     def __str__(self):
         return f"UID: {self.uid}"
@@ -96,16 +106,19 @@ class Category(BaseModelWithUID):
         ordering = ("-created_at",)
         verbose_name_plural = "Categories"
 
+
 class SubCategory(BaseModelWithUID):
     title = models.CharField(max_length=255)
+    slug = AutoSlugField(
+        populate_from=get_sub_category_slug, unique=True, db_index=True
+    )
 
     def __str__(self):
         return f"UID: {self.uid}"
-    
+
     class Meta:
         ordering = ("-created_at",)
         verbose_name_plural = "Sub Categories"
-
 
 
 class CategoryConnector(BaseModelWithUID):
@@ -115,8 +128,7 @@ class CategoryConnector(BaseModelWithUID):
 
     def __str__(self):
         return f"UID: {self.uid}"
-    
+
     class Meta:
         ordering = ("-created_at",)
         verbose_name_plural = "CategoryConnector"
-
