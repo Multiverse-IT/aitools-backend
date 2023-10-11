@@ -2,7 +2,6 @@ from django.contrib import admin
 
 from .models import (
     Category,
-    CategoryConnector,
     Feature,
     Rating,
     SubCategory,
@@ -37,11 +36,6 @@ class FeatureAdmin(admin.ModelAdmin):
 
 @admin.register(Rating)
 class RatingAdmin(admin.ModelAdmin):
-    list_display = ["id", "created_at"]
-
-
-@admin.register(CategoryConnector)
-class CategoryConnectorAdmin(admin.ModelAdmin):
     list_display = ["id", "created_at"]
 
 
