@@ -71,7 +71,8 @@ THIRD_PARTY_APPS = [
     "drf_yasg",
     "rest_framework",
     "social_django",
-    "rest_framework_simplejwt"
+    "rest_framework_simplejwt",
+    "corsheaders",
 ]
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
 
@@ -89,6 +90,7 @@ AUTH_USER_MODEL = "core.User"
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
