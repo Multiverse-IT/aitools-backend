@@ -18,9 +18,12 @@ class ToolListSerializer(serializers.ModelSerializer):
             "is_trending",
             "is_new",
             "save",
+            "meta_title",
+            "meta_description",
             "image",
             "status",
             "short_description",
+            "canonical_url",
             "website_url",
             "linkedin_url",
             "facebook_url",
@@ -28,4 +31,4 @@ class ToolListSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-        read_only_fields = ["__all__"]
+        read_only_fields = ["uid","created_at"]
