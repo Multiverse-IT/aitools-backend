@@ -4,9 +4,5 @@ from ..views import category
 
 urlpatterns = [
     path("", category.CatetoryList.as_view(), name="my-category-list"),
-    path(
-        "/<slug:slug>/sub-categories",
-        category.SubCategoryList.as_view(),
-        name="sub-categories",
-    ),
+    path("/<slug:slug>", category.CategoryDetail.as_view(), name="my-category-detail"),
 ]

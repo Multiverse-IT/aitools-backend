@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 
 from .models import (
     Category,
@@ -28,10 +29,6 @@ class SubCategoryAdmin(admin.ModelAdmin):
     search_fields = ["title"]
 
 
-@admin.register(Feature)
-class FeatureAdmin(admin.ModelAdmin):
-    list_display = ["id", "title", "created_at"]
-    search_fields = ["title"]
 
 
 @admin.register(Rating)
@@ -42,3 +39,19 @@ class RatingAdmin(admin.ModelAdmin):
 @admin.register(ToolsConnector)
 class ToolsConnectorAdmin(admin.ModelAdmin):
     list_display = ["id", "created_at"]
+
+class FeatureAdminForm(forms.ModelForm):
+    class Meta:
+        model = Feature
+        exclude = []
+
+class FeatureAdmin(admin.ModelAdmin):
+    form = FeatureAdminForm
+
+@admin.register(Feature)
+class FeatureAdmin(admin.ModelAdmin):
+    list_display = ["id", "title", "created_at"]
+    search_fields = ["title"]
+
+
+# admin.site.register(Feature, FeatureAdmin)

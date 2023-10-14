@@ -1,16 +1,15 @@
+from catalogio.models import Category, SubCategory
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from catalogio.models import Category, SubCategory
-
 from ..serializers.category import (
     CatetoryListSerializer,
-    SubCatetoryListByCategorySerializer,
+    SubCatetoryListDetailSerializer,
 )
 
 
-class CatetoryList(generics.ListAPIView):
+class CatetoryList(generics.ListCreateAPIView):
     queryset = Category.objects.filter()
     serializer_class = CatetoryListSerializer
     permission_classes = []
@@ -19,13 +18,24 @@ class CatetoryList(generics.ListAPIView):
         return self.queryset
 
 
-class SubCategoryList(generics.ListAPIView):
-    queryset = SubCategory.objects.filter()
-    serializer_class = SubCatetoryListByCategorySerializer
+class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.filter()
+    serializer_class = CatetoryListSerializer
+    permission_classes = []
+    lookup_field = "slug"
+
+
+class SubCategoryList(generics.ListCreateAPIView):
+    serializer_class = SubCatetoryListDetailSerializer
 
     def get_queryset(self):
-        slug = self.kwargs.get("slug", None)
-        return self.queryset.filter(category__slug=slug)
+        return SubCategory.objects.filter()
+
+
+class SubcategoryDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = SubCategory.objects.filter()
+    serializer_class = SubCatetoryListDetailSerializer
+    lookup_field = "slug"
 
 
 class SubCategoryListWithCategoryTitle(APIView):
@@ -35,7 +45,7 @@ class SubCategoryListWithCategoryTitle(APIView):
 
         for sub_category in queryset:
             category = sub_category.category.title
-            sub_category_data = SubCatetoryListByCategorySerializer(sub_category).data
+            sub_category_data = SubCatetoryListDetailSerializer(sub_category).data
             if category not in subcategory_dict:
                 subcategory_dict[category] = []
             subcategory_dict[category].append(sub_category_data)
