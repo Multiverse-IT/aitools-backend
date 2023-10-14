@@ -11,6 +11,9 @@ class ToolList(generics.ListCreateAPIView):
     serializer_class = ToolListSerializer
 
     def get_queryset(self):
+        search = self.request.query_params.get("search", None)
+        if search:
+            return self.queryset.filter(name__icontains=search)
         return self.queryset.filter(status=ToolStatus.ACTIVE)
 
 
