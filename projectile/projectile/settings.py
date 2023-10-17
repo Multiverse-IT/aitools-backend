@@ -65,6 +65,7 @@ DJANGO_APPS = [
 PROJECT_APPS = [
     "catalogio",
     "core",
+    "search",
 ]
 
 THIRD_PARTY_APPS = [
