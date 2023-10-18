@@ -27,6 +27,7 @@ class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class SubCategoryList(generics.ListCreateAPIView):
     serializer_class = SubCatetoryListDetailSerializer
+    permission_classes = []
 
     def get_queryset(self):
         return SubCategory.objects.filter()
@@ -36,9 +37,12 @@ class SubcategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = SubCategory.objects.filter()
     serializer_class = SubCatetoryListDetailSerializer
     lookup_field = "slug"
+    permission_classes = []
 
 
 class SubCategoryListWithCategoryTitle(APIView):
+    permission_classes = []
+
     def get(self, request):
         subcategory_dict = {}
         queryset = SubCategory.objects.filter()

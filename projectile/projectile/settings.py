@@ -65,6 +65,7 @@ DJANGO_APPS = [
 PROJECT_APPS = [
     "catalogio",
     "core",
+    "search",
 ]
 
 THIRD_PARTY_APPS = [
@@ -169,12 +170,12 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
 
     ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    # "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
     ],
-    "DEFAULT_THROTTLE_RATES": {"anon": "30/minute", "user": "120/minute"},
+    "DEFAULT_THROTTLE_RATES": {"anon": "60/minute", "user": "120/minute"},
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 40,
 }
