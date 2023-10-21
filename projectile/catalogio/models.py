@@ -4,7 +4,7 @@ from common.models import BaseModelWithUID
 
 from versatileimagefield.fields import VersatileImageField
 
-from .choices import ToolStatus
+from .choices import ToolStatus, ToolKind
 from .utils import (
     get_tools_media_path_prefix,
 )
@@ -28,7 +28,7 @@ class Tool(BaseModelWithUID):
         upload_to=get_tools_media_path_prefix,
         blank=True,
     )
-    short_description = models.CharField(max_length=255)
+    short_description = models.CharField(max_length=255, blank=True)
     status = models.CharField(
         max_length=30, choices=ToolStatus.choices, default=ToolStatus.ACTIVE
     )
@@ -98,6 +98,7 @@ class ToolsConnector(BaseModelWithUID):
     feature = models.ForeignKey(
         Feature, on_delete=models.CASCADE, blank=True, null=True
     )
+    kind = models.CharField(max_length=30, choices=ToolKind.choices)
 
     def __str__(self):
         return f"UID: {self.uid}"
