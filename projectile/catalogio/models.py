@@ -48,7 +48,7 @@ class Tool(BaseModelWithUID):
         verbose_name_plural = "Tools"
 
     def __str__(self):
-        return f"UID: {self.uid}, Created: {self.created_at}"
+        return f"Slug: {self.slug}, Created: {self.created_at}"
 
 
 class Rating(BaseModelWithUID):
@@ -68,7 +68,7 @@ class Rating(BaseModelWithUID):
     canonical_url = models.URLField(blank=True)
 
     def __str__(self):
-        return f"UID: {self.uid}, Tool: {self.tool.name}"
+        return f"Slug: {self.slug}"
 
     class Meta:
         ordering = ("created_at",)
@@ -84,7 +84,7 @@ class Feature(BaseModelWithUID):
     canonical_url = models.URLField(blank=True)
 
     def __str__(self):
-        return f"UID: {self.uid}, Title: {self.title}"
+        return f"Slug: {self.slug}, Title: {self.title}"
 
     class Meta:
         ordering = ("-created_at",)
@@ -92,7 +92,6 @@ class Feature(BaseModelWithUID):
 
 
 class ToolsConnector(BaseModelWithUID):
-    slug = models.CharField(max_length=55, unique=True, db_index=True)
     tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
     rating = models.ForeignKey(Rating, on_delete=models.CASCADE, blank=True, null=True)
     feature = models.ForeignKey(
@@ -117,7 +116,7 @@ class Category(BaseModelWithUID):
     canonical_url = models.URLField(blank=True)
 
     def __str__(self):
-        return f"UID: {self.uid}"
+        return f"Slug: {self.slug}"
 
     class Meta:
         ordering = ("-created_at",)
@@ -137,7 +136,7 @@ class SubCategory(BaseModelWithUID):
     canonical_url = models.URLField(blank=True)
 
     def __str__(self):
-        return f"UID: {self.uid}"
+        return f"Slug: {self.slug}"
 
     class Meta:
         ordering = ("-created_at",)

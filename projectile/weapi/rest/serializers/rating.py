@@ -12,12 +12,11 @@ class RatingListDetaliSerializer(serializers.ModelSerializer):
         fields = [
             "slug",
             "pros",
-            "con",
+            "cons",
             "review",
             "rating",
             "meta_title",
             "meta_description",
-            "tool",
             "tool_slug",
             "canonical_url",
             "created_at",
@@ -26,7 +25,7 @@ class RatingListDetaliSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tool = validated_data.pop("tool_slug", None)
-        rating = Rating.objects.create(tool=tool, **validated_data)
+        rating = Rating.objects.create(**validated_data)
         if tool:
             rating_connector, _ = ToolsConnector.objects.get_or_create(
                 tool=tool, rating=rating, kind=ToolKind.RATING
