@@ -23,7 +23,7 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
         "slug", queryset=Category.objects.filter(), write_only=True, required=True
     )
     category = CatetoryListSerializer(read_only=True)
-
+    read_category_slug = serializers.CharField(source="category.slug",read_only=True)
     class Meta:
         model = SubCategory
         fields = [
@@ -31,6 +31,7 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
             "slug",
             "title",
             "category_slug",
+            "read_category_slug",
             "category",
             "meta_title",
             "meta_description",
@@ -42,6 +43,7 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
             "uid",
             "created_at",
             "updated_at",
+            "read_category_slug"
         ]
 
     def create(self, validated_data):
