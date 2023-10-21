@@ -26,6 +26,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "meta_title",
             "meta_description",
             "image",
+            "is_indexed",
             "feature_slug",
             "status",
             "short_description",

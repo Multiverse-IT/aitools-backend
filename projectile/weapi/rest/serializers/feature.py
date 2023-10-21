@@ -10,6 +10,7 @@ class FeatureListDetailSerializer(serializers.ModelSerializer):
             "title",
             "meta_title",
             "meta_description",
+            "is_indexed",
             "canonical_url",
             "created_at",
             "updated_at",
