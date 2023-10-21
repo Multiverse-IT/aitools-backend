@@ -1,6 +1,6 @@
 from catalogio.models import Category, SubCategory
 from rest_framework import serializers
-from rest_framework.generics import get_object_or_404
+
 
 class CatetoryListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -47,3 +47,9 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         category_slug = validated_data.pop("category_slug", None)
         return SubCategory.objects.create(category=category_slug, **validated_data)
+
+    def update(self, instance, validated_data):
+        category = validated_data.pop("category_slug", None)
+        if category:
+            validated_data["category"] = category
+        return super().update(instance, validated_data)
