@@ -62,7 +62,7 @@ class Rating(BaseModelWithUID):
     meta_description = models.TextField(blank=True)
 
     # FK
-    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
+    # tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
 
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
