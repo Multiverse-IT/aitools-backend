@@ -28,6 +28,7 @@ class Tool(BaseModelWithUID):
         upload_to=get_tools_media_path_prefix,
         blank=True,
     )
+    is_indexed = models.BooleanField(default=True)
     short_description = models.CharField(max_length=255, blank=True)
     status = models.CharField(
         max_length=30, choices=ToolStatus.choices, default=ToolStatus.ACTIVE
@@ -80,6 +81,7 @@ class Feature(BaseModelWithUID):
     slug = models.CharField(max_length=55, unique=True, db_index=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
+    is_indexed = models.BooleanField(default=True)
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
 
@@ -112,6 +114,7 @@ class Category(BaseModelWithUID):
     slug = models.CharField(max_length=55, unique=True, db_index=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
+    is_indexed = models.BooleanField(default=True)
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
 
@@ -128,6 +131,7 @@ class SubCategory(BaseModelWithUID):
     slug = models.CharField(max_length=55, unique=True, db_index=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
+    is_indexed = models.BooleanField(default=True)
 
     # FK
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
