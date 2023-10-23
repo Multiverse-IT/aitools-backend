@@ -62,9 +62,6 @@ class Rating(BaseModelWithUID):
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
 
-    # FK
-    # tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
-
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
 
@@ -133,9 +130,6 @@ class SubCategory(BaseModelWithUID):
     meta_description = models.TextField(blank=True)
     is_indexed = models.BooleanField(default=True)
 
-    # FK
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
 
@@ -145,3 +139,13 @@ class SubCategory(BaseModelWithUID):
     class Meta:
         ordering = ("-created_at",)
         verbose_name_plural = "Sub Categories"
+
+
+class ToolsCategoryConnector(BaseModelWithUID):
+    tool = models.ForeignKey(Tool, on_delete=models.CASCADE, blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
+    subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, blank=True, null=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name_plural = "Category connectors"
