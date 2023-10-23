@@ -4,7 +4,7 @@ from catalogio.models import Category, SubCategory, ToolsCategoryConnector
 from common.serializers import CategorySlimSerializer, SubCategorySlimSerializer
 
 
-class SubCategorySlimSerializer(serializers.Serializer):
+class SubCategoriesSlimSerializer(serializers.Serializer):
     name = serializers.CharField(source="subcategory.title")
     total_tools = serializers.SerializerMethodField()
 
@@ -13,7 +13,7 @@ class SubCategorySlimSerializer(serializers.Serializer):
 
 
 class CatetoryListSerializer(serializers.ModelSerializer):
-    subCategories = SubCategorySlimSerializer(
+    subCategories = SubCategoriesSlimSerializer(
         many=True, source="toolscategoryconnector_set", read_only=True
     )
 
