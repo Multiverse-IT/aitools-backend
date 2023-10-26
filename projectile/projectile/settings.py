@@ -74,6 +74,7 @@ THIRD_PARTY_APPS = [
     "versatileimagefield",
     "rest_framework_simplejwt",
     "corsheaders",
+    "django_filters",
 ]
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
 

@@ -84,6 +84,7 @@ class ToolListSerializer(serializers.ModelSerializer):
 
         if feature_slugs:
             self._extracted_from_update_9(feature_slugs, tool)
+
         if category and subcategory_slugs:
             try:
                 connectors = [
@@ -148,27 +149,3 @@ class ToolListSerializer(serializers.ModelSerializer):
             for slug in feature_slugs
         ]
         ToolsConnector.objects.bulk_create(connectors)
-
-
-"""
-
-{
-    "slug": "nnnnnnnnnnnnnnnnnnnn",
-    "name": "nnnnnnnnnnnnnnnnnnnn",
-    "is_verified": false,
-    "description": "",
-    "is_editor": false,
-    "is_trending": false,
-    "is_new": false,
-    "meta_title": "",
-    "meta_description": "",
-    "is_indexed": false,
-    "feature_slugs": ["eeee"],
-    "status": "ACTIVE",
-    "short_description": "",
-    "category_slug": "rew",
-    "subcategory_slugs": ["omgge"],
-    "twitter_url": ""
-}
-
-"""

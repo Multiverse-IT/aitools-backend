@@ -1,5 +1,5 @@
-from rest_framework import generics
 
+from rest_framework import generics
 from catalogio.choices import ToolStatus
 from catalogio.models import Tool
 
@@ -12,7 +12,20 @@ class ToolList(generics.ListCreateAPIView):
     permission_classes = []
 
     def get_queryset(self):
-        return self.queryset.filter(status=ToolStatus.ACTIVE)
+        queryset = self.queryset
+
+        search = self.request.query_params.get("search", None)
+        category = self.request.query_params.get("category", None)
+
+        if search is not None:
+            queryset = queryset.filter(
+                toolscategoryconnector__category__title__icontains=search
+            )
+
+        if category is not None:
+            queryset = queryset.filter(toolscategoryconnector__category__title=category)
+
+        return queryset
 
 
 class ToolDetail(generics.RetrieveUpdateDestroyAPIView):
