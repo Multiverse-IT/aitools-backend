@@ -1,3 +1,5 @@
+from rest_framework import serializers
+
 from catalogio.choices import ToolKind
 from catalogio.models import (
     Category,
@@ -7,14 +9,16 @@ from catalogio.models import (
     ToolsCategoryConnector,
     ToolsConnector,
 )
-from rest_framework import serializers
-
-from common.serializers import CategorySlimSerializer, SubCategorySlimSerializer
+from common.serializers import (
+    CategorySlimSerializer,
+    FeatureSlimSerializer,
+    SubCategorySlimSerializer,
+)
 
 
 class ToolListSerializer(serializers.ModelSerializer):
-    feature_slug = serializers.SlugRelatedField(
-        slug_field="slug", queryset=Feature.objects.all(), required=False, many=False
+    feature_slugs = serializers.ListField(
+        write_only=True, required=False, child=serializers.CharField()
     )
     category_slug = serializers.SlugRelatedField(
         slug_field="slug",
@@ -30,6 +34,9 @@ class ToolListSerializer(serializers.ModelSerializer):
     )
     sub_category = SubCategorySlimSerializer(
         source="toolscategoryconnector_set", many=True, read_only=True
+    )
+    feature = FeatureSlimSerializer(
+        source="toolsconnector_set", many=True, read_only=True
     )
 
     class Meta:
@@ -50,7 +57,8 @@ class ToolListSerializer(serializers.ModelSerializer):
             "meta_description",
             "image",
             "is_indexed",
-            "feature_slug",
+            "feature_slugs",
+            "feature",
             "status",
             "short_description",
             "category_slug",
@@ -68,17 +76,14 @@ class ToolListSerializer(serializers.ModelSerializer):
         read_only_fields = ["uid", "created_at"]
 
     def create(self, validated_data):
-        feature = validated_data.pop("feature_slug", None)
+        feature_slugs = validated_data.pop("feature_slugs", None)
         category = validated_data.pop("category_slug", None)
         subcategory_slugs = validated_data.pop("subcategory_slugs", [])
 
         tool = Tool.objects.create(**validated_data)
 
-        if feature:
-            feature_connector, _ = ToolsConnector.objects.get_or_create(
-                tool=tool, feature=feature, kind=ToolKind.FEATURE
-            )
-
+        if feature_slugs:
+            self._extracted_from_update_9(feature_slugs, tool)
         if category and subcategory_slugs:
             try:
                 connectors = [
@@ -92,6 +97,78 @@ class ToolListSerializer(serializers.ModelSerializer):
                 ToolsCategoryConnector.objects.bulk_create(connectors)
 
             except Exception as e:
-                print("detail:", str(e))
+                print("detail:", e)
 
         return tool
+
+    def update(self, instance, validated_data):
+        feature_slugs = validated_data.pop("feature_slugs", None)
+        category_slug = validated_data.pop("category_slug", None)
+        subcategory_slugs = validated_data.pop("subcategory_slugs", [])
+
+        if feature_slugs:
+            self._extracted_from_update_9(feature_slugs, instance)
+
+        # Update category if category_slug is provided
+        if category_slug:
+            instance.category = category_slug
+            instance.save()
+
+        # Update subcategories if subcategory_slugs are provided
+        if subcategory_slugs:
+            # First, remove existing subcategory connectors for this tool
+            instance.toolscategoryconnector_set.filter(
+                subcategory__slug__in=subcategory_slugs
+            ).delete()
+
+            # Then, create new subcategory connectors for the provided subcategory slugs
+            connectors = [
+                ToolsCategoryConnector(
+                    tool=instance,
+                    category=category_slug,
+                    subcategory=SubCategory.objects.get(slug=slug),
+                )
+                for slug in subcategory_slugs
+            ]
+            ToolsCategoryConnector.objects.bulk_create(connectors)
+
+        return super().update(instance, validated_data)
+
+    def _extracted_from_update_9(self, feature_slugs, tool):
+        features = ToolsConnector.objects.filter(
+            feature__slug__in=feature_slugs, kind=ToolKind.FEATURE
+        ).delete()
+        print("feature slugs:", feature_slugs)
+        connectors = [
+            ToolsConnector(
+                tool=tool,
+                feature=Feature.objects.filter(slug=slug).first(),
+                kind=ToolKind.FEATURE,
+            )
+            for slug in feature_slugs
+        ]
+        ToolsConnector.objects.bulk_create(connectors)
+
+
+"""
+
+{
+    "slug": "nnnnnnnnnnnnnnnnnnnn",
+    "name": "nnnnnnnnnnnnnnnnnnnn",
+    "is_verified": false,
+    "description": "",
+    "is_editor": false,
+    "is_trending": false,
+    "is_new": false,
+    "meta_title": "",
+    "meta_description": "",
+    "is_indexed": false,
+    "feature_slugs": ["eeee"],
+    "status": "ACTIVE",
+    "short_description": "",
+    "category_slug": "rew",
+    "subcategory_slugs": ["omgge"],
+    "twitter_url": ""
+}
+
+"""

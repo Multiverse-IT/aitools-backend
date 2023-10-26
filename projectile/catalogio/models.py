@@ -7,6 +7,8 @@ from versatileimagefield.fields import VersatileImageField
 from .choices import ToolStatus, ToolKind
 from .utils import (
     get_tools_media_path_prefix,
+    get_category_media_path_prefix,
+    get_subategory_media_path_prefix
 )
 
 
@@ -111,6 +113,11 @@ class Category(BaseModelWithUID):
     slug = models.CharField(max_length=55, unique=True, db_index=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
+    image = VersatileImageField(
+        "Avatar",
+        upload_to=get_category_media_path_prefix,
+        blank=True,
+    )
     is_indexed = models.BooleanField(default=True)
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
@@ -128,6 +135,11 @@ class SubCategory(BaseModelWithUID):
     slug = models.CharField(max_length=55, unique=True, db_index=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
+    image = VersatileImageField(
+        "Avatar",
+        upload_to=get_subategory_media_path_prefix,
+        blank=True,
+    )
     is_indexed = models.BooleanField(default=True)
 
     # Links to other external urls

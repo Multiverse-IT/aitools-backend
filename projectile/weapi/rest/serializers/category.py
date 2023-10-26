@@ -25,6 +25,7 @@ class CatetoryListSerializer(serializers.ModelSerializer):
             "subCategories",
             "meta_title",
             "meta_description",
+            "image",
             "is_indexed",
             "canonical_url",
             "created_at",
@@ -50,6 +51,7 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
             "category",
             "meta_title",
             "meta_description",
+            "image",
             "is_indexed",
             "canonical_url",
             "created_at",
@@ -70,8 +72,7 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
         return sub_category
 
     def update(self, instance, validated_data):
-        category = validated_data.pop("category_slug", None)
-        if category:
+        if category := validated_data.pop("category_slug", None):
             category_connector = ToolsCategoryConnector.objects.filter(
                 subcategory=instance
             ).first()
