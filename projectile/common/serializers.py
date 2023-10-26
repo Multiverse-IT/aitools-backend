@@ -29,3 +29,14 @@ class SubCategorySlimSerializer(serializers.Serializer):
     canonical_url = serializers.CharField(
         source="subcategory.canonical_url", read_only=True, required=False
     )
+
+
+class FeatureSlimSerializer(serializers.Serializer):
+    title = serializers.CharField(source="feature.title", read_only=True)
+    slug = serializers.CharField(source="feature.slug", read_only=True)
+    meta_title = serializers.CharField(source="feature.meta_title", read_only=True)
+    meta_description = serializers.CharField(
+        source="feature.meta_description", read_only=True
+    )
+    is_indexed = serializers.BooleanField(source="feature.is_indexed", read_only=True)
+    canonical_url = serializers.URLField(source="feature.canonical_url", read_only=True)
