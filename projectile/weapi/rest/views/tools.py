@@ -1,7 +1,6 @@
-
-from rest_framework import generics
 from catalogio.choices import ToolStatus
 from catalogio.models import Tool
+from rest_framework import generics
 
 from ..serializers.tools import ToolListSerializer
 
@@ -15,15 +14,18 @@ class ToolList(generics.ListCreateAPIView):
         queryset = self.queryset
 
         search = self.request.query_params.get("search", None)
-        category = self.request.query_params.get("subcategory", None)
+        subcategory = self.request.query_params.get("subcategory", [])
 
         if search is not None:
             queryset = queryset.filter(
                 toolscategoryconnector__subcategory__title__icontains=search
             )
 
-        if category is not None:
-            queryset = queryset.filter(toolscategoryconnector__subcategory__title=category)
+        if subcategory:
+            subcategories = subcategory.split(",")
+            queryset = queryset.filter(
+                toolscategoryconnector__subcategory__slug__in=subcategories
+            )
 
         return queryset
 
