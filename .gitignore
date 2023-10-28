@@ -142,3 +142,4 @@ cython_debug/
 .idea/
 .vscode
 .vscode/
+txt.py
