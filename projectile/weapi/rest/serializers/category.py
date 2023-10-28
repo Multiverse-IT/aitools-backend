@@ -4,25 +4,26 @@ from catalogio.models import Category, SubCategory, ToolsCategoryConnector
 from common.serializers import CategorySlimSerializer, SubCategorySlimSerializer
 
 
-class SubCategoriesSlimSerializer(serializers.Serializer):
-    name = serializers.CharField(source="subcategory.title")
-    total_tools = serializers.SerializerMethodField()
+class SubCategoriesSlimSerializer(serializers.ModelSerializer):
+    total_tools = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = SubCategory
+        fields = ("title", "total_tools")
 
     def get_total_tools(self, obj):
-        return obj.subcategory.toolscategoryconnector_set.count()
+        return obj.toolscategoryconnector_set.count()
 
 
 class CatetoryListSerializer(serializers.ModelSerializer):
-    subCategories = SubCategoriesSlimSerializer(
-        many=True, source="toolscategoryconnector_set", read_only=True
-    )
+    subcategory = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
         fields = [
             "slug",
             "title",
-            "subCategories",
+            "subcategory",
             "meta_title",
             "meta_description",
             "image",
@@ -32,6 +33,15 @@ class CatetoryListSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["uid", "created_at", "updated_at"]
+
+    def get_subcategory(self, obj):
+        subcategories_ids = (
+            obj.toolscategoryconnector_set.select_related("subcategory")
+            .filter()
+            .values_list("subcategory_id", flat=True)
+        ).distinct()
+        subcategories = SubCategory.objects.filter(id__in=subcategories_ids).distinct()
+        return SubCategoriesSlimSerializer(subcategories, many=True).data
 
 
 class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
