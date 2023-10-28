@@ -9,7 +9,7 @@ class SubCategoriesSlimSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SubCategory
-        fields = ("title", "total_tools")
+        fields = ("title","slug", "total_tools")
 
     def get_total_tools(self, obj):
         return obj.toolscategoryconnector_set.filter(tool__isnull=False).count()
