@@ -119,15 +119,15 @@ class ToolListSerializer(serializers.ModelSerializer):
         # Update subcategories if subcategory_slugs are provided
         if subcategory_slugs:
             # First, remove existing subcategory connectors for this tool
-            instance.toolscategoryconnector_set.filter(
-                subcategory__slug__in=subcategory_slugs
-            ).delete()
+            subcategory_connectors = instance.toolscategoryconnector_set.filter()
+            category = subcategory_connectors.first().category
+            subcategory_connectors.delete()
 
             # Then, create new subcategory connectors for the provided subcategory slugs
             connectors = [
                 ToolsCategoryConnector(
                     tool=instance,
-                    category=category_slug,
+                    category=category,
                     subcategory=SubCategory.objects.get(slug=slug),
                 )
                 for slug in subcategory_slugs
@@ -137,10 +137,14 @@ class ToolListSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def _extracted_from_update_9(self, feature_slugs, tool):
-        features = ToolsConnector.objects.filter(
-            feature__slug__in=feature_slugs, kind=ToolKind.FEATURE
+        # features = ToolsConnector.objects.filter(
+        #     feature__slug__in=feature_slugs, kind=ToolKind.FEATURE
+        # ).delete()
+        # n = tool.toolsconnector_set.filter().delete()
+        feature_connectors = tool.toolsconnector_set.filter(
+            feature__isnull=False
         ).delete()
-        print("feature slugs:", feature_slugs)
+
         connectors = [
             ToolsConnector(
                 tool=tool,
