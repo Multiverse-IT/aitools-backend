@@ -15,15 +15,15 @@ class ToolList(generics.ListCreateAPIView):
         queryset = self.queryset
 
         search = self.request.query_params.get("search", None)
-        category = self.request.query_params.get("category", None)
+        category = self.request.query_params.get("subcategory", None)
 
         if search is not None:
             queryset = queryset.filter(
-                toolscategoryconnector__category__title__icontains=search
+                toolscategoryconnector__subcategory__title__icontains=search
             )
 
         if category is not None:
-            queryset = queryset.filter(toolscategoryconnector__category__title=category)
+            queryset = queryset.filter(toolscategoryconnector__subcategory__title=category)
 
         return queryset
 
