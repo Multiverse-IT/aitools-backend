@@ -52,6 +52,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "is_editor",
             "is_trending",
             "is_new",
+            "is_featured",
             "save",
             "meta_title",
             "meta_description",
