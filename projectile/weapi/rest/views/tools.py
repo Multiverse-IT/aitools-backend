@@ -27,7 +27,7 @@ class ToolList(generics.ListCreateAPIView):
                 toolscategoryconnector__subcategory__slug__in=subcategories
             )
 
-        return queryset
+        return queryset.distinct()
 
 
 class ToolDetail(generics.RetrieveUpdateDestroyAPIView):
