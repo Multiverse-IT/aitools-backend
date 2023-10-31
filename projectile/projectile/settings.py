@@ -218,3 +218,46 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 APPEND_SLASH = False
+
+
+'''
+
+https://aitools-staging.vercel.app/
+
+if os.environ.get("ENABLE_CORS_HEADERS", False) == "True":
+    INSTALLED_APPS = [
+        "corsheaders",
+    ] + INSTALLED_APPS
+    MIDDLEWARE = [
+        "corsheaders.middleware.CorsMiddleware",
+    ] + MIDDLEWARE
+
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+        "http://localhost:4000",
+        "http://127.0.0.1:5173",
+        "https://aitools-staging.vercel.app/",
+    ]
+    CSRF_TRUSTED_ORIGINS = [
+        "http://localhost:3000",
+        "http://localhost:4000",
+        "http://127.0.0.1:5173",
+        "https://aitools-staging.vercel.app/",
+    ]
+    CORS_ALLOW_HEADERS = (
+        *default_headers,
+        "accept",
+        "authorization",
+        "content-type",
+        "user-agent",
+        "x-csrftoken",
+        "x-requested-with",
+        "x-domain",
+    )
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        r"^http://\w+\.localhost:3000",
+    ]
+    CORS_ALLOW_ALL_ORIGINS = True
+
+'''
