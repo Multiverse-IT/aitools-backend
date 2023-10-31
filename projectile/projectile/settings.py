@@ -195,7 +195,7 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://aitools-staging.vercel.app/"
+    "https://aitools-staging.vercel.app"
 ]
 
 SOCIAL_AUTH_PIPELINE = (
@@ -237,13 +237,13 @@ if os.environ.get("ENABLE_CORS_HEADERS", False) == "True":
         "http://localhost:3000",
         "http://localhost:4000",
         "http://127.0.0.1:5173",
-        "https://aitools-staging.vercel.app/",
+        "https://aitools-staging.vercel.app",
     ]
     CSRF_TRUSTED_ORIGINS = [
         "http://localhost:3000",
         "http://localhost:4000",
         "http://127.0.0.1:5173",
-        "https://aitools-staging.vercel.app/",
+        "https://aitools-staging.vercel.app",
     ]
     CORS_ALLOW_HEADERS = (
         *default_headers,
