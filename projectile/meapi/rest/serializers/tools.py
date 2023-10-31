@@ -34,7 +34,6 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "is_trending",
             "is_new",
             "is_featured",
-            "love",
             "save_count",
             "meta_title",
             "meta_description",
