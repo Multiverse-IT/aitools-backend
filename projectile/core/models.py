@@ -10,7 +10,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from versatileimagefield.fields import VersatileImageField
 
-from .choices import UserGender, UserStatus
+from .choices import UserGender, UserStatus, UserRole
 from .managers import CustomUserManager
 from .utils import get_user_media_path_prefix, get_user_slug
 
@@ -38,7 +38,9 @@ class User(AbstractUser, BaseModelWithUID):
         max_length=20, blank=True, null=True, choices=UserGender.choices, db_index=True
     )
     date_of_birth = models.DateField(null=True, blank=True)
-
+    role = models.CharField(
+        max_length=30, choices=UserRole.choices, default=UserRole.INITIATOR
+    )
     # Other links
     website_url = models.URLField(blank=True)
     blog_url = models.URLField(blank=True)
