@@ -75,6 +75,7 @@ urlpatterns = [
     ),
     path("api/v1", include("core.rest.urls.users")),
     path("api/v1/we", include("weapi.rest.urls")),
+    path("api/v1/me", include("meapi.rest.urls")),
     path("adminium/", admin.site.urls),
 ]
 
