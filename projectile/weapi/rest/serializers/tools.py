@@ -42,7 +42,6 @@ class ToolListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
         fields = [
-            "uid",
             "slug",
             "name",
             "is_verified",
@@ -53,7 +52,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "is_trending",
             "is_new",
             "is_featured",
-            "save",
+            "save_count",
             "meta_title",
             "meta_description",
             "image",
