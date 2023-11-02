@@ -11,3 +11,9 @@ class ToolStatus(models.TextChoices):
 class ToolKind(models.TextChoices):
     FEATURE = "FEATUER", "Feature"
     RATING = "RATING", "Rating"
+
+
+class RequestToolStatus(models.TextChoices):
+    PENDING = "PENDING", "Pending"
+    APPROVED = "APPROVED", "Approved"
+    REJECTED = "REJECTED", "Rejected"

@@ -1,16 +1,17 @@
+from rest_framework import generics, permissions
 
 from catalogio.choices import ToolStatus
-from catalogio.models import Tool
-from rest_framework import generics
+from catalogio.models import SavedTool, Tool
+from catalogio.permissions import IsAuthenticatedOrReadOnlyForUserTool
 
 from ..serializers.tools import PublicTooDetailSerializer, PublicToolListSerializer
 
 
-class PublicToolList(generics.ListAPIView):
+class PublicToolList(generics.ListCreateAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
     serializer_class = PublicToolListSerializer
-    permission_classes = []
-
+    permission_classes = [IsAuthenticatedOrReadOnlyForUserTool]
+    
     def get_queryset(self):
         queryset = self.queryset
 
@@ -30,10 +31,21 @@ class PublicToolList(generics.ListAPIView):
 
         return queryset.distinct()
 
-from rest_framework import permissions
 
 class PublicToolDetail(generics.RetrieveUpdateAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
     serializer_class = PublicTooDetailSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     lookup_field = "slug"
+
+
+class UserLoveToolList(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PublicTooDetailSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        save_tool_ids = SavedTool.objects.filter(user=user).values_list(
+            "save_tool_id", flat=True
+        )
+        return Tool.objects.filter(id__in=save_tool_ids)

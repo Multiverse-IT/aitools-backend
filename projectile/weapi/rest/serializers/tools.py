@@ -1,11 +1,10 @@
-from rest_framework import serializers
-
-from catalogio.choices import ToolKind
+from catalogio.choices import RequestToolStatus, ToolKind, ToolStatus
 from catalogio.models import (
     Category,
     Feature,
     SubCategory,
     Tool,
+    ToolRequest,
     ToolsCategoryConnector,
     ToolsConnector,
 )
@@ -14,6 +13,7 @@ from common.serializers import (
     FeatureSlimSerializer,
     SubCategorySlimSerializer,
 )
+from rest_framework import serializers
 
 
 class ToolListSerializer(serializers.ModelSerializer):
@@ -60,6 +60,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "feature_slugs",
             "feature",
             "status",
+            "requested",
             "short_description",
             "category_slug",
             "category",
@@ -153,3 +154,18 @@ class ToolListSerializer(serializers.ModelSerializer):
             for slug in feature_slugs
         ]
         ToolsConnector.objects.bulk_create(connectors)
+
+
+class ToolRequestDetalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ToolRequest
+        fields = ("status",)
+
+    def update(self, instance, validated_data):
+        status = validated_data.get("status", None)
+
+        if status == RequestToolStatus.APPROVED:
+            instance.status = ToolStatus.ACTIVE
+            instance.save()
+            
+        return super().update(instance, validated_data)

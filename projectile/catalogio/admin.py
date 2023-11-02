@@ -8,7 +8,8 @@ from .models import (
     SubCategory,
     Tool,
     ToolsConnector,
-    ToolsCategoryConnector
+    ToolsCategoryConnector,
+    ToolRequest
 )
 
 
@@ -59,4 +60,4 @@ class FeatureAdmin(admin.ModelAdmin):
     search_fields = ["title"]
 
 
-# admin.site.register(Feature, FeatureAdmin)
+admin.site.register(ToolRequest)
