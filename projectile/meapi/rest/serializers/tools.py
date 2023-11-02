@@ -1,16 +1,33 @@
-from rest_framework import serializers
-
+from catalogio.choices import ToolKind, ToolStatus
 from catalogio.models import (
+    Category,
+    SavedTool,
+    SubCategory,
     Tool,
+    ToolRequest,
+    ToolsCategoryConnector,
 )
 from common.serializers import (
     CategorySlimSerializer,
     FeatureSlimSerializer,
     SubCategorySlimSerializer,
 )
+from rest_framework import serializers
 
 
 class PublicToolListSerializer(serializers.ModelSerializer):
+    feature_slugs = serializers.ListField(
+        write_only=True, required=False, child=serializers.CharField()
+    )
+    category_slug = serializers.SlugRelatedField(
+        slug_field="slug",
+        queryset=Category.objects.all(),
+        write_only=True,
+        required=False,
+    )
+    subcategory_slugs = serializers.ListField(
+        write_only=True, required=False, child=serializers.CharField()
+    )
     category = CategorySlimSerializer(
         source="toolscategoryconnector_set.first", read_only=True
     )
@@ -38,11 +55,15 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "meta_title",
             "meta_description",
             "image",
+            "requested",
             "is_indexed",
+            "feature_slugs",
             "feature",
             "status",
             "short_description",
+            "category_slug",
             "category",
+            "subcategory_slugs",
             "sub_category",
             "canonical_url",
             "website_url",
@@ -52,7 +73,40 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-        read_only_fields = ["__all__"]
+        read_only_fields = ["uid", "status","requested", "created_at"]
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        feature_slugs = validated_data.pop("feature_slugs", None)
+        category = validated_data.pop("category_slug", None)
+        subcategory_slugs = validated_data.pop("subcategory_slugs", [])
+        # requested = validated_data.get("requested")
+
+        tool = Tool.objects.create(requested=True, status=ToolStatus.PENDING, **validated_data)
+        
+        if tool.requested == True:
+            ToolRequest.objects.create(tool=tool, user=user)
+
+        if feature_slugs:
+            self._extracted_from_update_9(feature_slugs, tool)
+
+        if category and subcategory_slugs:
+            try:
+                connectors = [
+                    ToolsCategoryConnector(
+                        tool=tool,
+                        category=category,
+                        subcategory=SubCategory.objects.get(slug=slug),
+                    )
+                    for slug in subcategory_slugs
+                ]
+                ToolsCategoryConnector.objects.bulk_create(connectors)
+
+            except Exception as e:
+                print("detail:", e)
+
+        return tool
+
 
 class PublicTooDetailSerializer(serializers.ModelSerializer):
     category = CategorySlimSerializer(
@@ -125,10 +179,15 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
+        user = self.context["request"].user
         save_count = validated_data.get("save_count")
-        
+
         if save_count is not None:
             instance.save_count = save_count
             instance.save()
-        
+
+            saved_tool_obj, _ = SavedTool.objects.get_or_create(
+                save_tool=instance, user=user
+            )
+
         return instance

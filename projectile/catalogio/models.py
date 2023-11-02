@@ -1,15 +1,17 @@
-from django.db import models
-
 from common.models import BaseModelWithUID
-
+from django.contrib.auth import get_user_model
+from django.db import models
 from versatileimagefield.fields import VersatileImageField
 
-from .choices import ToolStatus, ToolKind
+from .choices import RequestToolStatus, ToolKind, ToolStatus
 from .utils import (
-    get_tools_media_path_prefix,
     get_category_media_path_prefix,
-    get_subategory_media_path_prefix
+    get_subategory_media_path_prefix,
+    get_tools_media_path_prefix,
 )
+from .managers import ToolQuerySet
+
+User = get_user_model()
 
 
 class Tool(BaseModelWithUID):
@@ -30,6 +32,8 @@ class Tool(BaseModelWithUID):
         upload_to=get_tools_media_path_prefix,
         blank=True,
     )
+    requested = models.BooleanField(default=False)
+
     is_indexed = models.BooleanField(default=True)
     short_description = models.CharField(max_length=255, blank=True)
     status = models.CharField(
@@ -46,6 +50,8 @@ class Tool(BaseModelWithUID):
     instagram_url = models.URLField(blank=True)
     facebook_url = models.URLField(blank=True)
     twitter_url = models.URLField(blank=True)
+
+    objects = ToolQuerySet.as_manager()
 
     class Meta:
         ordering = ("-created_at",)
@@ -156,9 +162,39 @@ class SubCategory(BaseModelWithUID):
 
 class ToolsCategoryConnector(BaseModelWithUID):
     tool = models.ForeignKey(Tool, on_delete=models.CASCADE, blank=True, null=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
-    subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, blank=True, null=True)
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, blank=True, null=True
+    )
+    subcategory = models.ForeignKey(
+        SubCategory, on_delete=models.CASCADE, blank=True, null=True
+    )
 
     class Meta:
         ordering = ("-created_at",)
         verbose_name_plural = "Category connectors"
+
+
+class SavedTool(BaseModelWithUID):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    love_tool = models.ForeignKey(
+        Tool, on_delete=models.SET_NULL, null=True, blank=True, related_name="love_tool"
+    )
+    save_tool = models.ForeignKey(
+        Tool, on_delete=models.SET_NULL, null=True, blank=True, related_name="save_tool"
+    )
+
+    def __str__(self):
+        return f"USER: {self.user.get_name()}"
+
+
+class ToolRequest(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
+    status = models.CharField(
+        choices=RequestToolStatus.choices,
+        default=RequestToolStatus.PENDING,
+        max_length=30,
+    )
+
+    def __str__(self):
+        return f"User: {self.user.get_name()}-Tool: {self.tool.name}"
