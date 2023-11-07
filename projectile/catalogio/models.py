@@ -74,6 +74,9 @@ class Rating(BaseModelWithUID):
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
 
+    # FKs 
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)  # Add this line to link ratings to users
+
     def __str__(self):
         return f"Slug: {self.slug}"
 

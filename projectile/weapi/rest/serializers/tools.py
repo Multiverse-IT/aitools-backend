@@ -12,6 +12,7 @@ from common.serializers import (
     CategorySlimSerializer,
     FeatureSlimSerializer,
     SubCategorySlimSerializer,
+    RatingSlimSerializer,
 )
 from rest_framework import serializers
 
@@ -36,6 +37,9 @@ class ToolListSerializer(serializers.ModelSerializer):
         source="toolscategoryconnector_set", many=True, read_only=True
     )
     feature = FeatureSlimSerializer(
+        source="toolsconnector_set", many=True, read_only=True
+    )
+    ratings = RatingSlimSerializer(
         source="toolsconnector_set", many=True, read_only=True
     )
 
@@ -66,6 +70,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "category",
             "subcategory_slugs",
             "sub_category",
+            "ratings",
             "canonical_url",
             "website_url",
             "linkedin_url",

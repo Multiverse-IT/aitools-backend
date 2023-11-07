@@ -40,3 +40,18 @@ class FeatureSlimSerializer(serializers.Serializer):
     )
     is_indexed = serializers.BooleanField(source="feature.is_indexed", read_only=True)
     canonical_url = serializers.URLField(source="feature.canonical_url", read_only=True)
+
+
+class RatingSlimSerializer(serializers.Serializer):
+    slug = serializers.CharField(source="rating.slug", read_only=True)
+    pros = serializers.CharField(source="rating.pros", read_only=True)
+    cons = serializers.CharField(source="rating.cons", read_only=True)
+    review = serializers.CharField(source="rating.review", read_only=True)
+    rating = serializers.DecimalField(source="rating.rating", read_only=True, max_digits=2, decimal_places=1)
+
+    meta_title = serializers.CharField(source="rating.meta_title", read_only=True)
+    meta_description = serializers.CharField(
+        source="rating.meta_description", read_only=True
+    )
+    # Links to other external urls
+    canonical_url = serializers.URLField(source="rating.canonical_url", read_only=True)

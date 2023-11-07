@@ -11,7 +11,7 @@ class RatingList(generics.ListCreateAPIView):
     permission_classes = []
 
 
-class RatingDetail(generics.ListCreateAPIView):
+class RatingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Rating.objects.filter()
     serializer_class = RatingListDetaliSerializer
     permission_classes = []

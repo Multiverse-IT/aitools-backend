@@ -5,7 +5,7 @@ from catalogio.models import Rating, Tool, ToolsConnector
 
 from core.rest.serializers.users import UserSerializerList
 
-class RatingListDetaliSerializer(serializers.ModelSerializer):
+class MeRatingListDetaliSerializer(serializers.ModelSerializer):
     tool_slug = serializers.SlugRelatedField(
         slug_field="slug", queryset=Tool.objects.all(), many=False, required=False
     )
@@ -28,10 +28,12 @@ class RatingListDetaliSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
+        user = self.context["request"].user
         tool = validated_data.pop("tool_slug", None)
-        rating = Rating.objects.create(**validated_data)
+        rating = Rating.objects.create(user=user, **validated_data)
         if tool:
             rating_connector, _ = ToolsConnector.objects.get_or_create(
                 tool=tool, rating=rating, kind=ToolKind.RATING
             )
+            print("rattings con:", rating_connector)
         return rating

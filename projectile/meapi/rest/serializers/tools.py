@@ -11,6 +11,7 @@ from common.serializers import (
     CategorySlimSerializer,
     FeatureSlimSerializer,
     SubCategorySlimSerializer,
+    RatingSlimSerializer
 )
 from rest_framework import serializers
 
@@ -37,7 +38,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
     feature = FeatureSlimSerializer(
         source="toolsconnector_set", many=True, read_only=True
     )
-
+    ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
     class Meta:
         model = Tool
         fields = [
@@ -60,6 +61,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "feature_slugs",
             "feature",
             "status",
+            "ratings",
             "short_description",
             "category_slug",
             "category",
@@ -118,6 +120,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
     feature = FeatureSlimSerializer(
         source="toolsconnector_set", many=True, read_only=True
     )
+    ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
 
     class Meta:
         model = Tool
@@ -139,6 +142,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "is_indexed",
             "feature",
             "status",
+            "ratings",
             "short_description",
             "category",
             "sub_category",
