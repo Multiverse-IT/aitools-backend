@@ -81,6 +81,12 @@ class ToolListSerializer(serializers.ModelSerializer):
 
         read_only_fields = ["uid", "created_at"]
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['feature'] = [feature for feature in data['feature'] if feature]
+        data['ratings'] = [rating for rating in data['ratings'] if rating]
+        return data
+    
     def create(self, validated_data):
         feature_slugs = validated_data.pop("feature_slugs", None)
         category = validated_data.pop("category_slug", None)

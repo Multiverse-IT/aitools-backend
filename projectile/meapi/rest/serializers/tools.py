@@ -76,7 +76,18 @@ class PublicToolListSerializer(serializers.ModelSerializer):
         ]
 
         read_only_fields = ["uid", "status","requested", "created_at"]
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
 
+        # Filter out empty features
+        data['feature'] = [feature for feature in data['feature'] if feature]
+
+        # Filter out empty ratings
+        data['ratings'] = [rating for rating in data['ratings'] if rating]
+
+        return data
+    
     def create(self, validated_data):
         user = self.context["request"].user
         feature_slugs = validated_data.pop("feature_slugs", None)
