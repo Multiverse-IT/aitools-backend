@@ -41,6 +41,11 @@ class User(AbstractUser, BaseModelWithUID):
     role = models.CharField(
         max_length=30, choices=UserRole.choices, default=UserRole.INITIATOR
     )
+    # extra field for google auth 
+    iid = models.CharField(max_length=255, blank=True)
+    exp = models.CharField(max_length=255, blank=True)
+    sub = models.CharField(max_length=255, blank=True)
+
     # Other links
     website_url = models.URLField(blank=True)
     blog_url = models.URLField(blank=True)
