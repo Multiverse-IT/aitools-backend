@@ -54,6 +54,9 @@ class PublicUserRegisterSerializer(serializers.ModelSerializer):
             "email",
             "image",
             "iid", 
+            "iat",
+            "jti",
+            "picture",
             "exp",
             "sub",
         ]
