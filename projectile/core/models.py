@@ -16,6 +16,7 @@ from .utils import get_user_media_path_prefix, get_user_slug
 
 
 class User(AbstractUser, BaseModelWithUID):
+    id = models.CharField(primary_key=True, max_length=255, unique=True)
     email = models.EmailField(unique=True, db_index=True)
     city = models.CharField(max_length=50, blank=True)
     country = models.CharField(max_length=50, db_index=True)
@@ -42,7 +43,6 @@ class User(AbstractUser, BaseModelWithUID):
         max_length=30, choices=UserRole.choices, default=UserRole.INITIATOR
     )
     # extra field for google auth 
-    iid = models.CharField(max_length=255, blank=True)
     exp = models.CharField(max_length=255, blank=True)
     sub = models.CharField(max_length=255, blank=True)
     iat = models.CharField(max_length=255, blank=True)
