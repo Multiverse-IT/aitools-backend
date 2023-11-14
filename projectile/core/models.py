@@ -24,11 +24,12 @@ class User(AbstractUser, BaseModelWithUID):
     phone = PhoneNumberField(unique=True, blank=True, null=True)
     description = models.TextField(null=True, blank=True)
     slug = AutoSlugField(populate_from=get_user_slug, unique=True, db_index=True)
-    image = VersatileImageField(
+    avatar = VersatileImageField(
         "Avatar",
         upload_to=get_user_media_path_prefix,
         blank=True,
     )
+    image = models.CharField(max_length=255, blank=True)
     status = models.CharField(
         max_length=20,
         choices=UserStatus.choices,
@@ -47,11 +48,7 @@ class User(AbstractUser, BaseModelWithUID):
     sub = models.CharField(max_length=255, blank=True)
     iat = models.CharField(max_length=255, blank=True)
     jti = models.CharField(max_length=255, blank=True)
-    picture = VersatileImageField(
-        "Picture",
-        upload_to=get_user_media_path_prefix,
-        blank=True,
-    )
+    picture = models.CharField(max_length=255,blank=True)
     # Other links
     website_url = models.URLField(blank=True)
     blog_url = models.URLField(blank=True)
