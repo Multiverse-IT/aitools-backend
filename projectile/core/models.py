@@ -16,8 +16,8 @@ from .utils import get_user_media_path_prefix, get_user_slug
 
 
 class User(AbstractUser, BaseModelWithUID):
-    id = models.CharField(primary_key=True, max_length=255, unique=True)
-    email = models.EmailField(unique=True, db_index=True)
+    id = models.CharField(primary_key=True, max_length=255)
+    email = models.EmailField(db_index=True)
     city = models.CharField(max_length=50, blank=True)
     country = models.CharField(max_length=50, db_index=True)
     language = models.CharField(max_length=2, default="en")
