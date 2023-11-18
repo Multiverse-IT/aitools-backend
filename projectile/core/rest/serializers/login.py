@@ -44,15 +44,14 @@ class PublicUserLoginSerializer(serializers.Serializer):
 
 class PublicUserRegisterSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=50, write_only=True)
-    iid = serializers.CharField(write_only=True)
-    name = serializers.SerializerMethodField(read_only=True)
+    last_name = serializers.CharField(max_length=50, write_only=True)
+
     class Meta:
         model = User
         fields = [
-            "iid", 
             "id",
             "first_name",
-            "name",
+            "last_name",
             "email",
             "image",
             "iat",
@@ -61,22 +60,4 @@ class PublicUserRegisterSerializer(serializers.ModelSerializer):
             "exp",
             "sub",
         ]
-        read_only_fields = ["id"]
-
-    def get_name(self, instance):
-        return instance.first_name
-    
-    def create(self, validated_data):
-        iid = validated_data.pop("iid")
-        name = validated_data.pop("first_name")
-        username = f"user_{iid}"
-
-        try:
-            user = User.objects.get(id=iid)
-        except:
-            validated_data["username"] = username
-            validated_data["id"]=iid
-            validated_data["first_name"] = name
-            user = super().create(validated_data)
-
-        return user
+       

@@ -16,20 +16,18 @@ from .utils import get_user_media_path_prefix, get_user_slug
 
 
 class User(AbstractUser, BaseModelWithUID):
-    id = models.CharField(primary_key=True, max_length=255)
-    email = models.EmailField(db_index=True)
+    email = models.EmailField(unique=True, db_index=True)
     city = models.CharField(max_length=50, blank=True)
     country = models.CharField(max_length=50, db_index=True)
     language = models.CharField(max_length=2, default="en")
-    phone = PhoneNumberField(unique=True, blank=True, null=True)
+    phone = PhoneNumberField(blank=True, null=True)
     description = models.TextField(null=True, blank=True)
     slug = AutoSlugField(populate_from=get_user_slug, unique=True, db_index=True)
-    avatar = VersatileImageField(
+    Image = VersatileImageField(
         "Avatar",
         upload_to=get_user_media_path_prefix,
         blank=True,
     )
-    image = models.CharField(max_length=255, blank=True)
     status = models.CharField(
         max_length=20,
         choices=UserStatus.choices,
@@ -43,12 +41,6 @@ class User(AbstractUser, BaseModelWithUID):
     role = models.CharField(
         max_length=30, choices=UserRole.choices, default=UserRole.INITIATOR
     )
-    # extra field for google auth 
-    exp = models.CharField(max_length=255, blank=True)
-    sub = models.CharField(max_length=255, blank=True)
-    iat = models.CharField(max_length=255, blank=True)
-    jti = models.CharField(max_length=255, blank=True)
-    picture = models.CharField(max_length=255,blank=True)
     # Other links
     website_url = models.URLField(blank=True)
     blog_url = models.URLField(blank=True)
