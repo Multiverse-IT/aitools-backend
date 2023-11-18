@@ -45,7 +45,6 @@ class User(AbstractUser, BaseModelWithUID):
     )
     image = models.CharField(max_length=255, blank=True)
     # extra field 
-    iid = models.CharField(max_length=255, blank=True)
     exp = models.CharField(max_length=255, blank=True)
     sub = models.CharField(max_length=255, blank=True)
     iat = models.CharField(max_length=255, blank=True)

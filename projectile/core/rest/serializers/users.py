@@ -17,6 +17,10 @@ class UserSerializerList(serializers.ModelSerializer):
             "avatar",
             "status",
             "gender",
+            "exp",
+            "sub",
+            "iat",
+            "jti",
             "date_of_birth",
             "created_at",
             "updated_at"

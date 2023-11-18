@@ -4,6 +4,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 
 from core.models import User
+from core.choices import UserStatus
+
 from core.utils import get_tokens_for_user
 
 from .users import UserSerializerList
@@ -77,11 +79,12 @@ class PublicUserRegisterSerializer(serializers.ModelSerializer):
         username = f"user_{iid}"
 
         try:
-            user = User.objects.get(id=iid)
+            user = User.objects.get(id=int(iid))
         except:
             validated_data["username"] = username
             validated_data["id"]=iid
             validated_data["first_name"] = name
+            validated_data["status"] = UserStatus.ACTIVE
             user = super().create(validated_data)
 
         return user
