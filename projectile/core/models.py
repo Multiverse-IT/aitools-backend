@@ -23,8 +23,8 @@ class User(AbstractUser, BaseModelWithUID):
     phone = PhoneNumberField(blank=True, null=True)
     description = models.TextField(null=True, blank=True)
     slug = AutoSlugField(populate_from=get_user_slug, unique=True, db_index=True)
-    Image = VersatileImageField(
-        "Avatar",
+    avatar = VersatileImageField(
+        "Image",
         upload_to=get_user_media_path_prefix,
         blank=True,
     )

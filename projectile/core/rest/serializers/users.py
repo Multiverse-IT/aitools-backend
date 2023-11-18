@@ -14,7 +14,7 @@ class UserSerializerList(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "description",
-            "image",
+            "avatar",
             "status",
             "gender",
             "date_of_birth",

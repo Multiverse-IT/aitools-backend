@@ -49,15 +49,12 @@ class PublicUserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            "id",
+            "slug",
             "first_name",
             "last_name",
             "email",
-            "image",
-            "iat",
-            "jti",
-            "picture",
-            "exp",
-            "sub",
+            "avatar",
+            "created_at",
+            "updated_at"
         ]
        
