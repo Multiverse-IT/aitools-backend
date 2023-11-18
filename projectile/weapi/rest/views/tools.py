@@ -17,6 +17,7 @@ class ToolList(generics.ListCreateAPIView):
         subcategory = self.request.query_params.get("subcategory", [])
         requested = self.request.query_params.get("requested", None)
         features = self.request.query_params.get("features", [])
+        trending = self.request.query_params.get("trending",None)
 
         if search is not None:
             queryset = queryset.filter(
@@ -31,6 +32,9 @@ class ToolList(generics.ListCreateAPIView):
 
         if requested:
             queryset = queryset.filter(requested=requested)
+
+        if trending:
+            queryset = queryset.filter(is_trending=trending)
 
         if features:
             features = features.split(",")
