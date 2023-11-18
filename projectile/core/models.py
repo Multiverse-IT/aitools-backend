@@ -41,6 +41,11 @@ class User(AbstractUser, BaseModelWithUID):
     role = models.CharField(
         max_length=30, choices=UserRole.choices, default=UserRole.INITIATOR
     )
+    image = VersatileImageField(
+        "Image",
+        upload_to=get_user_media_path_prefix,
+        blank=True,
+    )
     # Other links
     website_url = models.URLField(blank=True)
     blog_url = models.URLField(blank=True)
