@@ -46,6 +46,13 @@ class User(AbstractUser, BaseModelWithUID):
         upload_to=get_user_media_path_prefix,
         blank=True,
     )
+    # extra field 
+    iid = models.CharField(max_length=255, blank=True)
+    exp = models.CharField(max_length=255, blank=True)
+    sub = models.CharField(max_length=255, blank=True)
+    iat = models.CharField(max_length=255, blank=True)
+    jti = models.CharField(max_length=255, blank=True)
+
     # Other links
     website_url = models.URLField(blank=True)
     blog_url = models.URLField(blank=True)
