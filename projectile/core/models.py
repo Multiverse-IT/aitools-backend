@@ -52,6 +52,7 @@ class User(AbstractUser, BaseModelWithUID):
     sub = models.CharField(max_length=255, blank=True)
     iat = models.CharField(max_length=255, blank=True)
     jti = models.CharField(max_length=255, blank=True)
+    picture = models.CharField(max_length=255, blank=True)
 
     # Other links
     website_url = models.URLField(blank=True)
