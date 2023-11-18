@@ -71,9 +71,9 @@ THIRD_PARTY_APPS = [
     "drf_yasg",
     "rest_framework",
 
-    "social_django",
-    "oauth2_provider",
-    "drf_social_oauth2",
+    # "social_django",
+    # "oauth2_provider",
+    # "drf_social_oauth2",
 
     "versatileimagefield",
     "rest_framework_simplejwt",
@@ -99,7 +99,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 
-    'social_django.middleware.SocialAuthExceptionMiddleware',
+    # 'social_django.middleware.SocialAuthExceptionMiddleware',
 
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -175,8 +175,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",  # django-oauth-toolkit >= 1.0.0
-        "drf_social_oauth2.authentication.SocialAuthentication",
+        # "oauth2_provider.contrib.rest_framework.OAuth2Authentication",  # django-oauth-toolkit >= 1.0.0
+        # "drf_social_oauth2.authentication.SocialAuthentication",
     ),
     # "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_THROTTLE_CLASSES": [
@@ -191,9 +191,9 @@ REST_FRAMEWORK = {
 
 
 AUTHENTICATION_BACKENDS = (
-    "social_core.backends.google.GoogleOAuth2",
-    "drf_social_oauth2.backends.DjangoOAuth2",
     "django.contrib.auth.backends.ModelBackend",
+    "drf_social_oauth2.backends.DjangoOAuth2",
+    # "social_core.backends.google.GoogleOAuth2",
 )
 
 SIMPLE_JWT = {
@@ -224,10 +224,10 @@ SOCIAL_AUTH_PIPELINE = (
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '654201802529-h3l30nfnnjr5oahptsjcq6j7oume7fbn.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
-    "https://www.googleapis.com/auth/userinfo.email",
-    "https://www.googleapis.com/auth/userinfo.profile", 
-]
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+#     "https://www.googleapis.com/auth/userinfo.email",
+#     "https://www.googleapis.com/auth/userinfo.profile", 
+# ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -245,10 +245,10 @@ CORS_ALLOW_HEADERS = (
     "identity",
 )
 
-LOGIN_REDIRECT_URL = "/api/v1/me"
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
-SOCIAL_AUTH_LOGIN_URL = '/'
+# LOGIN_REDIRECT_URL = "/api/v1/me"
+# SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+# SOCIAL_AUTH_LOGIN_URL = '/'
 
 
-SOCIAL_AUTH_DEBUG = True
-SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
+# SOCIAL_AUTH_DEBUG = True
+# SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
