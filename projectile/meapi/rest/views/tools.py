@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import generics, permissions
 
 from catalogio.choices import ToolStatus
@@ -55,3 +57,11 @@ class UserLoveToolList(generics.ListAPIView):
             "save_tool_id", flat=True
         )
         return Tool.objects.filter(id__in=save_tool_ids)
+
+
+class PublicToolTodayList(generics.ListAPIView):
+    serializer_class = PublicToolListSerializer
+
+    def get_queryset(self):
+        today = datetime.now().date()
+        return Tool.objects.filter(created_at__date=today, status=ToolStatus.ACTIVE)
