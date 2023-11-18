@@ -41,11 +41,7 @@ class User(AbstractUser, BaseModelWithUID):
     role = models.CharField(
         max_length=30, choices=UserRole.choices, default=UserRole.INITIATOR
     )
-    image = VersatileImageField(
-        "Image",
-        upload_to=get_user_media_path_prefix,
-        blank=True,
-    )
+    image = models.CharField(max_length=255, blank=True)
     # extra field 
     iid = models.CharField(max_length=255, blank=True)
     exp = models.CharField(max_length=255, blank=True)
