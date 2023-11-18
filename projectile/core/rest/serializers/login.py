@@ -47,6 +47,7 @@ class PublicUserLoginSerializer(serializers.Serializer):
 class PublicUserRegisterSerializer(serializers.ModelSerializer):
     f_name = serializers.CharField(max_length=50, write_only=True)
     iid = serializers.CharField(write_only=True)
+    e_mail = serializers.EmailField(write_only=True)
     name = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = User
@@ -55,8 +56,8 @@ class PublicUserRegisterSerializer(serializers.ModelSerializer):
             "id",
             "slug",
             "f_name",
+            "e_mail",
             "name",
-            "email",
             "email",
             "image",
             "iat",
@@ -68,13 +69,14 @@ class PublicUserRegisterSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at"
         ]
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "email"]
 
     def get_name(self, instance):
         return instance.first_name
 
     def create(self, validated_data):
         iid = validated_data.pop("iid")
+        e_mail = validated_data.pop("e_mail")
         name = validated_data.pop("f_name")
         username = f"user_{iid}"
 
@@ -83,6 +85,7 @@ class PublicUserRegisterSerializer(serializers.ModelSerializer):
         except:
             validated_data["username"] = username
             validated_data["id"]=iid
+            validated_data["email"] = e_mail
             validated_data["first_name"] = name
             validated_data["status"] = UserStatus.ACTIVE
             user = super().create(validated_data)
