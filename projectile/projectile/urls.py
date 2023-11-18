@@ -77,6 +77,10 @@ urlpatterns = [
     path("api/v1/we", include("weapi.rest.urls")),
     path("api/v1/me", include("meapi.rest.urls")),
     path("adminium/", admin.site.urls),
+
+    # social auth
+    path("auth/", include("drf_social_oauth2.urls")),
+    path("social/", include("social_django.urls")),
 ]
 
 
