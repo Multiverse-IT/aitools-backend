@@ -21,6 +21,8 @@ class UserSerializerList(serializers.ModelSerializer):
             "sub",
             "iat",
             "jti",
+            "image",
+            "picture",
             "date_of_birth",
             "created_at",
             "updated_at"
