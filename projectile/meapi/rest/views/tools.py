@@ -1,12 +1,16 @@
 from datetime import datetime
 
-from rest_framework import generics, permissions
 from django.db.models import Q, F
+
+from rest_framework import generics, permissions
 
 from catalogio.choices import ToolStatus
 from catalogio.models import SavedTool, Tool
 from catalogio.permissions import IsAuthenticatedOrReadOnlyForUserTool
+
+ 
 from search.models import Keyword, KeywordSearch
+
 from ..serializers.tools import PublicTooDetailSerializer, PublicToolListSerializer
 
 
@@ -55,10 +59,10 @@ class PublicToolList(generics.ListCreateAPIView):
                         keyword_search.search_count = F('search_count') + 1
                         keyword_search.save()
 
-        if search is not None:
-            queryset = queryset.filter(
-                toolscategoryconnector__subcategory__title__icontains=search
-            )
+        # if search is not None:
+        #     queryset = queryset.filter(
+        #         toolscategoryconnector__subcategory__title__icontains=search
+        #     )
 
         if subcategory:
             subcategories = subcategory.split(",")

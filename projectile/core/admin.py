@@ -33,6 +33,7 @@ class UserAdmin(UserAdmin):
                     "image",
                     "gender",
                     "status",
+                    "role",
                     "date_of_birth",
                 )
             },

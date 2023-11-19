@@ -1,13 +1,17 @@
-from django.db import models
-
 from common.models import BaseModelWithUID
-
+from django.contrib.auth import get_user_model
+from django.db import models
 from versatileimagefield.fields import VersatileImageField
 
-from .choices import ToolStatus
+from .choices import RequestToolStatus, ToolKind, ToolStatus
 from .utils import (
+    get_category_media_path_prefix,
+    get_subategory_media_path_prefix,
     get_tools_media_path_prefix,
 )
+from .managers import ToolQuerySet
+
+User = get_user_model()
 
 
 class Tool(BaseModelWithUID):
@@ -28,10 +32,14 @@ class Tool(BaseModelWithUID):
         upload_to=get_tools_media_path_prefix,
         blank=True,
     )
-    short_description = models.CharField(max_length=255)
+    requested = models.BooleanField(default=False)
+
+    is_indexed = models.BooleanField(default=True)
+    short_description = models.CharField(max_length=255, blank=True)
     status = models.CharField(
         max_length=30, choices=ToolStatus.choices, default=ToolStatus.ACTIVE
     )
+    is_featured = models.BooleanField(default=False)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
     # Links to other external urls
@@ -43,12 +51,14 @@ class Tool(BaseModelWithUID):
     facebook_url = models.URLField(blank=True)
     twitter_url = models.URLField(blank=True)
 
+    objects = ToolQuerySet.as_manager()
+
     class Meta:
         ordering = ("-created_at",)
         verbose_name_plural = "Tools"
 
     def __str__(self):
-        return f"UID: {self.uid}, Created: {self.created_at}"
+        return f"Slug: {self.slug}, Created: {self.created_at}"
 
 
 class Rating(BaseModelWithUID):
@@ -61,14 +71,14 @@ class Rating(BaseModelWithUID):
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
 
-    # FK
-    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
-
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
 
+    # FKs 
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)  # Add this line to link ratings to users
+
     def __str__(self):
-        return f"UID: {self.uid}, Tool: {self.tool.name}"
+        return f"Slug: {self.slug}"
 
     class Meta:
         ordering = ("created_at",)
@@ -80,11 +90,12 @@ class Feature(BaseModelWithUID):
     slug = models.CharField(max_length=55, unique=True, db_index=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
+    is_indexed = models.BooleanField(default=True)
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
 
     def __str__(self):
-        return f"UID: {self.uid}, Title: {self.title}"
+        return f"Slug: {self.slug}, Title: {self.title}"
 
     class Meta:
         ordering = ("-created_at",)
@@ -92,12 +103,12 @@ class Feature(BaseModelWithUID):
 
 
 class ToolsConnector(BaseModelWithUID):
-    slug = models.CharField(max_length=55, unique=True, db_index=True)
     tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
     rating = models.ForeignKey(Rating, on_delete=models.CASCADE, blank=True, null=True)
     feature = models.ForeignKey(
         Feature, on_delete=models.CASCADE, blank=True, null=True
     )
+    kind = models.CharField(max_length=30, choices=ToolKind.choices)
 
     def __str__(self):
         return f"UID: {self.uid}"
@@ -112,11 +123,17 @@ class Category(BaseModelWithUID):
     slug = models.CharField(max_length=55, unique=True, db_index=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
+    image = VersatileImageField(
+        "Avatar",
+        upload_to=get_category_media_path_prefix,
+        blank=True,
+    )
+    is_indexed = models.BooleanField(default=True)
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
 
     def __str__(self):
-        return f"UID: {self.uid}"
+        return f"Slug: {self.slug}"
 
     class Meta:
         ordering = ("-created_at",)
@@ -128,16 +145,59 @@ class SubCategory(BaseModelWithUID):
     slug = models.CharField(max_length=55, unique=True, db_index=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
-
-    # FK
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    image = VersatileImageField(
+        "Avatar",
+        upload_to=get_subategory_media_path_prefix,
+        blank=True,
+    )
+    is_indexed = models.BooleanField(default=True)
 
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
 
     def __str__(self):
-        return f"UID: {self.uid}"
+        return f"Slug: {self.slug}"
 
     class Meta:
         ordering = ("-created_at",)
         verbose_name_plural = "Sub Categories"
+
+
+class ToolsCategoryConnector(BaseModelWithUID):
+    tool = models.ForeignKey(Tool, on_delete=models.CASCADE, blank=True, null=True)
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, blank=True, null=True
+    )
+    subcategory = models.ForeignKey(
+        SubCategory, on_delete=models.CASCADE, blank=True, null=True
+    )
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name_plural = "Category connectors"
+
+
+class SavedTool(BaseModelWithUID):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    love_tool = models.ForeignKey(
+        Tool, on_delete=models.SET_NULL, null=True, blank=True, related_name="love_tool"
+    )
+    save_tool = models.ForeignKey(
+        Tool, on_delete=models.SET_NULL, null=True, blank=True, related_name="save_tool"
+    )
+
+    def __str__(self):
+        return f"USER: {self.user.get_name()}"
+
+
+class ToolRequest(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
+    status = models.CharField(
+        choices=RequestToolStatus.choices,
+        default=RequestToolStatus.PENDING,
+        max_length=30,
+    )
+
+    def __str__(self):
+        return f"User: {self.user.get_name()}-Tool: {self.tool.name}"

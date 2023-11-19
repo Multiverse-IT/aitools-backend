@@ -8,6 +8,8 @@ from .models import (
     SubCategory,
     Tool,
     ToolsConnector,
+    ToolsCategoryConnector,
+    ToolRequest
 )
 
 
@@ -29,6 +31,10 @@ class SubCategoryAdmin(admin.ModelAdmin):
     search_fields = ["title"]
 
 
+@admin.register(ToolsCategoryConnector)
+class ToolsCategoryAdmin(admin.ModelAdmin):
+    list_display = ["id", "created_at"]
+    
 
 
 @admin.register(Rating)
@@ -54,4 +60,4 @@ class FeatureAdmin(admin.ModelAdmin):
     search_fields = ["title"]
 
 
-# admin.site.register(Feature, FeatureAdmin)
+admin.site.register(ToolRequest)

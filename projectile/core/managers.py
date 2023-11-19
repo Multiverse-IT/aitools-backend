@@ -3,7 +3,7 @@ import logging
 from django.contrib.auth.models import BaseUserManager
 from django.utils import timezone
 from django.db import models
-
+from core.choices import UserRole
 from .choices import UserStatus
 
 logger = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class CustomUserManager(BaseUserManager):
     def _create_user(
-        self, email, password, is_staff, is_superuser, is_active=True, **kwargs
+        self, email, password, is_staff, is_superuser, role, is_active=True,  **kwargs
     ):
         """
         Creates and saves a User with the given email and password.
@@ -26,6 +26,7 @@ class CustomUserManager(BaseUserManager):
             is_staff=is_staff,
             is_active=is_active,
             is_superuser=is_superuser,
+            role=role,
             last_login=now,
             date_joined=now,
         )
@@ -37,7 +38,8 @@ class CustomUserManager(BaseUserManager):
         return self._create_user(email, password, False, False, **kwargs)
 
     def create_superuser(self, email, password, **kwargs):
-        return self._create_user(email, password, True, True, **kwargs)
+        role = UserRole.OWNER
+        return self._create_user(email, password, True, True, role, **kwargs)
 
     def get_status_active(self):
         return self.get_queryset().filter(status=UserStatus.ACTIVE, is_active=True)

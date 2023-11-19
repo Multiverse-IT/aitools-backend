@@ -1,23 +1,22 @@
-from catalogio.choices import RequestToolStatus, ToolKind, ToolStatus
+from catalogio.choices import ToolKind, ToolStatus
 from catalogio.models import (
     Category,
-    Feature,
+    SavedTool,
     SubCategory,
     Tool,
     ToolRequest,
     ToolsCategoryConnector,
-    ToolsConnector,
 )
 from common.serializers import (
     CategorySlimSerializer,
     FeatureSlimSerializer,
     SubCategorySlimSerializer,
-    RatingSlimSerializer,
+    RatingSlimSerializer
 )
 from rest_framework import serializers
 
 
-class ToolListSerializer(serializers.ModelSerializer):
+class PublicToolListSerializer(serializers.ModelSerializer):
     feature_slugs = serializers.ListField(
         write_only=True, required=False, child=serializers.CharField()
     )
@@ -39,10 +38,7 @@ class ToolListSerializer(serializers.ModelSerializer):
     feature = FeatureSlimSerializer(
         source="toolsconnector_set", many=True, read_only=True
     )
-    ratings = RatingSlimSerializer(
-        source="toolsconnector_set", many=True, read_only=True
-    )
-
+    ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
     class Meta:
         model = Tool
         fields = [
@@ -60,17 +56,17 @@ class ToolListSerializer(serializers.ModelSerializer):
             "meta_title",
             "meta_description",
             "image",
+            "requested",
             "is_indexed",
             "feature_slugs",
             "feature",
             "status",
-            "requested",
+            "ratings",
             "short_description",
             "category_slug",
             "category",
             "subcategory_slugs",
             "sub_category",
-            "ratings",
             "canonical_url",
             "website_url",
             "linkedin_url",
@@ -79,20 +75,30 @@ class ToolListSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-        read_only_fields = ["uid", "created_at"]
-
+        read_only_fields = ["uid", "status","requested", "created_at"]
+    
     def to_representation(self, instance):
         data = super().to_representation(instance)
+
+        # Filter out empty features
         data['feature'] = [feature for feature in data['feature'] if feature]
+
+        # Filter out empty ratings
         data['ratings'] = [rating for rating in data['ratings'] if rating]
+
         return data
     
     def create(self, validated_data):
+        user = self.context["request"].user
         feature_slugs = validated_data.pop("feature_slugs", None)
         category = validated_data.pop("category_slug", None)
         subcategory_slugs = validated_data.pop("subcategory_slugs", [])
+        # requested = validated_data.get("requested")
 
-        tool = Tool.objects.create(**validated_data)
+        tool = Tool.objects.create(requested=True, status=ToolStatus.PENDING, **validated_data)
+        
+        if tool.requested == True:
+            ToolRequest.objects.create(tool=tool, user=user)
 
         if feature_slugs:
             self._extracted_from_update_9(feature_slugs, tool)
@@ -114,69 +120,89 @@ class ToolListSerializer(serializers.ModelSerializer):
 
         return tool
 
-    def update(self, instance, validated_data):
-        feature_slugs = validated_data.pop("feature_slugs", None)
-        category_slug = validated_data.pop("category_slug", None)
-        subcategory_slugs = validated_data.pop("subcategory_slugs", [])
 
-        if feature_slugs:
-            self._extracted_from_update_9(feature_slugs, instance)
+class PublicTooDetailSerializer(serializers.ModelSerializer):
+    category = CategorySlimSerializer(
+        source="toolscategoryconnector_set.first", read_only=True
+    )
+    sub_category = SubCategorySlimSerializer(
+        source="toolscategoryconnector_set", many=True, read_only=True
+    )
+    feature = FeatureSlimSerializer(
+        source="toolsconnector_set", many=True, read_only=True
+    )
+    ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
 
-        # Update category if category_slug is provided
-        if category_slug:
-            instance.category = category_slug
-            instance.save()
-
-        # Update subcategories if subcategory_slugs are provided
-        if subcategory_slugs:
-            # First, remove existing subcategory connectors for this tool
-            subcategory_connectors = instance.toolscategoryconnector_set.filter()
-            category = subcategory_connectors.first().category
-            subcategory_connectors.delete()
-
-            # Then, create new subcategory connectors for the provided subcategory slugs
-            connectors = [
-                ToolsCategoryConnector(
-                    tool=instance,
-                    category=category,
-                    subcategory=SubCategory.objects.get(slug=slug),
-                )
-                for slug in subcategory_slugs
-            ]
-            ToolsCategoryConnector.objects.bulk_create(connectors)
-
-        return super().update(instance, validated_data)
-
-    def _extracted_from_update_9(self, feature_slugs, tool):
-        # features = ToolsConnector.objects.filter(
-        #     feature__slug__in=feature_slugs, kind=ToolKind.FEATURE
-        # ).delete()
-        # n = tool.toolsconnector_set.filter().delete()
-        feature_connectors = tool.toolsconnector_set.filter(
-            feature__isnull=False
-        ).delete()
-
-        connectors = [
-            ToolsConnector(
-                tool=tool,
-                feature=Feature.objects.filter(slug=slug).first(),
-                kind=ToolKind.FEATURE,
-            )
-            for slug in feature_slugs
-        ]
-        ToolsConnector.objects.bulk_create(connectors)
-
-
-class ToolRequestDetalSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ToolRequest
-        fields = ("status",)
+        model = Tool
+        fields = [
+            "slug",
+            "name",
+            "is_verified",
+            "pricing",
+            "categories",
+            "description",
+            "is_editor",
+            "is_trending",
+            "is_new",
+            "is_featured",
+            "save_count",
+            "meta_title",
+            "meta_description",
+            "image",
+            "is_indexed",
+            "feature",
+            "status",
+            "ratings",
+            "short_description",
+            "category",
+            "sub_category",
+            "canonical_url",
+            "website_url",
+            "linkedin_url",
+            "facebook_url",
+            "twitter_url",
+            "created_at",
+        ]
+
+        read_only_fields = [
+            "slug",
+            "name",
+            "is_verified",
+            "pricing",
+            "categories",
+            "description",
+            "is_editor",
+            "is_trending",
+            "is_new",
+            "is_featured",
+            "meta_title",
+            "meta_description",
+            "image",
+            "is_indexed",
+            "feature",
+            "status",
+            "short_description",
+            "category",
+            "sub_category",
+            "canonical_url",
+            "website_url",
+            "linkedin_url",
+            "facebook_url",
+            "twitter_url",
+            "created_at",
+        ]
 
     def update(self, instance, validated_data):
-        status = validated_data.get("status", None)
+        user = self.context["request"].user
+        save_count = validated_data.get("save_count")
 
-        if status == RequestToolStatus.APPROVED:
-            instance.status = ToolStatus.ACTIVE
+        if save_count is not None:
+            instance.save_count = save_count
             instance.save()
-            
-        return super().update(instance, validated_data)
+
+            saved_tool_obj, _ = SavedTool.objects.get_or_create(
+                save_tool=instance, user=user
+            )
+
+        return instance

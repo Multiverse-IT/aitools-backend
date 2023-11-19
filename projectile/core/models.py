@@ -10,21 +10,23 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from versatileimagefield.fields import VersatileImageField
 
-from .choices import UserGender, UserStatus
+from .choices import UserGender, UserStatus, UserRole
 from .managers import CustomUserManager
 from .utils import get_user_media_path_prefix, get_user_slug
 
 
 class User(AbstractUser, BaseModelWithUID):
+    id = models.CharField(primary_key=True, max_length=255, unique=True)
+    # email = models.EmailField(db_index=True)
     email = models.EmailField(unique=True, db_index=True)
     city = models.CharField(max_length=50, blank=True)
     country = models.CharField(max_length=50, db_index=True)
     language = models.CharField(max_length=2, default="en")
-    phone = PhoneNumberField(unique=True, blank=True, null=True)
+    phone = PhoneNumberField(blank=True, null=True)
     description = models.TextField(null=True, blank=True)
     slug = AutoSlugField(populate_from=get_user_slug, unique=True, db_index=True)
-    image = VersatileImageField(
-        "Avatar",
+    avatar = VersatileImageField(
+        "Image",
         upload_to=get_user_media_path_prefix,
         blank=True,
     )
@@ -38,6 +40,16 @@ class User(AbstractUser, BaseModelWithUID):
         max_length=20, blank=True, null=True, choices=UserGender.choices, db_index=True
     )
     date_of_birth = models.DateField(null=True, blank=True)
+    role = models.CharField(
+        max_length=30, choices=UserRole.choices, default=UserRole.INITIATOR
+    )
+    image = models.CharField(max_length=255, blank=True)
+    # extra field 
+    exp = models.CharField(max_length=255, blank=True)
+    sub = models.CharField(max_length=255, blank=True)
+    iat = models.CharField(max_length=255, blank=True)
+    jti = models.CharField(max_length=255, blank=True)
+    picture = models.CharField(max_length=255, blank=True)
 
     # Other links
     website_url = models.URLField(blank=True)
