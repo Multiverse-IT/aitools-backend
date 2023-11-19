@@ -28,10 +28,8 @@ class PublicToolList(generics.ListCreateAPIView):
         # pricing = self.request.query_params.get("pricing")
 
         if search is not None:
-            # Split the search string by comma, filter out words with less than 2 characters
             search_words = [word.strip() for word in search.split(',') if len(word.strip()) >= 2]
 
-            # Build a single Q object for all search conditions
             q_object = Q()
             for word in search_words:
                 q_object |= (
