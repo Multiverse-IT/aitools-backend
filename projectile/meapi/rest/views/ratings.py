@@ -1,8 +1,8 @@
 from rest_framework import generics
 
-from catalogio.models import Rating
-
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
+from catalogio.models import Rating
 
 from ..serializers.ratings import MeRatingListDetaliSerializer
 

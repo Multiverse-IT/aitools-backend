@@ -1,9 +1,13 @@
+from django.contrib.auth import get_user_model
+
 from rest_framework import serializers
 
 from catalogio.choices import ToolKind
 from catalogio.models import Rating, Tool, ToolsConnector
 
 from core.rest.serializers.users import UserSerializerList
+
+User = get_user_model()
 
 class MeRatingListDetaliSerializer(serializers.ModelSerializer):
     tool_slug = serializers.SlugRelatedField(
@@ -28,12 +32,17 @@ class MeRatingListDetaliSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        user = self.context["request"].user
+
+        identity = self.context["request"].headers.get("identity")
+        user = User.objects.filter(id=identity).first()
+
+        if not user:
+            raise serializers.ValidationError({'detail': 'User not found.'})
+
         tool = validated_data.pop("tool_slug", None)
         rating = Rating.objects.create(user=user, **validated_data)
         if tool:
             rating_connector, _ = ToolsConnector.objects.get_or_create(
                 tool=tool, rating=rating, kind=ToolKind.RATING
             )
-            print("rattings con:", rating_connector)
         return rating
