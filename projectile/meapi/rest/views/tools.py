@@ -1,10 +1,15 @@
 from datetime import datetime
 
+from django.db.models import Q, F
+
 from rest_framework import generics, permissions
 
 from catalogio.choices import ToolStatus
 from catalogio.models import SavedTool, Tool
 from catalogio.permissions import IsAuthenticatedOrReadOnlyForUserTool
+
+ 
+from search.models import Keyword, KeywordSearch
 
 from ..serializers.tools import PublicTooDetailSerializer, PublicToolListSerializer
 
@@ -23,9 +28,39 @@ class PublicToolList(generics.ListCreateAPIView):
         # pricing = self.request.query_params.get("pricing")
 
         if search is not None:
-            queryset = queryset.filter(
-                toolscategoryconnector__subcategory__title__icontains=search
-            )
+            search_words = [word.strip() for word in search.split(',') if len(word.strip()) >= 2]
+
+            q_object = Q()
+            for word in search_words:
+                q_object |= (
+                    Q(name__icontains=word) |
+                    Q(description__icontains=word) |
+                    Q(toolscategoryconnector__subcategory__title__icontains=word) |
+                    Q(toolscategoryconnector__category__title__icontains=word)
+                )
+
+            # Filter tools based on the search words in multiple fields
+            if search_words:
+                queryset = queryset.filter(q_object)
+
+                # Save the search keyword and associate it with the user if authenticated
+                user = self.request.user
+                keyword, created = Keyword.objects.get_or_create(name=search)
+                if user.is_authenticated:
+                    keyword_search, created = KeywordSearch.objects.get_or_create(keyword=keyword, user=user)
+                    if not created:
+                        keyword_search.search_count = F('search_count') + 1
+                        keyword_search.save()
+                else:
+                    keyword_search, created = KeywordSearch.objects.get_or_create(keyword=keyword)
+                    if not created:
+                        keyword_search.search_count = F('search_count') + 1
+                        keyword_search.save()
+
+        # if search is not None:
+        #     queryset = queryset.filter(
+        #         toolscategoryconnector__subcategory__title__icontains=search
+        #     )
 
         if subcategory:
             subcategories = subcategory.split(",")
