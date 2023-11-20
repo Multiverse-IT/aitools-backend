@@ -19,6 +19,8 @@ class CategorySlimSerializer(serializers.Serializer):
 class SubCategorySlimSerializer(serializers.Serializer):
     slug = serializers.CharField(source="subcategory.slug", read_only=True)
     title = serializers.CharField(source="subcategory.title", read_only=True)
+    description = serializers.CharField(source="subcategory.description", read_only=True)
+
     meta_title = serializers.CharField(
         source="subcategory.meta_title", read_only=True, required=False
     )

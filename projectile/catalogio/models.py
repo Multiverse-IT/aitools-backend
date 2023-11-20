@@ -143,6 +143,7 @@ class Category(BaseModelWithUID):
 class SubCategory(BaseModelWithUID):
     title = models.CharField(max_length=255)
     slug = models.CharField(max_length=55, unique=True, db_index=True)
+    description = models.TextField(blank=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
     image = VersatileImageField(

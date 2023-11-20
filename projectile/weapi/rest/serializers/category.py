@@ -57,6 +57,7 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
         fields = [
             "slug",
             "title",
+            "description",
             "category_slug",
             "category",
             "meta_title",

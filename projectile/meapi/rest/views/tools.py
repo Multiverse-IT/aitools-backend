@@ -7,10 +7,10 @@ from rest_framework import generics, permissions
 
 from catalogio.choices import ToolStatus
 from catalogio.models import SavedTool, Tool
-from catalogio.permissions import IsAuthenticatedOrReadOnlyForUserTool
-from ..permissions import CustomIdentityHeaderPermission
 
 from search.models import Keyword, KeywordSearch
+
+from ..permissions import CustomIdentityHeaderPermission
 
 from ..serializers.tools import PublicTooDetailSerializer, PublicToolListSerializer
 
