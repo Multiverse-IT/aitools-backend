@@ -39,6 +39,8 @@ class PublicToolListSerializer(serializers.ModelSerializer):
         source="toolsconnector_set", many=True, read_only=True
     )
     ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
+    average_ratings = serializers.FloatField(read_only=True)
+
     class Meta:
         model = Tool
         fields = [
@@ -62,6 +64,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "feature",
             "status",
             "ratings",
+            "average_ratings",
             "short_description",
             "category_slug",
             "category",
@@ -132,6 +135,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
         source="toolsconnector_set", many=True, read_only=True
     )
     ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
+    average_ratings = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Tool
@@ -154,6 +158,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "feature",
             "status",
             "ratings",
+            "average_ratings",
             "short_description",
             "category",
             "sub_category",
@@ -193,6 +198,12 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['feature'] = [feature for feature in data['feature'] if feature]
+        data['ratings'] = [rating for rating in data['ratings'] if rating]
+        return data
+    
     def update(self, instance, validated_data):
         user = self.context["request"].user
         save_count = validated_data.get("save_count")
@@ -200,9 +211,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
         if save_count is not None:
             instance.save_count = save_count
             instance.save()
-
             saved_tool_obj, _ = SavedTool.objects.get_or_create(
                 save_tool=instance, user=user
             )
-
         return instance

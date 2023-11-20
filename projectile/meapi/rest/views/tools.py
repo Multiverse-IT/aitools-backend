@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.db.models import Q, F
+from django.db.models import Q, F, Avg
 
 from rest_framework import generics, permissions
 
@@ -72,6 +72,8 @@ class PublicToolList(generics.ListCreateAPIView):
             features = features.split(",")
             queryset = queryset.filter(toolsconnector__feature__slug__in=features)
 
+        queryset = queryset.annotate(average_ratings=Avg("toolsconnector__rating__rating"))
+
         return queryset.distinct()
 
 
@@ -80,6 +82,12 @@ class PublicToolDetail(generics.RetrieveUpdateAPIView):
     serializer_class = PublicTooDetailSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     lookup_field = "slug"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.annotate(average_ratings=Avg('toolsconnector__rating__rating'))
+
+        return queryset.distinct()
 
 
 class UserLoveToolList(generics.ListAPIView):
