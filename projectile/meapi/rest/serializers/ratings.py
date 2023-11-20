@@ -32,7 +32,6 @@ class MeRatingListDetaliSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-
         identity = self.context["request"].headers.get("identity")
         user = User.objects.filter(id=identity).first()
 
