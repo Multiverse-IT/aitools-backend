@@ -30,7 +30,7 @@ class PublicToolList(generics.ListCreateAPIView):
         # pricing = self.request.query_params.get("pricing")
 
         if search is not None:
-            search_words = [word.strip() for word in search.split('+') if len(word.strip()) >= 2]
+            search_words = [word.strip() for word in search.split(',') if len(word.strip()) >= 2]
 
             q_object = Q()
             for word in search_words:

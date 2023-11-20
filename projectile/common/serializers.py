@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from core.rest.serializers.users import UserSerializerList
 
 class CategorySlimSerializer(serializers.Serializer):
     slug = serializers.CharField(source="category.slug", read_only=True)
@@ -55,5 +56,6 @@ class RatingSlimSerializer(serializers.Serializer):
     meta_description = serializers.CharField(
         source="rating.meta_description", read_only=True
     )
+    user = UserSerializerList(source="rating.user", read_only=True)
     # Links to other external urls
     canonical_url = serializers.URLField(source="rating.canonical_url", read_only=True)
