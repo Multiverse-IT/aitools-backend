@@ -1,23 +1,25 @@
 from datetime import datetime
 
 from django.db.models import Q, F, Avg
+from django.contrib.auth import get_user_model
 
 from rest_framework import generics, permissions
 
 from catalogio.choices import ToolStatus
 from catalogio.models import SavedTool, Tool
 from catalogio.permissions import IsAuthenticatedOrReadOnlyForUserTool
+from ..permissions import CustomIdentityHeaderPermission
 
- 
 from search.models import Keyword, KeywordSearch
 
 from ..serializers.tools import PublicTooDetailSerializer, PublicToolListSerializer
 
+User = get_user_model()
 
 class PublicToolList(generics.ListCreateAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
     serializer_class = PublicToolListSerializer
-    permission_classes = [IsAuthenticatedOrReadOnlyForUserTool]
+    permission_classes = [CustomIdentityHeaderPermission]
 
     def get_queryset(self):
         queryset = self.queryset
@@ -80,7 +82,7 @@ class PublicToolList(generics.ListCreateAPIView):
 class PublicToolDetail(generics.RetrieveUpdateAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
     serializer_class = PublicTooDetailSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [CustomIdentityHeaderPermission]
     lookup_field = "slug"
 
     def get_queryset(self):
@@ -91,11 +93,17 @@ class PublicToolDetail(generics.RetrieveUpdateAPIView):
 
 
 class UserLoveToolList(generics.ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [CustomIdentityHeaderPermission]
     serializer_class = PublicTooDetailSerializer
 
     def get_queryset(self):
-        user = self.request.user
+        identity = self.request.headers.get("identity")
+        user = User.objects.filter(id=identity).first()
+
+        if not user:
+            return Tool.objects.none()
+
+        # user = self.request.user
         save_tool_ids = SavedTool.objects.filter(user=user).values_list(
             "save_tool_id", flat=True
         )

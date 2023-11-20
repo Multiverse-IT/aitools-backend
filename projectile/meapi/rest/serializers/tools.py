@@ -1,3 +1,5 @@
+from django.contrib.auth import get_user_model
+
 from catalogio.choices import ToolKind, ToolStatus
 from catalogio.models import (
     Category,
@@ -15,6 +17,7 @@ from common.serializers import (
 )
 from rest_framework import serializers
 
+User = get_user_model()
 
 class PublicToolListSerializer(serializers.ModelSerializer):
     feature_slugs = serializers.ListField(
@@ -92,11 +95,15 @@ class PublicToolListSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validated_data):
-        user = self.context["request"].user
+        identity = self.context["request"].headers.get("identity")
+        user = User.objects.filter(id=identity).first()
+
+        if not user:
+            raise serializers.ValidationError({'detail': 'User not found.'})
+
         feature_slugs = validated_data.pop("feature_slugs", None)
         category = validated_data.pop("category_slug", None)
         subcategory_slugs = validated_data.pop("subcategory_slugs", [])
-        # requested = validated_data.get("requested")
 
         tool = Tool.objects.create(requested=True, status=ToolStatus.PENDING, **validated_data)
         
@@ -205,7 +212,12 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
         return data
     
     def update(self, instance, validated_data):
-        user = self.context["request"].user
+        identity = self.context["request"].headers.get("identity")
+        user = User.objects.filter(id=identity).first()
+
+        if not user:
+            raise serializers.ValidationError({'detail': 'User not found.'})
+
         save_count = validated_data.get("save_count")
 
         if save_count is not None:
