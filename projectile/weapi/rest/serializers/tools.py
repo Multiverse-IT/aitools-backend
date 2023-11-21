@@ -1,10 +1,11 @@
+from rest_framework import serializers
+
 from catalogio.choices import RequestToolStatus, ToolKind, ToolStatus
 from catalogio.models import (
     Category,
     Feature,
     SubCategory,
     Tool,
-    ToolRequest,
     ToolsCategoryConnector,
     ToolsConnector,
 )
@@ -14,7 +15,6 @@ from common.serializers import (
     SubCategorySlimSerializer,
     RatingSlimSerializer,
 )
-from rest_framework import serializers
 
 
 class ToolListSerializer(serializers.ModelSerializer):
@@ -83,10 +83,10 @@ class ToolListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['feature'] = [feature for feature in data['feature'] if feature]
-        data['ratings'] = [rating for rating in data['ratings'] if rating]
+        data["feature"] = [feature for feature in data["feature"] if feature]
+        data["ratings"] = [rating for rating in data["ratings"] if rating]
         return data
-    
+
     def create(self, validated_data):
         feature_slugs = validated_data.pop("feature_slugs", None)
         category = validated_data.pop("category_slug", None)
@@ -168,15 +168,19 @@ class ToolListSerializer(serializers.ModelSerializer):
 
 
 class ToolRequestDetalSerializer(serializers.ModelSerializer):
+    request_status = serializers.ChoiceField(
+        choices=RequestToolStatus.choices, write_only=True
+    )
+
     class Meta:
-        model = ToolRequest
-        fields = ("status",)
+        model = Tool
+        fields = ("status", "request_status")
+        read_only_fields = ["status"]
 
     def update(self, instance, validated_data):
-        status = validated_data.get("status", None)
-
+        status = validated_data.pop("request_status", None)
         if status == RequestToolStatus.APPROVED:
             instance.status = ToolStatus.ACTIVE
             instance.save()
-            
+
         return super().update(instance, validated_data)
