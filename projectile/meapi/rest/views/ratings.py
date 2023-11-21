@@ -16,7 +16,6 @@ class RatingList(generics.ListCreateAPIView):
     permission_classes = [CustomIdentityHeaderPermission]
 
     def get_queryset(self):
-        user = self.request.user
         identity = self.request.headers.get("identity")
         user = User.objects.filter(id=identity).first()
 
