@@ -8,6 +8,8 @@ from catalogio.models import (
     Tool,
     ToolRequest,
     ToolsCategoryConnector,
+    ToolsConnector,
+    Feature
 )
 from common.serializers import (
     CategorySlimSerializer,
@@ -129,6 +131,22 @@ class PublicToolListSerializer(serializers.ModelSerializer):
                 print("detail:", e)
 
         return tool
+
+    def _extracted_from_update_9(self, feature_slugs, tool):
+        feature_connectors = tool.toolsconnector_set.filter(
+            feature__isnull=False
+        ).delete()
+
+        connectors = [
+            ToolsConnector(
+                tool=tool,
+                feature=Feature.objects.filter(slug=slug).first(),
+                kind=ToolKind.FEATURE,
+            )
+            for slug in feature_slugs
+        ]
+        ToolsConnector.objects.bulk_create(connectors)
+
 
 
 class PublicTooDetailSerializer(serializers.ModelSerializer):
