@@ -263,9 +263,17 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
         save_count = validated_data.get("save_count")
 
         if save_count is not None:
-            instance.save_count = save_count
-            instance.save()
-            saved_tool_obj, _ = SavedTool.objects.get_or_create(
-                save_tool=instance, user=user
-            )
+            if save_count > instance.save_count:
+                instance.save_count = save_count
+                instance.save()
+                saved_tool_obj, _ = SavedTool.objects.get_or_create(
+                    save_tool=instance, user=user
+                )
+            else:
+                saved_tool_obj = SavedTool.objects.filter(save_tool=instance, user=user).first()
+                instance.save_count = save_count
+                instance.save()
+                if saved_tool_obj:
+                    saved_tool_obj.delete()
+
         return instance
