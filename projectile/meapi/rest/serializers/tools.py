@@ -45,7 +45,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
     )
     ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
     average_ratings = serializers.FloatField(read_only=True)
-
+    is_loved = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Tool
         fields = [
@@ -58,6 +58,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "is_editor",
             "is_trending",
             "is_new",
+            "is_loved",
             "is_featured",
             "save_count",
             "meta_title",
@@ -85,6 +86,16 @@ class PublicToolListSerializer(serializers.ModelSerializer):
 
         read_only_fields = ["uid", "status","requested", "created_at"]
     
+    def get_is_loved(self, instance):
+        identity = self.context["request"].headers.get("identity")
+        user = User.objects.filter(id=identity).first()
+
+        if user:
+            return SavedTool.objects.filter(user = user, save_tool = instance).exists()
+        else:
+            return False
+        
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
 
@@ -161,6 +172,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
     )
     ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
     average_ratings = serializers.FloatField(read_only=True)
+    is_loved = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Tool
@@ -175,6 +187,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "is_trending",
             "is_new",
             "is_featured",
+            "is_loved",
             "save_count",
             "meta_title",
             "meta_description",
@@ -223,6 +236,15 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
+    def get_is_loved(self, instance):
+        identity = self.context["request"].headers.get("identity")
+        user = User.objects.filter(id=identity).first()
+
+        if user:
+            return SavedTool.objects.filter(user = user, save_tool = instance).exists()
+        else:
+            return False
+        
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['feature'] = [feature for feature in data['feature'] if feature]
