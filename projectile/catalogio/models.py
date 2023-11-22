@@ -62,7 +62,6 @@ class Tool(BaseModelWithUID):
 
 
 class Rating(BaseModelWithUID):
-    slug = models.CharField(max_length=55, unique=True, db_index=True)
     pros = models.CharField(max_length=255, blank=True)
     cons = models.CharField(max_length=255, blank=True)
     review = models.CharField(max_length=255, blank=True)

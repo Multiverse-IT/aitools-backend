@@ -13,7 +13,6 @@ class RatingListDetaliSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = [
-            "slug",
             "pros",
             "cons",
             "review",

@@ -46,7 +46,6 @@ class FeatureSlimSerializer(serializers.Serializer):
 
 
 class RatingSlimSerializer(serializers.Serializer):
-    slug = serializers.CharField(source="rating.slug", read_only=True)
     pros = serializers.CharField(source="rating.pros", read_only=True)
     cons = serializers.CharField(source="rating.cons", read_only=True)
     review = serializers.CharField(source="rating.review", read_only=True)
