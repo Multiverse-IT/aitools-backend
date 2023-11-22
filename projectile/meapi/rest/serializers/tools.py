@@ -126,20 +126,20 @@ class PublicToolListSerializer(serializers.ModelSerializer):
         if feature_slugs:
             self._extracted_from_update_9(feature_slugs, tool)
 
-        if category and subcategory_slugs:
+        if category:
             try:
-                connectors = [
-                    ToolsCategoryConnector(
-                        tool=tool,
-                        category=category,
-                        subcategory=SubCategory.objects.get(slug=slug),
-                    )
-                    for slug in subcategory_slugs
-                ]
-                ToolsCategoryConnector.objects.bulk_create(connectors)
+                ToolsCategoryConnector.objects.create(tool=tool, category=category)
 
-            except Exception as e:
-                print("detail:", e)
+                if subcategory_slugs:
+                    subcategories = SubCategory.objects.filter(slug__in=subcategory_slugs)
+                    for subcategory in subcategories:
+                        ToolsCategoryConnector.objects.create(tool=tool, category=category, subcategory=subcategory)
+            
+            except Category.DoesNotExist:
+                print("Category not found")
+
+            except SubCategory.DoesNotExist:
+                print("Subcategory not found")
 
         return tool
 

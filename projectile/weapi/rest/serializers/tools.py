@@ -124,8 +124,19 @@ class ToolListSerializer(serializers.ModelSerializer):
 
         # Update category if category_slug is provided
         if category_slug:
-            instance.category = category_slug
-            instance.save()
+            try:
+                # instance.category = category_slug
+                # instance.save()
+                connector = instance.toolscategoryconnector_set.first()
+                if connector:
+                    connector.category = category_slug
+                    connector.save()
+                else:
+                    connector = ToolsCategoryConnector.objects.create(tool=instance, category=category_slug)
+
+            except Category.DoesNotExist:
+                print("Category not found")
+
 
         # Update subcategories if subcategory_slugs are provided
         if subcategory_slugs:
@@ -184,3 +195,5 @@ class ToolRequestDetalSerializer(serializers.ModelSerializer):
             instance.save()
 
         return super().update(instance, validated_data)
+
+
