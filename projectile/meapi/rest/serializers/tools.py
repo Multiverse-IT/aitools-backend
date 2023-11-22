@@ -30,9 +30,11 @@ class PublicToolListSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(),
         write_only=True,
         required=False,
+        allow_null = True,
+        allow_empty=True
     )
     subcategory_slugs = serializers.ListField(
-        write_only=True, required=False, child=serializers.CharField()
+        write_only=True, required=False, child=serializers.CharField(),  allow_null = True, allow_empty=True
     )
     category = CategorySlimSerializer(
         source="toolscategoryconnector_set.first", read_only=True
