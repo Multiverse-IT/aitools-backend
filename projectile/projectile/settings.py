@@ -189,7 +189,11 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 40,
 }
 
-
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'localhost:9200',  
+    },
+}
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",

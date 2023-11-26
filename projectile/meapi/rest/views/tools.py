@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.db.models import Q, F, Avg
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from rest_framework import generics, permissions
 
@@ -28,6 +29,8 @@ class PublicToolList(generics.ListCreateAPIView):
         subcategory = self.request.query_params.get("subcategory", [])
         features = self.request.query_params.get("features", [])
         # pricing = self.request.query_params.get("pricing")
+        trending = self.request.query_params.get("trending",None)
+        time_range = self.request.query_params.get("time_range", None)
 
         if search is not None:
             search_words = [word.strip() for word in search.split(',') if len(word.strip()) >= 2]
@@ -59,10 +62,21 @@ class PublicToolList(generics.ListCreateAPIView):
                         keyword_search.search_count = F('search_count') + 1
                         keyword_search.save()
 
-        # if search is not None:
-        #     queryset = queryset.filter(
-        #         toolscategoryconnector__subcategory__title__icontains=search
-        #     )
+        if time_range:
+            now = timezone.now()
+
+            if time_range == "this_week":
+                start_date = now - timedelta(days=now.weekday())
+                queryset = queryset.filter(created_at__gte=start_date)
+
+            elif time_range == "this_month":
+                start_date = now.replace(day=1)
+                queryset = queryset.filter(created_at__gte=start_date)
+
+            elif time_range == "last_month":
+                last_month_end = now.replace(day=1) - timedelta(days=1)
+                last_month_start = last_month_end.replace(day=1)
+                queryset = queryset.filter(created_at__range=(last_month_start, last_month_end))
 
         if subcategory:
             subcategories = subcategory.split(",")
@@ -73,6 +87,9 @@ class PublicToolList(generics.ListCreateAPIView):
         if features:
             features = features.split(",")
             queryset = queryset.filter(toolsconnector__feature__slug__in=features)
+
+        if trending:
+            queryset = queryset.filter(is_trending=trending)
 
         queryset = queryset.annotate(average_ratings=Avg("toolsconnector__rating__rating"))
 

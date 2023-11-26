@@ -46,7 +46,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
         source="toolsconnector_set", many=True, read_only=True
     )
     ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
-    average_ratings = serializers.FloatField(read_only=True)
+    average_ratings = serializers.DecimalField(max_digits=3, decimal_places=1, read_only=True)
     is_loved = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Tool
