@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from django.db.models import Q, F, Avg
+from django.db.models import Q, F, Avg, Count
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
@@ -13,7 +13,7 @@ from search.models import Keyword, KeywordSearch
 
 from ..permissions import CustomIdentityHeaderPermission
 
-from ..serializers.tools import PublicTooDetailSerializer, PublicToolListSerializer
+from ..serializers.tools import PublicTooDetailSerializer, PublicToolListSerializer, PublicTrendingToolListSerializer
 
 User = get_user_model()
 
@@ -133,3 +133,46 @@ class PublicToolTodayList(generics.ListAPIView):
     def get_queryset(self):
         today = datetime.now().date()
         return Tool.objects.filter(created_at__date=today, status=ToolStatus.ACTIVE)
+
+
+
+class PublicTrendingToolList(generics.ListAPIView):
+    queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
+    serializer_class = PublicTrendingToolListSerializer
+    permission_classes = [CustomIdentityHeaderPermission]
+
+    def get_queryset(self):
+        queryset = self.queryset
+        time_range = self.request.query_params.get("time_range",None)
+
+        if time_range:
+            now = timezone.now()
+            
+            if time_range == "this_week":
+                start_date = now - timedelta(days=now.weekday())
+                print("std:", start_date)
+                queryset = queryset.annotate(
+                    total_saved_tools = Count("save_tool", filter=Q(save_tool__created_at__gte=start_date))
+                ).order_by("-total_saved_tools")
+
+            elif time_range == "this_month":
+                start_date = now.replace(day=1)
+                queryset = queryset.annotate(
+                    total_saved_tools = Count("save_tool", filter=Q(save_tool__created_at__gte=start_date))
+                ).order_by("-total_saved_tools")
+
+            elif time_range == "last_month":
+                last_month_end = now.replace(day=1) - timedelta(days=1)
+                last_month_start = last_month_end.replace(day=1)
+                queryset = queryset.annotate(
+                    total_saved_tools = Count("save_tool", filter=Q(save_tool__created_at__range=(last_month_start, last_month_end)))
+                ).order_by("-total_saved_tools")
+
+        return queryset
+
+
+class PublicTrendingToolDetail(generics.RetrieveAPIView):
+    queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
+    serializer_class = PublicTrendingToolListSerializer
+    permission_classes = [CustomIdentityHeaderPermission]
+    lookup_field = "slug"
