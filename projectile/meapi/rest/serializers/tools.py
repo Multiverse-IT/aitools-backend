@@ -1,4 +1,7 @@
+from decimal import Decimal
+
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 
 from catalogio.choices import ToolKind, ToolStatus
 from catalogio.models import (
@@ -48,6 +51,8 @@ class PublicToolListSerializer(serializers.ModelSerializer):
     ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
     average_ratings = serializers.DecimalField(max_digits=3, decimal_places=1, read_only=True)
     is_loved = serializers.SerializerMethodField(read_only=True)
+    ratings_distribution = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Tool
         fields = [
@@ -84,6 +89,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "facebook_url",
             "twitter_url",
             "created_at",
+            "ratings_distribution",
         ]
 
         read_only_fields = ["uid", "status","requested", "created_at"]
@@ -109,6 +115,63 @@ class PublicToolListSerializer(serializers.ModelSerializer):
 
         return data
     
+    # def get_ratings_distribution(self, instance):
+    #     # Get the ratings distribution for the given tool instance
+    #     ratings_distribution = instance.toolsconnector_set.values('rating__rating').annotate(
+    #         count=Count('rating__rating')
+    #     ).order_by('rating__rating')
+    #     print("rating distribution:", ratings_distribution)
+
+    #     # Create a dictionary to represent the distribution
+    #     distribution_dict = {str(Decimal(i)): 0 for i in range(5, 0, -1)}  # Ratings from 1 to 5
+    #     for rating_entry in ratings_distribution:
+    #         print("rating entry:", rating_entry)
+    #         rating_value = str(rating_entry['rating__rating'])
+    #         print("rating value:", rating_value)
+    #         distribution_dict[rating_value] = rating_entry['count']
+    #         print("distribuion dict after adding value:", distribution_dict)
+
+    #     # Calculate percentages
+    #     total_ratings = sum(distribution_dict.values())
+    #     print("total ratings:", total_ratings)
+    #     percentages = {rating_value: (count / total_ratings) * 100 if total_ratings > 0 else 0
+    #                    for rating_value, count in distribution_dict.items()}
+        
+    #     print("percentage:", percentages)
+    #     return percentages
+    def get_ratings_distribution(self, instance):
+        # Get the ratings distribution for the given tool instance
+        ratings_distribution = instance.toolsconnector_set.values('rating__rating').annotate(
+            count=Count('rating__rating')
+        ).order_by('rating__rating')  # Order by rating in ascending order
+        
+        print("rating distribution:", ratings_distribution)
+
+        # Create a dictionary to represent the distribution
+        distribution_dict = {i: 0 for i in range(5, 0, -1)}  # Ratings from 5 to 1
+        print("dict or dist:", distribution_dict)
+
+        for rating_entry in ratings_distribution:
+            rating_value = rating_entry['rating__rating']
+            print("rating value:", rating_value)
+            # Round the rating value to the nearest integer and convert to integer
+            key = int(round(rating_value))
+            print("key:", key)
+            # Update existing values
+            if key in distribution_dict:
+                distribution_dict[key] += rating_entry['count']
+                print("dis dict key:", distribution_dict)
+
+        # Calculate percentages
+        total_ratings = sum(distribution_dict.values())
+        print("total ratings:", total_ratings
+              )
+        percentages = {str(key): int((count / total_ratings) * 100) if total_ratings > 0 else 0
+                       for key, count in distribution_dict.items()}
+
+        return percentages
+    
+
     def create(self, validated_data):
         identity = self.context["request"].headers.get("identity")
         user = User.objects.filter(id=identity).first()
