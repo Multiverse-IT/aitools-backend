@@ -66,6 +66,7 @@ PROJECT_APPS = [
     "catalogio",
     "core",
     "search",
+    "contentio",
 ]
 
 THIRD_PARTY_APPS = [
