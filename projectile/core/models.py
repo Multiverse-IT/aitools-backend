@@ -62,13 +62,13 @@ class User(AbstractUser, BaseModelWithUID):
     objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["id"]
 
     class Meta:
         ordering = ("-date_joined",)
 
     def __str__(self):
-        return f"ID: {self.id}, Email: {self.email}"
+        return f"UID: {self.uid}"
 
     def get_name(self):
         name = " ".join([self.first_name, self.last_name])
