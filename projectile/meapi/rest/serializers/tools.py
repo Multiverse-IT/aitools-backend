@@ -115,57 +115,29 @@ class PublicToolListSerializer(serializers.ModelSerializer):
 
         return data
     
-    # def get_ratings_distribution(self, instance):
-    #     # Get the ratings distribution for the given tool instance
-    #     ratings_distribution = instance.toolsconnector_set.values('rating__rating').annotate(
-    #         count=Count('rating__rating')
-    #     ).order_by('rating__rating')
-    #     print("rating distribution:", ratings_distribution)
-
-    #     # Create a dictionary to represent the distribution
-    #     distribution_dict = {str(Decimal(i)): 0 for i in range(5, 0, -1)}  # Ratings from 1 to 5
-    #     for rating_entry in ratings_distribution:
-    #         print("rating entry:", rating_entry)
-    #         rating_value = str(rating_entry['rating__rating'])
-    #         print("rating value:", rating_value)
-    #         distribution_dict[rating_value] = rating_entry['count']
-    #         print("distribuion dict after adding value:", distribution_dict)
-
-    #     # Calculate percentages
-    #     total_ratings = sum(distribution_dict.values())
-    #     print("total ratings:", total_ratings)
-    #     percentages = {rating_value: (count / total_ratings) * 100 if total_ratings > 0 else 0
-    #                    for rating_value, count in distribution_dict.items()}
-        
-    #     print("percentage:", percentages)
-    #     return percentages
+   
     def get_ratings_distribution(self, instance):
         # Get the ratings distribution for the given tool instance
         ratings_distribution = instance.toolsconnector_set.values('rating__rating').annotate(
             count=Count('rating__rating')
-        ).order_by('rating__rating')  # Order by rating in ascending order
-        
-        print("rating distribution:", ratings_distribution)
+        ).order_by('rating__rating')  
 
         # Create a dictionary to represent the distribution
-        distribution_dict = {i: 0 for i in range(5, 0, -1)}  # Ratings from 5 to 1
-        print("dict or dist:", distribution_dict)
-
+        distribution_dict = {i: 0 for i in range(5, 0, -1)}  
         for rating_entry in ratings_distribution:
             rating_value = rating_entry['rating__rating']
-            print("rating value:", rating_value)
-            # Round the rating value to the nearest integer and convert to integer
-            key = int(round(rating_value))
-            print("key:", key)
-            # Update existing values
-            if key in distribution_dict:
-                distribution_dict[key] += rating_entry['count']
-                print("dis dict key:", distribution_dict)
+
+            # Check if the rating_value is not None before rounding
+            if rating_value is not None:
+                # Round the rating value to the nearest integer and convert to integer
+                key = int(round(rating_value))
+
+                # Update existing values
+                if key in distribution_dict:
+                    distribution_dict[key] += rating_entry['count']
 
         # Calculate percentages
         total_ratings = sum(distribution_dict.values())
-        print("total ratings:", total_ratings
-              )
         percentages = {str(key): int((count / total_ratings) * 100) if total_ratings > 0 else 0
                        for key, count in distribution_dict.items()}
 
