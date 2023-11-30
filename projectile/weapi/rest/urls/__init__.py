@@ -9,4 +9,5 @@ urlpatterns = [
     path("/features", include("weapi.rest.urls.feature")),
     path("/ratings", include("weapi.rest.urls.rating")),
     path("/google", include("weapi.rest.urls.users")),
+    path("/users", include("weapi.rest.urls.admin_user")),
 ]
