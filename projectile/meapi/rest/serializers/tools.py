@@ -51,7 +51,6 @@ class PublicToolListSerializer(serializers.ModelSerializer):
     ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
     average_ratings = serializers.DecimalField(max_digits=3, decimal_places=1, read_only=True)
     is_loved = serializers.SerializerMethodField(read_only=True)
-    ratings_distribution = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Tool
@@ -89,7 +88,6 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "facebook_url",
             "twitter_url",
             "created_at",
-            "ratings_distribution",
         ]
 
         read_only_fields = ["uid", "status","requested", "created_at"]
@@ -115,33 +113,6 @@ class PublicToolListSerializer(serializers.ModelSerializer):
 
         return data
     
-   
-    def get_ratings_distribution(self, instance):
-        # Get the ratings distribution for the given tool instance
-        ratings_distribution = instance.toolsconnector_set.values('rating__rating').annotate(
-            count=Count('rating__rating')
-        ).order_by('rating__rating')  
-
-        # Create a dictionary to represent the distribution
-        distribution_dict = {i: 0 for i in range(5, 0, -1)}  
-        for rating_entry in ratings_distribution:
-            rating_value = rating_entry['rating__rating']
-
-            # Check if the rating_value is not None before rounding
-            if rating_value is not None:
-                # Round the rating value to the nearest integer and convert to integer
-                key = int(round(rating_value))
-
-                # Update existing values
-                if key in distribution_dict:
-                    distribution_dict[key] += rating_entry['count']
-
-        # Calculate percentages
-        total_ratings = sum(distribution_dict.values())
-        percentages = {str(key): int((count / total_ratings) * 100) if total_ratings > 0 else 0
-                       for key, count in distribution_dict.items()}
-
-        return percentages
     
 
     def create(self, validated_data):
@@ -210,6 +181,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
     ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
     average_ratings = serializers.FloatField(read_only=True)
     is_loved = serializers.SerializerMethodField(read_only=True)
+    ratings_distribution = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Tool
@@ -237,6 +209,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "short_description",
             "category",
             "sub_category",
+            "ratings_distribution",
             "canonical_url",
             "website_url",
             "linkedin_url",
@@ -282,6 +255,33 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
         else:
             return False
         
+    def get_ratings_distribution(self, instance):
+        # Get the ratings distribution for the given tool instance
+        ratings_distribution = instance.toolsconnector_set.values('rating__rating').annotate(
+            count=Count('rating__rating')
+        ).order_by('rating__rating')  
+
+        # Create a dictionary to represent the distribution
+        distribution_dict = {i: 0 for i in range(5, 0, -1)}  
+        for rating_entry in ratings_distribution:
+            rating_value = rating_entry['rating__rating']
+
+            # Check if the rating_value is not None before rounding
+            if rating_value is not None:
+                # Round the rating value to the nearest integer and convert to integer
+                key = int(round(rating_value))
+
+                # Update existing values
+                if key in distribution_dict:
+                    distribution_dict[key] += rating_entry['count']
+
+        # Calculate percentages
+        total_ratings = sum(distribution_dict.values())
+        percentages = {str(key): int((count / total_ratings) * 100) if total_ratings > 0 else 0
+                       for key, count in distribution_dict.items()}
+
+        return percentages
+    
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['feature'] = [feature for feature in data['feature'] if feature]

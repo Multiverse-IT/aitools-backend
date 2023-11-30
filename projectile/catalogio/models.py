@@ -77,7 +77,7 @@ class Rating(BaseModelWithUID):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)  # Add this line to link ratings to users
 
     def __str__(self):
-        return f"Slug: {self.slug}"
+        return f"UID: {self.uid}"
 
     class Meta:
         ordering = ("created_at",)
