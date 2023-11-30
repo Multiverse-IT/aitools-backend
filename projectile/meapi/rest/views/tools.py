@@ -29,7 +29,7 @@ class PublicToolList(generics.ListCreateAPIView):
         subcategory = self.request.query_params.get("subcategory", [])
         features = self.request.query_params.get("features", [])
         # pricing = self.request.query_params.get("pricing")
-        trending = self.request.query_params.get("trending",None)
+        # trending = self.request.query_params.get("trending",None)
         time_range = self.request.query_params.get("time_range", None)
 
         if search is not None:
@@ -88,8 +88,8 @@ class PublicToolList(generics.ListCreateAPIView):
             features = features.split(",")
             queryset = queryset.filter(toolsconnector__feature__slug__in=features)
 
-        if trending:
-            queryset = queryset.filter(is_trending=trending)
+        # if trending:
+        #     queryset = queryset.filter(is_trending=trending)
 
         queryset = queryset.annotate(average_ratings=Avg("toolsconnector__rating__rating"))
 
