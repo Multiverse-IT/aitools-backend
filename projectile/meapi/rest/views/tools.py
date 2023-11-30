@@ -1,21 +1,24 @@
 from datetime import datetime, timedelta
 
-from django.db.models import Q, F, Avg, Count
 from django.contrib.auth import get_user_model
+from django.db.models import Avg, Count, F, Q
 from django.utils import timezone
-
-from rest_framework import generics, permissions
 
 from catalogio.choices import ToolStatus
 from catalogio.models import SavedTool, Tool
 
+from rest_framework import generics
 from search.models import Keyword, KeywordSearch
 
 from ..permissions import CustomIdentityHeaderPermission
-
-from ..serializers.tools import PublicTooDetailSerializer, PublicToolListSerializer, PublicTrendingToolListSerializer
+from ..serializers.tools import (
+    PublicTooDetailSerializer,
+    PublicToolListSerializer,
+    PublicTrendingToolListSerializer,
+)
 
 User = get_user_model()
+
 
 class PublicToolList(generics.ListCreateAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
@@ -28,20 +31,21 @@ class PublicToolList(generics.ListCreateAPIView):
         search = self.request.query_params.get("search", None)
         subcategory = self.request.query_params.get("subcategory", [])
         features = self.request.query_params.get("features", [])
-        # pricing = self.request.query_params.get("pricing")
-        # trending = self.request.query_params.get("trending",None)
+        ordering_param = self.request.query_params.get("ordering", None)
         time_range = self.request.query_params.get("time_range", None)
 
         if search is not None:
-            search_words = [word.strip() for word in search.split(',') if len(word.strip()) >= 2]
+            search_words = [
+                word.strip() for word in search.split(",") if len(word.strip()) >= 2
+            ]
 
             q_object = Q()
             for word in search_words:
                 q_object |= (
-                    Q(name__icontains=word) |
-                    Q(description__icontains=word) |
-                    Q(toolscategoryconnector__subcategory__title__icontains=word) |
-                    Q(toolscategoryconnector__category__title__icontains=word)
+                    Q(name__icontains=word)
+                    | Q(description__icontains=word)
+                    | Q(toolscategoryconnector__subcategory__title__icontains=word)
+                    | Q(toolscategoryconnector__category__title__icontains=word)
                 )
 
             # Filter tools based on the search words in multiple fields
@@ -52,14 +56,18 @@ class PublicToolList(generics.ListCreateAPIView):
                 user = self.request.user
                 keyword, created = Keyword.objects.get_or_create(name=search)
                 if user.is_authenticated:
-                    keyword_search, created = KeywordSearch.objects.get_or_create(keyword=keyword, user=user)
+                    keyword_search, created = KeywordSearch.objects.get_or_create(
+                        keyword=keyword, user=user
+                    )
                     if not created:
-                        keyword_search.search_count = F('search_count') + 1
+                        keyword_search.search_count = F("search_count") + 1
                         keyword_search.save()
                 else:
-                    keyword_search, created = KeywordSearch.objects.get_or_create(keyword=keyword)
+                    keyword_search, created = KeywordSearch.objects.get_or_create(
+                        keyword=keyword
+                    )
                     if not created:
-                        keyword_search.search_count = F('search_count') + 1
+                        keyword_search.search_count = F("search_count") + 1
                         keyword_search.save()
 
         if time_range:
@@ -76,7 +84,9 @@ class PublicToolList(generics.ListCreateAPIView):
             elif time_range == "last_month":
                 last_month_end = now.replace(day=1) - timedelta(days=1)
                 last_month_start = last_month_end.replace(day=1)
-                queryset = queryset.filter(created_at__range=(last_month_start, last_month_end))
+                queryset = queryset.filter(
+                    created_at__range=(last_month_start, last_month_end)
+                )
 
         if subcategory:
             subcategories = subcategory.split(",")
@@ -88,11 +98,20 @@ class PublicToolList(generics.ListCreateAPIView):
             features = features.split(",")
             queryset = queryset.filter(toolsconnector__feature__slug__in=features)
 
-        # if trending:
-        #     queryset = queryset.filter(is_trending=trending)
+        if ordering_param:
+            if ordering_param == "most_loved":
+                queryset = queryset.annotate(most_loved=Count("save_tool")).order_by(
+                    "-most_loved"
+                )
+            elif ordering_param == "average_ratings":
+                queryset.annotate(average_ratings=Avg("toolsconnector__rating__rating")).order_by("-average_ratings")
 
-        queryset = queryset.annotate(average_ratings=Avg("toolsconnector__rating__rating"))
+            elif ordering_param == "created_at":
+                queryset.order_by("-created_at")
 
+        queryset = queryset.annotate(
+            average_ratings=Avg("toolsconnector__rating__rating")
+        )
         return queryset.distinct()
 
 
@@ -104,7 +123,9 @@ class PublicToolDetail(generics.RetrieveUpdateAPIView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.annotate(average_ratings=Avg('toolsconnector__rating__rating'))
+        queryset = queryset.annotate(
+            average_ratings=Avg("toolsconnector__rating__rating")
+        )
 
         return queryset.distinct()
 
@@ -135,7 +156,6 @@ class PublicToolTodayList(generics.ListAPIView):
         return Tool.objects.filter(created_at__date=today, status=ToolStatus.ACTIVE)
 
 
-
 class PublicTrendingToolList(generics.ListAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
     serializer_class = PublicTrendingToolListSerializer
@@ -143,29 +163,41 @@ class PublicTrendingToolList(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = self.queryset
-        time_range = self.request.query_params.get("time_range",None)
+        time_range = self.request.query_params.get("time_range", None)
 
         if time_range:
             now = timezone.now()
-            
+
             if time_range == "this_week":
                 start_date = now - timedelta(days=now.weekday())
                 print("std:", start_date)
                 queryset = queryset.annotate(
-                    total_saved_tools = Count("save_tool", filter=Q(save_tool__created_at__gte=start_date))
+                    total_saved_tools=Count(
+                        "save_tool", filter=Q(save_tool__created_at__gte=start_date)
+                    )
                 ).order_by("-total_saved_tools")
 
             elif time_range == "this_month":
                 start_date = now.replace(day=1)
                 queryset = queryset.annotate(
-                    total_saved_tools = Count("save_tool", filter=Q(save_tool__created_at__gte=start_date))
+                    total_saved_tools=Count(
+                        "save_tool", filter=Q(save_tool__created_at__gte=start_date)
+                    )
                 ).order_by("-total_saved_tools")
 
             elif time_range == "last_month":
                 last_month_end = now.replace(day=1) - timedelta(days=1)
                 last_month_start = last_month_end.replace(day=1)
                 queryset = queryset.annotate(
-                    total_saved_tools = Count("save_tool", filter=Q(save_tool__created_at__range=(last_month_start, last_month_end)))
+                    total_saved_tools=Count(
+                        "save_tool",
+                        filter=Q(
+                            save_tool__created_at__range=(
+                                last_month_start,
+                                last_month_end,
+                            )
+                        ),
+                    )
                 ).order_by("-total_saved_tools")
 
         return queryset
