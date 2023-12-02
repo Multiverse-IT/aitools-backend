@@ -33,7 +33,7 @@ class PrivateUserList(generics.ListCreateAPIView):
     serializer_class = PrivateUserSerializer
     permission_classes = [IsAdmin]
     
-class PrivateUserDetail(generics.RetrieveDestroyAPIView):
+class PrivateUserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.filter()
     serializer_class = PrivateUserSerializer
     permission_classes = [IsAdmin]
