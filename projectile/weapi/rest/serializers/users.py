@@ -31,8 +31,6 @@ class PrivateUserSerializer(serializers.ModelSerializer):
             "image",
             "picture",
             "date_of_birth",
-            "created_at",
-            "updated_at",
         ]
         read_only_fields = [
             "description",
@@ -44,8 +42,6 @@ class PrivateUserSerializer(serializers.ModelSerializer):
             "jti",
             "image",
             "picture",
-            "created_at",
-            "updated_at",
         ]
 
     def create(self, validated_data):
@@ -60,3 +56,46 @@ class PrivateUserSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
+    
+
+class PrivateUserDetailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "slug",
+            "email",
+            "phone",
+            "first_name",
+            "last_name",
+            "avatar",
+            "description",
+            "status",
+            "gender",
+            "exp",
+            "sub",
+            "iat",
+            "jti",
+            "image",
+            "picture",
+            "date_of_birth",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "slug",
+            "description",
+            "avatar",
+            "status",
+            "exp",
+            "sub",
+            "iat",
+            "jti",
+            "image",
+            "picture",
+            "created_at",
+            "updated_at",
+        ]
