@@ -12,6 +12,10 @@ class PublicPostListSerializer(serializers.ModelSerializer):
             "avatar",
             "description",
             "status",
+            "meta_title",
+            "meta_description",
+            "canonical_url",
+            "is_indexed",
             "created_at", 
             "updated_at",
         ]
