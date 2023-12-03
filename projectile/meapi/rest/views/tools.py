@@ -55,20 +55,21 @@ class PublicToolList(generics.ListCreateAPIView):
                 # Save the search keyword and associate it with the user if authenticated
                 user = self.request.user
                 keyword, created = Keyword.objects.get_or_create(name=search)
+            
                 if user.is_authenticated:
-                    keyword_search, created = KeywordSearch.objects.get_or_create(
-                        keyword=keyword, user=user
-                    )
-                    if not created:
-                        keyword_search.search_count = F("search_count") + 1
-                        keyword_search.save()
+                    keyword_search = KeywordSearch.objects.filter(keyword=keyword).first()
+                    
+                    if not keyword_search:
+                        keyword_search = KeywordSearch.objects.create(keyword=keyword, user=user)
+                    keyword_search.search_count += 1
+                    keyword_search.save()
+
                 else:
-                    keyword_search, created = KeywordSearch.objects.get_or_create(
-                        keyword=keyword
-                    )
-                    if not created:
-                        keyword_search.search_count = F("search_count") + 1
-                        keyword_search.save()
+                    keyword_search = KeywordSearch.objects.filter(keyword=keyword).first()
+                    if not keyword_search:
+                        keyword_search = KeywordSearch.objects.create(keyword=keyword)
+                    keyword_search.search_count += 1
+                    keyword_search.save()
 
         if time_range:
             now = timezone.now()
