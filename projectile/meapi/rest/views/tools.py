@@ -107,7 +107,7 @@ class PublicToolList(generics.ListCreateAPIView):
                 queryset.annotate(average_ratings=Avg("toolsconnector__rating__rating")).order_by("-average_ratings")
 
             elif ordering_param == "created_at":
-                queryset.order_by("-created_at")
+                queryset = queryset.order_by("-created_at")
 
         queryset = queryset.annotate(
             average_ratings=Avg("toolsconnector__rating__rating")
