@@ -11,7 +11,7 @@ class ToolList(generics.ListCreateAPIView):
     permission_classes = []
 
     def get_queryset(self):
-        queryset = self.queryset.exclude(requested=True)
+        queryset = self.queryset.exclude(requested=True, status = ToolStatus.PENDING)
         search = self.request.query_params.get("search", None)
         subcategory = self.request.query_params.get("subcategory", [])
         requested = self.request.query_params.get("requested", None)
