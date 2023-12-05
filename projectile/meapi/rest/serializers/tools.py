@@ -51,7 +51,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
     ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
     average_ratings = serializers.DecimalField(max_digits=3, decimal_places=1, read_only=True)
     is_loved = serializers.SerializerMethodField(read_only=True)
-    most_loved = serializers.IntegerField(default=0)
+    most_loved = serializers.IntegerField(default=0, read_only=True)
     class Meta:
         model = Tool
         fields = [
@@ -91,7 +91,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "most_loved",
         ]
 
-        read_only_fields = ["uid", "status","requested", "created_at"]
+        read_only_fields = ["uid", "status","requested","most_loved", "created_at"]
     
     def get_is_loved(self, instance):
         identity = self.context["request"].headers.get("identity")
