@@ -51,7 +51,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
     ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
     average_ratings = serializers.DecimalField(max_digits=3, decimal_places=1, read_only=True)
     is_loved = serializers.SerializerMethodField(read_only=True)
-
+    most_loved = serializers.IntegerField(default=0)
     class Meta:
         model = Tool
         fields = [
@@ -88,6 +88,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "facebook_url",
             "twitter_url",
             "created_at",
+            "most_loved",
         ]
 
         read_only_fields = ["uid", "status","requested", "created_at"]
