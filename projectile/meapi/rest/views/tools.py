@@ -101,9 +101,7 @@ class PublicToolList(generics.ListCreateAPIView):
 
         if ordering_param:
             if ordering_param == "most_loved":
-                queryset = queryset.annotate(most_loved=Count("save_tool")).order_by(
-                    "-most_loved"
-                )
+                queryset = queryset.order_by("-save_count")
             elif ordering_param == "average_ratings":
                 queryset.annotate(average_ratings=Avg("toolsconnector__rating__rating")).order_by("-average_ratings")
 
@@ -170,12 +168,11 @@ class PublicTrendingToolList(generics.ListAPIView):
 
             if time_range == "this_week":
                 start_date = now - timedelta(days=now.weekday())
-                print("std:", start_date)
                 queryset = queryset.annotate(
                     total_saved_tools=Count(
                         "save_tool", filter=Q(save_tool__created_at__gte=start_date)
                     )
-                ).order_by("-total_saved_tools")
+                ).filter(total_saved_tools__gt=3).order_by("-total_saved_tools")
 
             elif time_range == "this_month":
                 start_date = now.replace(day=1)
@@ -183,7 +180,7 @@ class PublicTrendingToolList(generics.ListAPIView):
                     total_saved_tools=Count(
                         "save_tool", filter=Q(save_tool__created_at__gte=start_date)
                     )
-                ).order_by("-total_saved_tools")
+                ).filter(total_saved_tools__gt=3).order_by("-total_saved_tools")
 
             elif time_range == "last_month":
                 last_month_end = now.replace(day=1) - timedelta(days=1)
@@ -198,7 +195,7 @@ class PublicTrendingToolList(generics.ListAPIView):
                             )
                         ),
                     )
-                ).order_by("-total_saved_tools")
+                ).filter(total_saved_tools__gt=3).order_by("-total_saved_tools")
 
         return queryset
 
