@@ -27,7 +27,9 @@ class PublicToolList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         queryset = self.queryset
-
+        queryset = queryset.annotate(
+            average_ratings=Avg("toolsconnector__rating__rating")
+        )
         search = self.request.query_params.get("search", None)
         subcategory = self.request.query_params.get("subcategory", [])
         features = self.request.query_params.get("features", [])
@@ -103,14 +105,12 @@ class PublicToolList(generics.ListCreateAPIView):
             if ordering_param == "most_loved":
                 queryset = queryset.order_by("-save_count")
             elif ordering_param == "average_ratings":
-                queryset.annotate(average_ratings=Avg("toolsconnector__rating__rating")).order_by("-average_ratings")
+                queryset.order_by("-average_ratings")
 
             elif ordering_param == "created_at":
                 queryset = queryset.order_by("-created_at")
 
-        queryset = queryset.annotate(
-            average_ratings=Avg("toolsconnector__rating__rating")
-        )
+        
         return queryset.distinct()
 
 class PublicToolDetail(generics.RetrieveUpdateAPIView):
