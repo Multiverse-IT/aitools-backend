@@ -296,21 +296,36 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
         if not user:
             raise serializers.ValidationError({'detail': 'User not found.'})
 
-        save_count = validated_data.get("save_count")
-
+        save_count = validated_data.get("save_count", None)
+        '''
+        save count paile check if already exists count -1 then remove connector 
+        exists na paile count +1
+        '''
         if save_count is not None:
-            if save_count > instance.save_count:
-                instance.save_count = save_count
+            saved_tool_obj = SavedTool.objects.filter(save_tool=instance, user=user).first()
+            if saved_tool_obj:
+                instance.save_count -=1
                 instance.save()
-                saved_tool_obj, _ = SavedTool.objects.get_or_create(
+                saved_tool_obj.delete()
+            else:
+                saved_tool_obj = SavedTool.objects.create(
                     save_tool=instance, user=user
                 )
-            else:
-                saved_tool_obj = SavedTool.objects.filter(save_tool=instance, user=user).first()
-                instance.save_count = save_count
+                instance.save_count += 1
                 instance.save()
-                if saved_tool_obj:
-                    saved_tool_obj.delete()
+
+            # if save_count > instance.save_count:
+            #     instance.save_count = save_count
+            #     instance.save()
+            #     saved_tool_obj, _ = SavedTool.objects.get_or_create(
+            #         save_tool=instance, user=user
+            #     )
+            # else:
+            #     saved_tool_obj = SavedTool.objects.filter(save_tool=instance, user=user).first()
+            #     instance.save_count = save_count
+            #     instance.save()
+            #     if saved_tool_obj:
+            #         saved_tool_obj.delete()
 
         return instance
 

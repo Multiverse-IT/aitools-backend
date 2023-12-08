@@ -114,7 +114,7 @@ class PublicToolList(generics.ListCreateAPIView):
         return queryset.distinct()
 
 class PublicToolDetail(generics.RetrieveUpdateAPIView):
-    queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
+    queryset = Tool.objects.filter()
     serializer_class = PublicTooDetailSerializer
     permission_classes = [CustomIdentityHeaderPermission]
     lookup_field = "slug"
