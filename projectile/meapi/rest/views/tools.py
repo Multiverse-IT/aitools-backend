@@ -111,7 +111,7 @@ class PublicToolList(generics.ListCreateAPIView):
                 queryset = queryset.order_by("-created_at")
 
         
-        return queryset.distinct()
+        return queryset.distinct().order_by("-created_at")
 
 class PublicToolDetail(generics.RetrieveUpdateAPIView):
     queryset = Tool.objects.filter()
