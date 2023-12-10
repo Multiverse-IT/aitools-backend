@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from catalogio.choices import ToolStatus
 from catalogio.models import SavedTool, Tool
@@ -170,6 +170,18 @@ class PublicTrendingToolList(generics.ListAPIView):
 
         if time_range:
             now = timezone.now()
+
+            if time_range == "today":
+                start_date = date.today() 
+                queryset = (
+                    queryset.annotate(
+                        total_saved_tools=Count(
+                            "save_tool", filter=Q(save_tool__created_at__gte=start_date)
+                        )
+                    )
+                    .filter(total_saved_tools__gt=3)
+                    .order_by("-total_saved_tools")
+                )
 
             if time_range == "this_week":
                 start_date = now - timedelta(days=now.weekday())
