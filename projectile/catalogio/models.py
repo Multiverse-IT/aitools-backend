@@ -32,6 +32,7 @@ class Tool(BaseModelWithUID):
         upload_to=get_tools_media_path_prefix,
         blank=True,
     )
+    alt = models.CharField(max_length=255, blank=True)
     requested = models.BooleanField(default=False)
 
     is_indexed = models.BooleanField(default=True)
@@ -127,6 +128,7 @@ class Category(BaseModelWithUID):
         upload_to=get_category_media_path_prefix,
         blank=True,
     )
+    alt = models.CharField(max_length=255, blank=True)
     is_indexed = models.BooleanField(default=True)
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
@@ -150,6 +152,7 @@ class SubCategory(BaseModelWithUID):
         upload_to=get_subategory_media_path_prefix,
         blank=True,
     )
+    alt = models.CharField(max_length=255, blank=True)
     is_indexed = models.BooleanField(default=True)
 
     # Links to other external urls
@@ -201,3 +204,15 @@ class ToolRequest(models.Model):
 
     def __str__(self):
         return f"User: {self.user.get_name()}-Tool: {self.tool.name}"
+    
+
+
+class FeatureTool(BaseModelWithUID):
+    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Tool Name: {self.tool.name}"
