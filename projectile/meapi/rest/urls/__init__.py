@@ -7,5 +7,6 @@ urlpatterns = [
     path("/ratings", include("meapi.rest.urls.ratings")),
     path("/counts", include("meapi.rest.urls.count")),
     path("/posts", include("meapi.rest.urls.posts")),
+    path("/feature-tools", include("meapi.rest.urls.feature_tool")),
     path("", include("meapi.rest.urls.me")),
 ]

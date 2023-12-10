@@ -11,7 +11,7 @@ class PrivateFeatureToolList(generics.ListCreateAPIView):
     permission_classes = [IsAdmin]
 
 
-class PrivateFeatureToolList(generics.RetrieveUpdateDestroyAPIView):
+class PrivateFeatureToolDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = FeatureTool.objects.filter()
     serializer_class = PrivateFeatureToolSerializer
     lookup_field = "slug"
