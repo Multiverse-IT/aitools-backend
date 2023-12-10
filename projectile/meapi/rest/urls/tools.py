@@ -16,5 +16,10 @@ urlpatterns = [
         name="trending-tool-detail",
     ),
     path("/this/day", tools.PublicToolTodayList.as_view(), name="todays-tool"),
+    path(
+        "/subcategory/<slug:subcategory_slug>",
+        tools.PublicSubCategoryToolList.as_view(),
+        name="subcategory-tool-list",
+    ),
     path("", tools.PublicToolList.as_view(), name="tool-list"),
 ]

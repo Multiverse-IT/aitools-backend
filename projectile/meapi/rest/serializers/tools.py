@@ -403,3 +403,77 @@ class PublicTrendingToolListSerializer(serializers.ModelSerializer):
         data['ratings'] = [rating for rating in data['ratings'] if rating]
 
         return data
+    
+
+class PublicSubCategoryToolSerializer(serializers.ModelSerializer):
+    category = CategorySlimSerializer(
+        source="toolscategoryconnector_set.first", read_only=True
+    )
+    sub_category = SubCategorySlimSerializer(
+        source="toolscategoryconnector_set", many=True, read_only=True
+    )
+    feature = FeatureSlimSerializer(
+        source="toolsconnector_set", many=True, read_only=True
+    )
+    ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
+    average_ratings = serializers.DecimalField(max_digits=3, decimal_places=1, default=0, read_only=True)
+    is_loved = serializers.SerializerMethodField(read_only=True)
+    most_loved = serializers.IntegerField(default=0, read_only=True)
+    class Meta:
+        model = Tool
+        fields = [
+            "slug",
+            "name",
+            "is_verified",
+            "pricing",
+            "categories",
+            "description",
+            "is_editor",
+            "is_trending",
+            "is_new",
+            "is_loved",
+            "is_featured",
+            "save_count",
+            "meta_title",
+            "meta_description",
+            "image",
+            "requested",
+            "is_indexed",
+            "feature",
+            "status",
+            "ratings",
+            "average_ratings",
+            "short_description",
+            "category",
+            "sub_category",
+            "canonical_url",
+            "website_url",
+            "linkedin_url",
+            "facebook_url",
+            "twitter_url",
+            "created_at",
+            "most_loved",
+        ]
+
+        read_only_fields = ["uid", "status","requested","most_loved", "created_at"]
+    
+    def get_is_loved(self, instance):
+        identity = self.context["request"].headers.get("identity")
+        user = User.objects.filter(id=identity).first()
+
+        if user:
+            return SavedTool.objects.filter(user = user, save_tool = instance).exists()
+        else:
+            return False
+        
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        # Filter out empty features
+        data['feature'] = [feature for feature in data['feature'] if feature]
+
+        # Filter out empty ratings
+        data['ratings'] = [rating for rating in data['ratings'] if rating]
+
+        return data
