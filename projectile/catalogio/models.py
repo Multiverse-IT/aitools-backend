@@ -8,6 +8,7 @@ from .utils import (
     get_category_media_path_prefix,
     get_subategory_media_path_prefix,
     get_tools_media_path_prefix,
+    get_feature_slug
 )
 from .managers import ToolQuerySet
 
@@ -206,8 +207,10 @@ class ToolRequest(models.Model):
         return f"User: {self.user.get_name()}-Tool: {self.tool.name}"
     
 
+from autoslug import AutoSlugField
 
 class FeatureTool(BaseModelWithUID):
+    slug = AutoSlugField(populate_from=get_feature_slug, unique=True, db_index=True)
     tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 

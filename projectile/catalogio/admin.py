@@ -10,7 +10,8 @@ from .models import (
     ToolsConnector,
     ToolsCategoryConnector,
     ToolRequest,
-    SavedTool
+    SavedTool,
+    FeatureTool
 )
 
 
@@ -63,3 +64,4 @@ class FeatureAdmin(admin.ModelAdmin):
 
 admin.site.register(ToolRequest)
 admin.site.register(SavedTool)
+admin.site.register(FeatureTool)

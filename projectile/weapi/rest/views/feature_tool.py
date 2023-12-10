@@ -1,0 +1,18 @@
+from rest_framework import generics
+from catalogio.models import FeatureTool, Tool
+from core.permissions import IsAdmin
+
+from ..serializers.feature_tool import PrivateFeatureToolSerializer
+
+
+class PrivateFeatureToolList(generics.ListCreateAPIView):
+    queryset = FeatureTool.objects.filter()
+    serializer_class = PrivateFeatureToolSerializer
+    permission_classes = [IsAdmin]
+
+
+class PrivateFeatureToolList(generics.RetrieveUpdateDestroyAPIView):
+    queryset = FeatureTool.objects.filter()
+    serializer_class = PrivateFeatureToolSerializer
+    lookup_field = "slug"
+    permission_classes = [IsAdmin]
