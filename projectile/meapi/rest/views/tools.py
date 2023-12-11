@@ -34,6 +34,7 @@ class PublicToolList(generics.ListCreateAPIView):
         features = self.request.query_params.get("features", [])
         ordering_param = self.request.query_params.get("ordering", None)
         time_range = self.request.query_params.get("time_range", None)
+        trending = self.request.query_params.get("trending", None)
 
         if search is not None:
             search_words = [
@@ -94,6 +95,69 @@ class PublicToolList(generics.ListCreateAPIView):
                 last_month_start = last_month_end.replace(day=1)
                 queryset = queryset.filter(
                     created_at__range=(last_month_start, last_month_end)
+                )
+
+        if trending:
+            now = timezone.now()
+
+            if trending == "today":
+                start_date = date.today() 
+                queryset = (
+                    queryset.annotate(
+                        total_saved_tools=Count(
+                            "save_tool", filter=Q(save_tool__created_at__gte=start_date)
+                        )
+                    )
+                    .filter(total_saved_tools__gt=3)
+                    .order_by("-total_saved_tools")
+                )
+
+            if trending == "this_week":
+                print("trrrrrr:", trending)
+                start_date = now - timedelta(days=now.weekday())
+                print("now:", now)
+                print("weekday:", now.weekday())
+                print("start date:", start_date)
+                queryset = (
+                    queryset.annotate(
+                        total_saved_tools=Count(
+                            "save_tool", filter=Q(save_tool__created_at__gte=start_date)
+                        )
+                    )
+                    .filter(total_saved_tools__gt=3)
+                    .order_by("-total_saved_tools")
+                )
+                print("sqqqqqqqqqqqq:", queryset)
+
+            elif trending == "this_month":
+                start_date = now.replace(day=1)
+                queryset = (
+                    queryset.annotate(
+                        total_saved_tools=Count(
+                            "save_tool", filter=Q(save_tool__created_at__gte=start_date)
+                        )
+                    )
+                    .filter(total_saved_tools__gt=3)
+                    .order_by("-total_saved_tools")
+                )
+
+            elif trending == "last_month":
+                last_month_end = now.replace(day=1) - timedelta(days=1)
+                last_month_start = last_month_end.replace(day=1)
+                queryset = (
+                    queryset.annotate(
+                        total_saved_tools=Count(
+                            "save_tool",
+                            filter=Q(
+                                save_tool__created_at__range=(
+                                    last_month_start,
+                                    last_month_end,
+                                )
+                            ),
+                        )
+                    )
+                    .filter(total_saved_tools__gt=3)
+                    .order_by("-total_saved_tools")
                 )
 
         if subcategory:
