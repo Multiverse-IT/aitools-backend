@@ -113,11 +113,7 @@ class PublicToolList(generics.ListCreateAPIView):
                 )
 
             if trending == "this_week":
-                print("trrrrrr:", trending)
                 start_date = now - timedelta(days=now.weekday())
-                print("now:", now)
-                print("weekday:", now.weekday())
-                print("start date:", start_date)
                 queryset = (
                     queryset.annotate(
                         total_saved_tools=Count(
