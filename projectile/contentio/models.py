@@ -37,6 +37,7 @@ class Post(BaseModelWithUID):
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
 
+    view_count = models.PositiveBigIntegerField(default=0)
 
     def __str__(self):
         return f"UID: {self.uid}-slug: {self.slug}"

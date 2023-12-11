@@ -15,4 +15,11 @@ class PublicPostDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.filter(status=PostStatus.ACTIVE)
     serializer_class = PublicPostListSerializer
     permission_classes = [IsAdmin]
-    lookup_field = "slug"
+
+    def get_object(self):
+        slug = self.kwargs.get("slug", None)
+        post = generics.get_object_or_404(self.queryset.filter(), slug=slug)
+        post.view_count += 1
+        post.save()
+        return post
+    

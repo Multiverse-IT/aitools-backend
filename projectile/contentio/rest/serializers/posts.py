@@ -19,6 +19,7 @@ class PublicPostListSerializer(serializers.ModelSerializer):
             "is_indexed",
             "created_at", 
             "updated_at",
+            "view_count"
         ]
 
     def create(self, validated_data):
