@@ -24,6 +24,7 @@ class PrivateUserSerializer(serializers.ModelSerializer):
             "status",
             "gender",
             "password",
+            "alt",
             "exp",
             "sub",
             "iat",
