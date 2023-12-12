@@ -28,7 +28,7 @@ class PublicToolList(generics.ListCreateAPIView):
         queryset = self.queryset
         queryset = queryset.annotate(
             average_ratings=Avg("toolsconnector__rating__rating")
-        )
+        ).order_by("-created_at")
         search = self.request.query_params.get("search", None)
         subcategory = self.request.query_params.get("subcategory", [])
         features = self.request.query_params.get("features", [])
@@ -175,7 +175,7 @@ class PublicToolList(generics.ListCreateAPIView):
             elif ordering_param == "created_at":
                 queryset = queryset.order_by("-created_at")
 
-        return queryset.distinct().order_by("-created_at")
+        return queryset.distinct()
 
 
 class PublicToolDetail(generics.RetrieveUpdateAPIView):
@@ -306,13 +306,14 @@ class PublicSubCategoryToolList(generics.ListAPIView):
         slug = self.kwargs.get("subcategory_slug", None)
         queryset = self.queryset.filter(
             toolscategoryconnector__subcategory__slug=slug
-        ).annotate(average_ratings=Avg("toolsconnector__rating__rating"))
+        ).annotate(average_ratings=Avg("toolsconnector__rating__rating")).order_by("-created_at")
 
         # query params
         search = self.request.query_params.get("search", None)
         features = self.request.query_params.get("features", [])
         ordering_param = self.request.query_params.get("ordering", None)
         time_range = self.request.query_params.get("time_range", None)
+        trending = self.request.query_params.get("trending", None)
 
         if search is not None:
             search_words = [
@@ -388,4 +389,63 @@ class PublicSubCategoryToolList(generics.ListAPIView):
             elif ordering_param == "created_at":
                 queryset = queryset.order_by("-created_at")
 
-        return queryset.distinct().order_by("-created_at")
+
+        if trending:
+            now = timezone.now()
+
+            if trending == "today":
+                start_date = date.today() 
+                queryset = (
+                    queryset.annotate(
+                        total_saved_tools=Count(
+                            "save_tool", filter=Q(save_tool__created_at__gte=start_date)
+                        )
+                    )
+                    .filter(total_saved_tools__gt=3)
+                    .order_by("-total_saved_tools")
+                )
+
+            if trending == "this_week":
+                start_date = now - timedelta(days=now.weekday())
+                queryset = (
+                    queryset.annotate(
+                        total_saved_tools=Count(
+                            "save_tool", filter=Q(save_tool__created_at__gte=start_date)
+                        )
+                    )
+                    .filter(total_saved_tools__gt=3)
+                    .order_by("-total_saved_tools")
+                )
+
+            elif trending == "this_month":
+                start_date = now.replace(day=1)
+                queryset = (
+                    queryset.annotate(
+                        total_saved_tools=Count(
+                            "save_tool", filter=Q(save_tool__created_at__gte=start_date)
+                        )
+                    )
+                    .filter(total_saved_tools__gt=3)
+                    .order_by("-total_saved_tools")
+                )
+
+            elif trending == "last_month":
+                last_month_end = now.replace(day=1) - timedelta(days=1)
+                last_month_start = last_month_end.replace(day=1)
+                queryset = (
+                    queryset.annotate(
+                        total_saved_tools=Count(
+                            "save_tool",
+                            filter=Q(
+                                save_tool__created_at__range=(
+                                    last_month_start,
+                                    last_month_end,
+                                )
+                            ),
+                        )
+                    )
+                    .filter(total_saved_tools__gt=3)
+                    .order_by("-total_saved_tools")
+                )
+
+        return queryset.distinct()
