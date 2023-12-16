@@ -6,8 +6,8 @@ from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count, F, Q
 from django.utils import timezone
 from rest_framework import generics
+from common.utils import CustomPagination10
 from search.models import Keyword, KeywordSearch
-
 from ..permissions import CustomIdentityHeaderPermission
 from ..serializers.tools import (
     PublicSubCategoryToolSerializer,
@@ -23,6 +23,7 @@ class PublicToolList(generics.ListCreateAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
     serializer_class = PublicToolListSerializer
     permission_classes = [CustomIdentityHeaderPermission]
+    pagination_class = CustomPagination10
 
     def get_queryset(self):
         queryset = self.queryset
@@ -123,7 +124,6 @@ class PublicToolList(generics.ListCreateAPIView):
                     .filter(total_saved_tools__gt=3)
                     .order_by("-total_saved_tools")
                 )
-                print("sqqqqqqqqqqqq:", queryset)
 
             elif trending == "this_month":
                 start_date = now.replace(day=1)
@@ -301,6 +301,7 @@ class PublicSubCategoryToolList(generics.ListAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
     serializer_class = PublicSubCategoryToolSerializer
     permission_classes = [CustomIdentityHeaderPermission]
+    pagination_class = CustomPagination10
 
     def get_queryset(self):
         slug = self.kwargs.get("subcategory_slug", None)

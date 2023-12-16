@@ -1,13 +1,17 @@
+from rest_framework import generics
+
 from contentio.choices import PostStatus
 from contentio.models import Post
 from contentio.rest.serializers.posts import PublicPostListSerializer
-from rest_framework import generics
+
+from common.utils import CustomPagination10
 
 
 class PublicPostList(generics.ListAPIView):
     queryset = Post.objects.filter(status=PostStatus.ACTIVE)
     serializer_class = PublicPostListSerializer
     permission_classes = []
+    pagination_class = CustomPagination10
 
     def get_queryset(self):
         popular = self.request.query_params.get("popular", None)
