@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count, F, Q
 from django.utils import timezone
 from rest_framework import generics
+from rest_framework.response import Response
 from common.utils import CustomPagination10
 from search.models import Keyword, KeywordSearch
 from ..permissions import CustomIdentityHeaderPermission
@@ -189,9 +190,28 @@ class PublicToolDetail(generics.RetrieveUpdateAPIView):
         queryset = queryset.annotate(
             average_ratings=Avg("toolsconnector__rating__rating")
         )
-
         return queryset.distinct()
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        alternative_tool = self.get_alternative_tool(instance)
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+        if alternative_tool:
+            alternative_serializer = PublicTooDetailSerializer(alternative_tool, context={'request': request})
+            data["alternative_tool"]=alternative_serializer.data
+        return Response(data)
+
+    def get_alternative_tool(self, current_tool):
+        queryset = Tool.objects.annotate(total_save_count=Count('save_tool')).order_by("-total_save_count")
+
+        current_position = list(queryset).index(current_tool)
+
+        alternative_position = current_position + 1
+        if alternative_position < len(queryset):
+            alternative_tool = queryset[alternative_position]
+            return alternative_tool
+        return None
 
 class UserLoveToolList(generics.ListAPIView):
     permission_classes = [CustomIdentityHeaderPermission]
