@@ -198,7 +198,7 @@ class PublicToolDetail(generics.RetrieveUpdateAPIView):
         serializer = self.get_serializer(instance)
         data = serializer.data
         if alternative_tool:
-            alternative_serializer = PublicTooDetailSerializer(alternative_tool, context={'request': request})
+            alternative_serializer = PublicToolListSerializer(alternative_tool, context={'request': request})
             data["alternative_tool"]=alternative_serializer.data
         return Response(data)
 

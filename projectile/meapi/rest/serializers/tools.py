@@ -1,28 +1,28 @@
 from decimal import Decimal
-
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 
 from catalogio.choices import ToolKind, ToolStatus
 from catalogio.models import (
     Category,
+    Feature,
     SavedTool,
     SubCategory,
     Tool,
     ToolRequest,
     ToolsCategoryConnector,
     ToolsConnector,
-    Feature
 )
 from common.serializers import (
     CategorySlimSerializer,
     FeatureSlimSerializer,
+    RatingSlimSerializer,
     SubCategorySlimSerializer,
-    RatingSlimSerializer
 )
 from rest_framework import serializers
 
 User = get_user_model()
+
 
 class PublicToolListSerializer(serializers.ModelSerializer):
     feature_slugs = serializers.ListField(
@@ -33,11 +33,15 @@ class PublicToolListSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(),
         write_only=True,
         required=False,
-        allow_null = True,
-        allow_empty=True
+        allow_null=True,
+        allow_empty=True,
     )
     subcategory_slugs = serializers.ListField(
-        write_only=True, required=False, child=serializers.CharField(),  allow_null = True, allow_empty=True
+        write_only=True,
+        required=False,
+        child=serializers.CharField(),
+        allow_null=True,
+        allow_empty=True,
     )
     category = CategorySlimSerializer(
         source="toolscategoryconnector_set.first", read_only=True
@@ -48,10 +52,15 @@ class PublicToolListSerializer(serializers.ModelSerializer):
     feature = FeatureSlimSerializer(
         source="toolsconnector_set", many=True, read_only=True
     )
-    ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
-    average_ratings = serializers.DecimalField(max_digits=3, decimal_places=1, default=0, read_only=True)
+    ratings = RatingSlimSerializer(
+        source="toolsconnector_set", many=True, read_only=True
+    )
+    average_ratings = serializers.DecimalField(
+        max_digits=3, decimal_places=1, default=0, read_only=True
+    )
     is_loved = serializers.SerializerMethodField(read_only=True)
     most_loved = serializers.IntegerField(default=0, read_only=True)
+
     class Meta:
         model = Tool
         fields = [
@@ -91,44 +100,43 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "most_loved",
         ]
 
-        read_only_fields = ["uid", "status","requested","most_loved", "created_at"]
-    
+        read_only_fields = ["uid", "status", "requested", "most_loved", "created_at"]
+
     def get_is_loved(self, instance):
         identity = self.context["request"].headers.get("identity")
         user = User.objects.filter(id=identity).first()
 
         if user:
-            return SavedTool.objects.filter(user = user, save_tool = instance).exists()
+            return SavedTool.objects.filter(user=user, save_tool=instance).exists()
         else:
             return False
-        
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
 
         # Filter out empty features
-        data['feature'] = [feature for feature in data['feature'] if feature]
+        data["feature"] = [feature for feature in data["feature"] if feature]
 
         # Filter out empty ratings
-        data['ratings'] = [rating for rating in data['ratings'] if rating]
+        data["ratings"] = [rating for rating in data["ratings"] if rating]
 
         return data
-    
-    
 
     def create(self, validated_data):
         identity = self.context["request"].headers.get("identity")
         user = User.objects.filter(id=identity).first()
 
         if not user:
-            raise serializers.ValidationError({'detail': 'User not found.'})
+            raise serializers.ValidationError({"detail": "User not found."})
 
         feature_slugs = validated_data.pop("feature_slugs", None)
         category = validated_data.pop("category_slug", None)
         subcategory_slugs = validated_data.pop("subcategory_slugs", [])
 
-        tool = Tool.objects.create(requested=True, status=ToolStatus.PENDING, **validated_data)
-        
+        tool = Tool.objects.create(
+            requested=True, status=ToolStatus.PENDING, **validated_data
+        )
+
         if tool.requested == True:
             ToolRequest.objects.create(tool=tool, user=user)
 
@@ -140,10 +148,14 @@ class PublicToolListSerializer(serializers.ModelSerializer):
                 ToolsCategoryConnector.objects.create(tool=tool, category=category)
 
                 if subcategory_slugs:
-                    subcategories = SubCategory.objects.filter(slug__in=subcategory_slugs)
+                    subcategories = SubCategory.objects.filter(
+                        slug__in=subcategory_slugs
+                    )
                     for subcategory in subcategories:
-                        ToolsCategoryConnector.objects.create(tool=tool, category=category, subcategory=subcategory)
-            
+                        ToolsCategoryConnector.objects.create(
+                            tool=tool, category=category, subcategory=subcategory
+                        )
+
             except Category.DoesNotExist:
                 print("Category not found")
 
@@ -168,7 +180,6 @@ class PublicToolListSerializer(serializers.ModelSerializer):
         ToolsConnector.objects.bulk_create(connectors)
 
 
-
 class PublicTooDetailSerializer(serializers.ModelSerializer):
     category = CategorySlimSerializer(
         source="toolscategoryconnector_set.first", read_only=True
@@ -179,11 +190,14 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
     feature = FeatureSlimSerializer(
         source="toolsconnector_set", many=True, read_only=True
     )
-    ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
+    ratings = RatingSlimSerializer(
+        source="toolsconnector_set", many=True, read_only=True
+    )
     average_ratings = serializers.FloatField(read_only=True)
     is_loved = serializers.SerializerMethodField(read_only=True)
     ratings_distribution = serializers.SerializerMethodField(read_only=True)
-
+    related_tools = serializers.SerializerMethodField(read_only=True)
+    
     class Meta:
         model = Tool
         fields = [
@@ -217,6 +231,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "facebook_url",
             "twitter_url",
             "created_at",
+            "related_tools",
         ]
 
         read_only_fields = [
@@ -252,20 +267,22 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
         user = User.objects.filter(id=identity).first()
 
         if user:
-            return SavedTool.objects.filter(user = user, save_tool = instance).exists()
+            return SavedTool.objects.filter(user=user, save_tool=instance).exists()
         else:
             return False
-        
+
     def get_ratings_distribution(self, instance):
         # Get the ratings distribution for the given tool instance
-        ratings_distribution = instance.toolsconnector_set.values('rating__rating').annotate(
-            count=Count('rating__rating')
-        ).order_by('rating__rating')  
+        ratings_distribution = (
+            instance.toolsconnector_set.values("rating__rating")
+            .annotate(count=Count("rating__rating"))
+            .order_by("rating__rating")
+        )
 
         # Create a dictionary to represent the distribution
-        distribution_dict = {i: 0 for i in range(5, 0, -1)}  
+        distribution_dict = {i: 0 for i in range(5, 0, -1)}
         for rating_entry in ratings_distribution:
-            rating_value = rating_entry['rating__rating']
+            rating_value = rating_entry["rating__rating"]
 
             # Check if the rating_value is not None before rounding
             if rating_value is not None:
@@ -274,48 +291,62 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
 
                 # Update existing values
                 if key in distribution_dict:
-                    distribution_dict[key] += rating_entry['count']
+                    distribution_dict[key] += rating_entry["count"]
 
         # Calculate percentages
         total_ratings = sum(distribution_dict.values())
-        percentages = {str(key): int((count / total_ratings) * 100) if total_ratings > 0 else 0
-                       for key, count in distribution_dict.items()}
+        percentages = {
+            str(key): int((count / total_ratings) * 100) if total_ratings > 0 else 0
+            for key, count in distribution_dict.items()
+        }
 
         return percentages
-    
+
+    def get_related_tools(self, instance):
+        related_tools = (
+            Tool.objects.filter(
+                toolscategoryconnector__category__id=instance.toolscategoryconnector_set.first().category.id
+            )
+            .exclude(id=instance.id)
+            .distinct()
+        )
+        related_tools_serializer = PublicToolListSerializer(
+            related_tools, many=True, context=self.context
+        ).data
+        return related_tools_serializer
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['feature'] = [feature for feature in data['feature'] if feature]
-        data['ratings'] = [rating for rating in data['ratings'] if rating]
+        data["feature"] = [feature for feature in data["feature"] if feature]
+        data["ratings"] = [rating for rating in data["ratings"] if rating]
         return data
-    
+
     def update(self, instance, validated_data):
         identity = self.context["request"].headers.get("identity")
         user = User.objects.filter(id=identity).first()
 
         if not user:
-            raise serializers.ValidationError({'detail': 'User not found.'})
+            raise serializers.ValidationError({"detail": "User not found."})
 
         save_count = validated_data.get("save_count", None)
-        '''
+        """
         save count paile check if already exists count -1 then remove connector 
         exists na paile count +1
-        '''
+        """
         if save_count is not None:
-            saved_tool_obj = SavedTool.objects.filter(save_tool=instance, user=user).first()
+            saved_tool_obj = SavedTool.objects.filter(
+                save_tool=instance, user=user
+            ).first()
             if saved_tool_obj:
-                instance.save_count -=1
+                instance.save_count -= 1
                 instance.save()
                 saved_tool_obj.delete()
             else:
-                saved_tool_obj = SavedTool.objects.create(
-                    save_tool=instance, user=user
-                )
+                saved_tool_obj = SavedTool.objects.create(save_tool=instance, user=user)
                 instance.save_count += 1
                 instance.save()
 
         return instance
-
 
 
 class PublicTrendingToolListSerializer(serializers.ModelSerializer):
@@ -328,10 +359,15 @@ class PublicTrendingToolListSerializer(serializers.ModelSerializer):
     feature = FeatureSlimSerializer(
         source="toolsconnector_set", many=True, read_only=True
     )
-    ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
-    average_ratings = serializers.DecimalField(max_digits=3, decimal_places=1, read_only=True)
+    ratings = RatingSlimSerializer(
+        source="toolsconnector_set", many=True, read_only=True
+    )
+    average_ratings = serializers.DecimalField(
+        max_digits=3, decimal_places=1, read_only=True
+    )
     is_loved = serializers.SerializerMethodField(read_only=True)
     total_saved_tools = serializers.IntegerField(read_only=True, default=0)
+
     class Meta:
         model = Tool
         fields = [
@@ -368,29 +404,28 @@ class PublicTrendingToolListSerializer(serializers.ModelSerializer):
             "total_saved_tools",
         ]
 
-        read_only_fields = ["uid", "status","requested", "created_at"]
-    
+        read_only_fields = ["uid", "status", "requested", "created_at"]
+
     def get_is_loved(self, instance):
         identity = self.context["request"].headers.get("identity")
         user = User.objects.filter(id=identity).first()
 
         if user:
-            return SavedTool.objects.filter(user = user, save_tool = instance).exists()
+            return SavedTool.objects.filter(user=user, save_tool=instance).exists()
         else:
             return False
-        
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
 
         # Filter out empty features
-        data['feature'] = [feature for feature in data['feature'] if feature]
+        data["feature"] = [feature for feature in data["feature"] if feature]
 
         # Filter out empty ratings
-        data['ratings'] = [rating for rating in data['ratings'] if rating]
+        data["ratings"] = [rating for rating in data["ratings"] if rating]
 
         return data
-    
+
 
 class PublicSubCategoryToolSerializer(serializers.ModelSerializer):
     category = CategorySlimSerializer(
@@ -402,10 +437,15 @@ class PublicSubCategoryToolSerializer(serializers.ModelSerializer):
     feature = FeatureSlimSerializer(
         source="toolsconnector_set", many=True, read_only=True
     )
-    ratings = RatingSlimSerializer(source="toolsconnector_set", many=True, read_only=True)
-    average_ratings = serializers.DecimalField(max_digits=3, decimal_places=1, default=0, read_only=True)
+    ratings = RatingSlimSerializer(
+        source="toolsconnector_set", many=True, read_only=True
+    )
+    average_ratings = serializers.DecimalField(
+        max_digits=3, decimal_places=1, default=0, read_only=True
+    )
     is_loved = serializers.SerializerMethodField(read_only=True)
     most_loved = serializers.IntegerField(default=0, read_only=True)
+
     class Meta:
         model = Tool
         fields = [
@@ -442,25 +482,24 @@ class PublicSubCategoryToolSerializer(serializers.ModelSerializer):
             "most_loved",
         ]
 
-        read_only_fields = ["uid", "status","requested","most_loved", "created_at"]
-    
+        read_only_fields = ["uid", "status", "requested", "most_loved", "created_at"]
+
     def get_is_loved(self, instance):
         identity = self.context["request"].headers.get("identity")
         user = User.objects.filter(id=identity).first()
 
         if user:
-            return SavedTool.objects.filter(user = user, save_tool = instance).exists()
+            return SavedTool.objects.filter(user=user, save_tool=instance).exists()
         else:
             return False
-        
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
 
         # Filter out empty features
-        data['feature'] = [feature for feature in data['feature'] if feature]
+        data["feature"] = [feature for feature in data["feature"] if feature]
 
         # Filter out empty ratings
-        data['ratings'] = [rating for rating in data['ratings'] if rating]
+        data["ratings"] = [rating for rating in data["ratings"] if rating]
 
         return data
