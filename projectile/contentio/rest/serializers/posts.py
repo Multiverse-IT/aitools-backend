@@ -10,6 +10,7 @@ class PublicPostListSerializer(serializers.ModelSerializer):
             "slug",
             "title",
             "avatar",
+            "alt",
             "description",
             "short_description",
             "status",
