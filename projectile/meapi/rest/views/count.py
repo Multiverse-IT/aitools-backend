@@ -15,11 +15,14 @@ class CountOfEveryThingList(generics.RetrieveAPIView):
 
     def get_object(self):
         today = datetime.now().date()
+        today = datetime.now().date()
+        now = timezone.now()
+        start_date = now  - timedelta(days=now.weekday())
 
         queryset = Tool.objects.filter(status=ToolStatus.ACTIVE).annotate(
             total_tools=Count("id"),
             today_created_tools=Count("id", filter=Q(created_at__date=today)),
-            trending_tools=Count("id", filter=Q(is_trending=True)),
+            trending_tools = Count("save_tool", filter=Q(save_tool__created_at__gte=start_date)),
             love_tools_count=Count(
                 "love_tool", distinct=True
             ),  # Use the related name 'love_tool'
@@ -35,7 +38,7 @@ class CountOfEveryThingList(generics.RetrieveAPIView):
                 today_created_tools=Count("id", filter=Q(created_at__date=today))
             )["today_created_tools"],
             "trending_tools": queryset.aggregate(
-                trending_tools=Count("id", filter=Q(is_trending=True))
+                trending_tools=Count("save_tool", filter=Q(save_tool__created_at__gte=start_date))
             )["trending_tools"],
         }
 
