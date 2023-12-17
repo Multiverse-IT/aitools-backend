@@ -73,6 +73,7 @@ urlpatterns = [
         TokenVerifyView.as_view(),
         name="token_verify",
     ),
+    path("api/v1/public", include("publicapi.rest.urls")),
     path("api/v1", include("core.rest.urls.users")),
     path("api/v1/we", include("weapi.rest.urls")),
     path("api/v1/me", include("meapi.rest.urls")),
