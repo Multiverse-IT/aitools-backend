@@ -6,13 +6,13 @@ from ..serializers.posts import PublicPostListSerializer
 from core.permissions import IsAdmin
 
 class PublicPostList(generics.ListCreateAPIView):
-    queryset = Post.objects.filter(status=PostStatus.ACTIVE)
+    queryset = Post.objects.get_status_editable()
     serializer_class = PublicPostListSerializer
     permission_classes = [IsAdmin]
 
 
 class PublicPostDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Post.objects.filter(status=PostStatus.ACTIVE)
+    queryset = Post.objects.get_status_editable()
     serializer_class = PublicPostListSerializer
     permission_classes = [IsAdmin]
 

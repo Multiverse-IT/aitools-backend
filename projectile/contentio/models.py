@@ -9,7 +9,7 @@ from common.models import BaseModelWithUID
 
 from .choices import PostStatus
 from .utils import get_post_media_path_prefix, get_post_slug
-
+from .managers import PostQuerySet
 
 class Post(BaseModelWithUID):
     title = models.CharField(max_length=255)
@@ -38,6 +38,8 @@ class Post(BaseModelWithUID):
     canonical_url = models.URLField(blank=True)
 
     view_count = models.PositiveBigIntegerField(default=0)
+
+    objects = PostQuerySet.as_manager()
 
     def __str__(self):
         return f"UID: {self.uid}-slug: {self.slug}"
