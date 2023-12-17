@@ -1,7 +1,11 @@
-from common.models import BaseModelWithUID
-from django.contrib.auth import get_user_model
+from autoslug import AutoSlugField
+
 from django.db import models
+from django.contrib.auth import get_user_model
+
 from versatileimagefield.fields import VersatileImageField
+
+from common.models import BaseModelWithUID
 
 from .choices import RequestToolStatus, ToolKind, ToolStatus
 from .utils import (
@@ -207,15 +211,14 @@ class ToolRequest(models.Model):
         return f"User: {self.user.get_name()}-Tool: {self.tool.name}"
     
 
-from autoslug import AutoSlugField
 
 class FeatureTool(BaseModelWithUID):
     slug = AutoSlugField(populate_from=get_feature_slug, unique=True, db_index=True)
-    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
+    tool = models.JSONField(default=list, null=False, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"Tool Name: {self.tool.name}"
+        return f"UID: {self.uid}-SLUG: {self.slug}"

@@ -8,40 +8,29 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
     tool_slugs = serializers.ListField(
         write_only=True, required=False, child=serializers.CharField()
     )
-    tool = ToolListSerializer(read_only=True)
-
     class Meta:
         model = FeatureTool
         fields = ("slug", "tool", "created_at", "updated_at", "tool_slugs")
 
-        read_only_fields = ["slug","created_at", "updated_at"]
+        read_only_fields = ["created_at", "updated_at"]
 
     def create(self, validated_data):
+        user=self.context["request"].user
         tool_slugs = validated_data.pop("tool_slugs", None)
         tools = Tool.objects.filter(slug__in=tool_slugs)
-
-        if tools.exists():
-            feature_tools = [
-                FeatureTool(tool=tool, user=self.context["request"].user)
-                for tool in tools if not FeatureTool.objects.filter(tool=tool).first()
-            ]
-            FeatureTool.objects.bulk_create(feature_tools)
-       
-        return validated_data
+        feature_tool = FeatureTool.objects.create(user=user, **validated_data)
+        feature_tool.tool = ToolListSerializer(tools, many=True).data
+        feature_tool.save()
+        
+        return feature_tool
     
     def update(self, instance, validated_data):
         tool_slugs = validated_data.pop("tool_slugs", None)
-        tools_to_remove = Tool.objects.filter(slug__in=tool_slugs)
-
-        feature_tools = FeatureTool.objects.filter(tool__in=tools_to_remove)
-        feature_tools.delete()
+        instance.tool = []
+        instance.save()
         tools = Tool.objects.filter(slug__in=tool_slugs)
+        instance.tool = ToolListSerializer(tools, many=True).data
+        instance.save()
 
-        if tools.exists():
-            feature_tools = [
-                FeatureTool(tool=tool, user=self.context["request"].user)
-                for tool in tools if not FeatureTool.objects.filter(tool=tool).first()
-            ]
-            FeatureTool.objects.bulk_create(feature_tools)
-        return super().update(instance, validated_data)
+        return instance
     

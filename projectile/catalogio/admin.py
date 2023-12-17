@@ -23,7 +23,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Tool)
 class ToolAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "created_at"]
+    list_display = ["id", "name","slug", "created_at"]
     search_fields = ["name"]
 
 
