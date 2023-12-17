@@ -28,3 +28,20 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
             FeatureTool.objects.bulk_create(feature_tools)
        
         return validated_data
+    
+    def update(self, instance, validated_data):
+        tool_slugs = validated_data.pop("tool_slugs", None)
+        tools_to_remove = Tool.objects.filter(slug__in=tool_slugs)
+
+        feature_tools = FeatureTool.objects.filter(tool__in=tools_to_remove)
+        feature_tools.delete()
+        tools = Tool.objects.filter(slug__in=tool_slugs)
+
+        if tools.exists():
+            feature_tools = [
+                FeatureTool(tool=tool, user=self.context["request"].user)
+                for tool in tools if not FeatureTool.objects.filter(tool=tool).first()
+            ]
+            FeatureTool.objects.bulk_create(feature_tools)
+        return super().update(instance, validated_data)
+    

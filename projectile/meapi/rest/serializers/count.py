@@ -5,3 +5,10 @@ class PublicCountSerializer(serializers.Serializer):
     total_tools = serializers.IntegerField()
     today_created_tools = serializers.IntegerField()
     trending_tools = serializers.IntegerField()
+
+class PublicSubcategoryCountSerializer(serializers.Serializer):
+    total_tools = serializers.IntegerField(read_only=True)
+    today_created_tools = serializers.IntegerField(read_only=True)
+    trending_tools = serializers.IntegerField(read_only=True)
+    love_tools_count = serializers.IntegerField(read_only=True)
+
