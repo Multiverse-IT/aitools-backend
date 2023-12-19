@@ -305,17 +305,20 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
         return percentages
 
     def get_related_tools(self, instance):
-        related_tools = (
-            Tool.objects.filter(
-                toolscategoryconnector__category__id=instance.toolscategoryconnector_set.first().category.id
+        try:
+            related_tools = (
+                Tool.objects.filter(
+                    toolscategoryconnector__category__id=instance.toolscategoryconnector_set.first().category.id
+                )
+                .exclude(id=instance.id)
+                .distinct()
             )
-            .exclude(id=instance.id)
-            .distinct()
-        )
-        related_tools_serializer = PublicToolListSerializer(
-            related_tools, many=True, context=self.context
-        ).data
-        return related_tools_serializer
+            related_tools_serializer = PublicToolListSerializer(
+                related_tools, many=True, context=self.context
+            ).data
+            return related_tools_serializer
+        except:
+            return []
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

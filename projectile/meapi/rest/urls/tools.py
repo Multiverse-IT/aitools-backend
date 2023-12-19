@@ -5,6 +5,7 @@ from ..views.count import PublicSubcategoryToolsCountList
 urlpatterns = [
     path("/love-tool", tools.UserLoveToolList.as_view(), name="love-tool"),
     path("/<slug:slug>", tools.PublicToolDetail.as_view(), name="tool-detail"),
+    path("/<slug:slug>/verify", tools.PublicCodeVerifyApi.as_view(), name="verify-api"),
     path(
         "/all/trending",
         tools.PublicTrendingToolList.as_view(),

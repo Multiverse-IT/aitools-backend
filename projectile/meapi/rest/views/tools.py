@@ -1,14 +1,22 @@
 from datetime import datetime, timedelta, date
 
-from catalogio.choices import ToolStatus
-from catalogio.models import SavedTool, Tool
 from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count, F, Q
 from django.utils import timezone
+
 from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from catalogio.choices import ToolStatus
+from catalogio.models import SavedTool, Tool
+
 from common.utils import CustomPagination10
+
+from meapi.rest.scrape.link_find import check_code_presence
+
 from search.models import Keyword, KeywordSearch
+
 from ..permissions import CustomIdentityHeaderPermission
 from ..serializers.tools import (
     PublicSubCategoryToolSerializer,
@@ -470,3 +478,30 @@ class PublicSubCategoryToolList(generics.ListAPIView):
                 )
 
         return queryset.distinct()
+
+
+
+class PublicCodeVerifyApi(APIView):
+
+    def get(self, request, *args, **kwargs):
+        slug = self.kwargs.get("slug", None)
+        tool = generics.get_object_or_404(Tool.objects.filter(), slug=slug)
+        code = tool.verification_code
+        url = tool.website_url
+
+        if url == "":
+            return Response({"detail":"Wrong url or You didn't fill up your website link!"}) 
+
+        if tool.is_verified:
+            return Response({"detail": "You have already been verified!"})
+
+        commitment = check_code_presence(url, code)
+
+        if commitment:
+            tool.is_verified = True
+            tool.save()
+            return Response({"detail": "Verified successfully!"})
+
+        return Response({"detail":"Verification failed. Something went wrong!"})
+
+        

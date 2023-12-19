@@ -12,7 +12,8 @@ from .utils import (
     get_category_media_path_prefix,
     get_subategory_media_path_prefix,
     get_tools_media_path_prefix,
-    get_feature_slug
+    get_feature_slug,
+    get_verification_code,
 )
 from .managers import ToolQuerySet
 
@@ -39,6 +40,7 @@ class Tool(BaseModelWithUID):
     )
     alt = models.CharField(max_length=255, blank=True)
     requested = models.BooleanField(default=False)
+    verification_code = models.CharField(max_length=50, blank=True)
 
     is_indexed = models.BooleanField(default=True)
     short_description = models.CharField(max_length=255, blank=True)
@@ -65,6 +67,12 @@ class Tool(BaseModelWithUID):
 
     def __str__(self):
         return f"Slug: {self.slug}, Created: {self.created_at}"
+
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            self.verification_code = get_verification_code(self)
+        super().save(*args, **kwargs)
 
 
 class Rating(BaseModelWithUID):
