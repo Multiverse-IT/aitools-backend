@@ -133,14 +133,23 @@ WSGI_APPLICATION = 'projectile.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'aitools',
+        'USER': 'bappi',
+        'PASSWORD': 'bappi',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -177,9 +186,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-        # "oauth2_provider.contrib.rest_framework.OAuth2Authentication",  # django-oauth-toolkit >= 1.0.0
-        # "drf_social_oauth2.authentication.SocialAuthentication",
-    ),
+       ),
     # "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
@@ -198,8 +205,6 @@ ELASTICSEARCH_DSL = {
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
-    # "drf_social_oauth2.backends.DjangoOAuth2",
-    # "social_core.backends.google.GoogleOAuth2",
 )
 
 SIMPLE_JWT = {
@@ -214,26 +219,6 @@ CORS_ALLOWED_ORIGINS = [
     "https://aitools-staging.vercel.app"
 ]
 
-# SOCIAL_AUTH_PIPELINE = (
-#     'social_core.pipeline.social_auth.social_details',
-#     'social_core.pipeline.social_auth.social_uid',
-#     'social_core.pipeline.social_auth.auth_allowed',
-#     'social_core.pipeline.social_auth.social_user',
-#     'social_core.pipeline.social_auth.associate_user',
-#     'social_core.pipeline.social_auth.load_extra_data',
-#     'social_core.pipeline.user.user_details',
-# )
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
-
-# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '654201802529-h3l30nfnnjr5oahptsjcq6j7oume7fbn.apps.googleusercontent.com'
-# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
-
-# SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
-#     "https://www.googleapis.com/auth/userinfo.email",
-#     "https://www.googleapis.com/auth/userinfo.profile", 
-# ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -250,11 +235,3 @@ CORS_ALLOW_HEADERS = (
     "x-domain",
     "identity",
 )
-
-# LOGIN_REDIRECT_URL = "/api/v1/me"
-# SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
-# SOCIAL_AUTH_LOGIN_URL = '/'
-
-
-# SOCIAL_AUTH_DEBUG = True
-# SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
