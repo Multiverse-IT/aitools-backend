@@ -16,6 +16,7 @@ class UserSerializerList(serializers.ModelSerializer):
             "description",
             "avatar",
             "status",
+            "role",
             "gender",
             "exp",
             "sub",
