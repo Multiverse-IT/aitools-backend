@@ -55,6 +55,7 @@ class PublicUserRegisterSerializer(serializers.ModelSerializer):
             "iid",
             "id",
             "slug",
+            "role",
             "f_name",
             "e_mail",
             "name",
