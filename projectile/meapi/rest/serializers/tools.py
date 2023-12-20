@@ -313,7 +313,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
                 )
                 .exclude(id=instance.id)
                 .distinct()
-            )
+            )[:8]
             related_tools_serializer = PublicToolListSerializer(
                 related_tools, many=True, context=self.context
             ).data
