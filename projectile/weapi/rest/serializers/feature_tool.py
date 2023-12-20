@@ -10,7 +10,7 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = FeatureTool
-        fields = ("slug", "tool", "created_at", "updated_at", "tool_slugs")
+        fields = ("slug", "feature_tools", "created_at", "updated_at", "tool_slugs")
 
         read_only_fields = ["created_at", "updated_at"]
 
@@ -19,17 +19,17 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
         tool_slugs = validated_data.pop("tool_slugs", None)
         tools = Tool.objects.filter(slug__in=tool_slugs)
         feature_tool = FeatureTool.objects.create(user=user, **validated_data)
-        feature_tool.tool = ToolListSerializer(tools, many=True).data
+        feature_tool.feature_tools = ToolListSerializer(tools, many=True).data
         feature_tool.save()
         
         return feature_tool
     
     def update(self, instance, validated_data):
         tool_slugs = validated_data.pop("tool_slugs", None)
-        instance.tool = []
+        instance.feature_tools = []
         instance.save()
         tools = Tool.objects.filter(slug__in=tool_slugs)
-        instance.tool = ToolListSerializer(tools, many=True).data
+        instance.feature_tools = ToolListSerializer(tools, many=True).data
         instance.save()
 
         return instance

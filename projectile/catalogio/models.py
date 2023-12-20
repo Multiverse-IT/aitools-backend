@@ -222,7 +222,7 @@ class ToolRequest(models.Model):
 
 class FeatureTool(BaseModelWithUID):
     slug = AutoSlugField(populate_from=get_feature_slug, unique=True, db_index=True)
-    tool = models.JSONField(default=list, null=False, blank=True)
+    feature_tools = models.JSONField(default=list, null=False, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
