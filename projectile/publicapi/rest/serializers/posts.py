@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from contentio.models import Post
 
-class PublicPostListSerializer(serializers.ModelSerializer):
+class PublicApiPostListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = [
