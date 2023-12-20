@@ -92,6 +92,10 @@ class PublicToolList(generics.ListCreateAPIView):
         if time_range:
             now = timezone.now()
 
+            if time_range == "today":
+                start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+                queryset = queryset.filter(created_at__gte=start_date, created_at__lt=now)
+
             if time_range == "this_week":
                 start_date = now - timedelta(days=now.weekday())
                 queryset = queryset.filter(created_at__gte=start_date)
