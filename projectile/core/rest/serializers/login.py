@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 
 from core.models import User
-from core.choices import UserStatus
+from core.choices import UserStatus, UserRole
 
 from core.utils import get_tokens_for_user
 
@@ -30,6 +30,9 @@ class PublicUserLoginSerializer(serializers.Serializer):
                 | Q(phone=username)
                 | Q(username=username)
             )
+            if not (user.role == UserRole.ADMIN or user.role == UserRole.OWNER):
+                raise AuthenticationFailed()
+            
             if not user.check_password(password):
                 raise AuthenticationFailed()
 
