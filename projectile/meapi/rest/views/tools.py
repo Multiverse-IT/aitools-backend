@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from catalogio.choices import ToolStatus
-from catalogio.models import SavedTool, Tool
+from catalogio.models import SavedTool, Tool, SubCategory
 from common.utils import CustomPagination10
 from meapi.rest.scrape.link_find import check_code_presence
 from search.models import Keyword, KeywordSearch
@@ -350,10 +350,12 @@ class PublicSubCategoryToolList(generics.ListAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
     serializer_class = PublicSubCategoryToolSerializer
     permission_classes = [CustomIdentityHeaderPermission]
-    pagination_class = CustomPagination10
+    # pagination_class = CustomPagination10
 
     def get_queryset(self):
         slug = self.kwargs.get("subcategory_slug", None)
+        subcategory = SubCategory.objects.filter(slug=slug).first()
+
         queryset = (
             self.queryset.filter(toolscategoryconnector__subcategory__slug=slug)
             .annotate(average_ratings=Avg("toolsconnector__rating__rating"))
@@ -505,8 +507,20 @@ class PublicSubCategoryToolList(generics.ListAPIView):
                     .order_by("-total_saved_tools")
                 )
 
-        return queryset.distinct()
+        return queryset.distinct(), subcategory
+    
+    def list(self, request, *args, **kwargs):
+        queryset, subcategory = self.get_queryset()
 
+        serialized_tools = self.serializer_class(queryset, many=True, context={'request':request}).data
+
+        return Response({
+            "tools": serialized_tools,
+            "name": subcategory.title if subcategory else None,
+            "description": subcategory.description if subcategory else None
+        })
+    
+   
 
 class PublicCodeVerifyApi(APIView):
     def get(self, request, *args, **kwargs):
