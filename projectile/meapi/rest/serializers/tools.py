@@ -325,7 +325,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
     def get_related_tools(self, instance):
         try:
             related_tools = (
-                Tool.objects.filter(
+                Tool.objects.filter(status=ToolStatus.Active,
                     toolscategoryconnector__category__id=instance.toolscategoryconnector_set.first().category.id
                 )
                 .exclude(id=instance.id)

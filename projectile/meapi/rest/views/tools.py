@@ -1,20 +1,16 @@
-from datetime import datetime, timedelta, date
+from datetime import date, datetime, timedelta
 
 from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count, F, Q
 from django.utils import timezone
-
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from catalogio.choices import ToolStatus
 from catalogio.models import SavedTool, Tool
-
 from common.utils import CustomPagination10
-
 from meapi.rest.scrape.link_find import check_code_presence
-
 from search.models import Keyword, KeywordSearch
 
 from ..permissions import CustomIdentityHeaderPermission
@@ -94,7 +90,9 @@ class PublicToolList(generics.ListCreateAPIView):
 
             if time_range == "today":
                 start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
-                queryset = queryset.filter(created_at__gte=start_date, created_at__lt=now)
+                queryset = queryset.filter(
+                    created_at__gte=start_date, created_at__lt=now
+                )
 
             if time_range == "this_week":
                 start_date = now - timedelta(days=now.weekday())
@@ -115,7 +113,7 @@ class PublicToolList(generics.ListCreateAPIView):
             now = timezone.now()
 
             if trending == "today":
-                start_date = date.today() 
+                start_date = date.today()
                 queryset = (
                     queryset.annotate(
                         total_saved_tools=Count(
@@ -210,27 +208,40 @@ class PublicToolDetail(generics.RetrieveUpdateAPIView):
         serializer = self.get_serializer(instance)
         data = serializer.data
         if alternative_tool:
-            alternative_serializer = PublicToolListSerializer(alternative_tool, context={'request': request})
-            data["alternative_tool"]=alternative_serializer.data
+            alternative_serializer = PublicToolListSerializer(
+                alternative_tool, context={"request": request}
+            )
+            data["alternative_tool"] = alternative_serializer.data
 
         else:
             data["alternative_tool"] = {}
-            
+
         queryset = self.get_queryset()
         tool_position = list(queryset).index(instance)
         data["index_no"] = tool_position
         return Response(data)
 
     def get_alternative_tool(self, current_tool):
-        queryset = Tool.objects.annotate(total_save_count=Count('save_tool')).order_by("-total_save_count")
+        try:
+            # current tool category 
+            category = current_tool.toolscategoryconnector_set.first().category
+            queryset = (
+                Tool.objects.annotate(total_save_count=Count("save_tool"))
+                .filter(toolscategoryconnector__category=category)  # Filter by category
+                .order_by("-total_save_count")
+            )
 
-        current_position = list(queryset).index(current_tool)
+            current_position = list(queryset).index(current_tool)
 
-        alternative_position = current_position + 1
-        if alternative_position < len(queryset):
-            alternative_tool = queryset[alternative_position]
-            return alternative_tool
-        return None
+            alternative_position = current_position + 1
+            if alternative_position < len(queryset):
+                alternative_tool = queryset[alternative_position]
+                return alternative_tool
+            return None
+        
+        except:
+            return None
+
 
 class UserLoveToolList(generics.ListAPIView):
     permission_classes = [CustomIdentityHeaderPermission]
@@ -271,7 +282,7 @@ class PublicTrendingToolList(generics.ListAPIView):
             now = timezone.now()
 
             if time_range == "today":
-                start_date = date.today() 
+                start_date = date.today()
                 queryset = (
                     queryset.annotate(
                         total_saved_tools=Count(
@@ -335,7 +346,6 @@ class PublicTrendingToolDetail(generics.RetrieveAPIView):
     lookup_field = "slug"
 
 
-
 class PublicSubCategoryToolList(generics.ListAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
     serializer_class = PublicSubCategoryToolSerializer
@@ -344,9 +354,11 @@ class PublicSubCategoryToolList(generics.ListAPIView):
 
     def get_queryset(self):
         slug = self.kwargs.get("subcategory_slug", None)
-        queryset = self.queryset.filter(
-            toolscategoryconnector__subcategory__slug=slug
-        ).annotate(average_ratings=Avg("toolsconnector__rating__rating")).order_by("-created_at")
+        queryset = (
+            self.queryset.filter(toolscategoryconnector__subcategory__slug=slug)
+            .annotate(average_ratings=Avg("toolsconnector__rating__rating"))
+            .order_by("-created_at")
+        )
 
         # query params
         search = self.request.query_params.get("search", None)
@@ -400,10 +412,12 @@ class PublicSubCategoryToolList(generics.ListAPIView):
 
         if time_range:
             now = timezone.now()
-            
+
             if time_range == "today":
                 start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
-                queryset = queryset.filter(created_at__gte=start_date, created_at__lt=now)
+                queryset = queryset.filter(
+                    created_at__gte=start_date, created_at__lt=now
+                )
 
             if time_range == "this_week":
                 start_date = now - timedelta(days=now.weekday())
@@ -433,12 +447,11 @@ class PublicSubCategoryToolList(generics.ListAPIView):
             elif ordering_param == "created_at":
                 queryset = queryset.order_by("-created_at")
 
-
         if trending:
             now = timezone.now()
 
             if trending == "today":
-                start_date = date.today() 
+                start_date = date.today()
                 queryset = (
                     queryset.annotate(
                         total_saved_tools=Count(
@@ -495,9 +508,7 @@ class PublicSubCategoryToolList(generics.ListAPIView):
         return queryset.distinct()
 
 
-
 class PublicCodeVerifyApi(APIView):
-
     def get(self, request, *args, **kwargs):
         slug = self.kwargs.get("slug", None)
         tool = generics.get_object_or_404(Tool.objects.filter(), slug=slug)
@@ -505,7 +516,9 @@ class PublicCodeVerifyApi(APIView):
         url = tool.website_url
 
         if url == "":
-            return Response({"detail":"Wrong url or You didn't fill up your website link!"}) 
+            return Response(
+                {"detail": "Wrong url or You didn't fill up your website link!"}
+            )
 
         if tool.is_verified:
             return Response({"detail": "You have already been verified!"})
@@ -517,6 +530,4 @@ class PublicCodeVerifyApi(APIView):
             tool.save()
             return Response({"detail": "Verified successfully!"})
 
-        return Response({"detail":"Verification failed. Something went wrong!"})
-
-        
+        return Response({"detail": "Verification failed. Something went wrong!"})
