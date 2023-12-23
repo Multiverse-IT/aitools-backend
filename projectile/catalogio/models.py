@@ -58,6 +58,12 @@ class Tool(BaseModelWithUID):
     instagram_url = models.URLField(blank=True)
     facebook_url = models.URLField(blank=True)
     twitter_url = models.URLField(blank=True)
+    email_url = models.URLField(blank=True)
+    tiktok_url = models.URLField(blank=True)
+    github_url = models.URLField(blank=True)
+    youtube_url = models.URLField(blank=True)
+    discoard_url = models.URLField(blank=True)
+
 
     objects = ToolQuerySet.as_manager()
 

@@ -212,6 +212,10 @@ class PublicToolDetail(generics.RetrieveUpdateAPIView):
         if alternative_tool:
             alternative_serializer = PublicToolListSerializer(alternative_tool, context={'request': request})
             data["alternative_tool"]=alternative_serializer.data
+
+        else:
+            data["alternative_tool"] = {}
+            
         queryset = self.get_queryset()
         tool_position = list(queryset).index(instance)
         data["index_no"] = tool_position

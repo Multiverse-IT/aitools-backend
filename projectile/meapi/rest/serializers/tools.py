@@ -32,7 +32,6 @@ class PublicToolListSerializer(serializers.ModelSerializer):
         slug_field="slug",
         queryset=Category.objects.all(),
         write_only=True,
-        required=False,
         allow_null=True,
         allow_empty=True,
     )
@@ -97,6 +96,11 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "linkedin_url",
             "facebook_url",
             "twitter_url",
+            "email_url",
+            "tiktok_url",
+            "github_url",
+            "youtube_url",
+            "discoard_url",
             "created_at",
             "most_loved",
         ]
@@ -233,6 +237,11 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "linkedin_url",
             "facebook_url",
             "twitter_url",
+            "email_url",
+            "tiktok_url",
+            "github_url",
+            "youtube_url",
+            "discoard_url",
             "created_at",
             "related_tools",
         ]
@@ -262,6 +271,11 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "linkedin_url",
             "facebook_url",
             "twitter_url",
+            "email_url",
+            "tiktok_url",
+            "github_url",
+            "youtube_url",
+            "discoard_url",
             "created_at",
         ]
 

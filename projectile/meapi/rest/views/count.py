@@ -24,15 +24,23 @@ class CountOfEveryThingList(generics.RetrieveAPIView):
             created_at__date=timezone.now().date()
         ).count()
 
+        trending_tools_count = (
+                    queryset.annotate(
+                        total_saved_tools=Count(
+                            "save_tool", filter=Q(save_tool__created_at__gte=start_date)
+                        )
+                    )
+                    .filter(total_saved_tools__gt=3)
+                    .order_by("-total_saved_tools")
+                ).count()
+        
         return {
             "today_search_count": today_search_count,
             "total_tools": queryset.aggregate(total_tools=Count("id"))["total_tools"],
             "today_created_tools": queryset.aggregate(
                 today_created_tools=Count("id", filter=Q(created_at__date=today))
             )["today_created_tools"],
-            "trending_tools": queryset.aggregate(
-                trending_tools=Count("save_tool", filter=Q(save_tool__created_at__gte=start_date))
-            )["trending_tools"],
+            "trending_tools": trending_tools_count
         }
 
 
@@ -48,12 +56,20 @@ class PublicSubcategoryToolsCountList(generics.RetrieveAPIView):
         queryset = Tool.objects.filter(
             toolscategoryconnector__subcategory__slug=slug, status=ToolStatus.ACTIVE).distinct()
 
+        trending_tools_count = (
+                    queryset.annotate(
+                        total_saved_tools=Count(
+                            "save_tool", filter=Q(save_tool__created_at__gte=start_date)
+                        )
+                    )
+                    .filter(total_saved_tools__gt=3)
+                    .order_by("-total_saved_tools")
+                ).count()
+        
         return {
             "total_tools": queryset.aggregate(total_tools=Count("id"))["total_tools"],
             "today_created_tools": queryset.aggregate(
                 today_created_tools=Count("id", filter=Q(created_at__date=today))
             )["today_created_tools"],
-            "trending_tools": queryset.aggregate(
-                trending_tools=Count("save_tool", filter=Q(save_tool__created_at__gte=start_date))
-            )["trending_tools"],
+            "trending_tools": trending_tools_count
         }

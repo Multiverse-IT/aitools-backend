@@ -78,6 +78,11 @@ class ToolListSerializer(serializers.ModelSerializer):
             "linkedin_url",
             "facebook_url",
             "twitter_url",
+            "email_url",
+            "tiktok_url",
+            "github_url",
+            "youtube_url",
+            "discoard_url",
             "created_at",
         ]
 
