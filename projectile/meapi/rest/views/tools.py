@@ -520,7 +520,6 @@ class PublicSubCategoryToolList(generics.ListAPIView):
             "description": subcategory.description if subcategory else None
         })
     
-   
 
 class PublicCodeVerifyApi(APIView):
     def get(self, request, *args, **kwargs):
@@ -531,11 +530,15 @@ class PublicCodeVerifyApi(APIView):
 
         if url == "":
             return Response(
-                {"detail": "Wrong url or You didn't fill up your website link!"}
+                {"detail": "Wrong URL or you didn't fill up your website link!"},
+                status=400, 
             )
 
         if tool.is_verified:
-            return Response({"detail": "You have already been verified!"})
+            return Response(
+                {"detail": "You have already been verified!"},
+                status=400, 
+            )
 
         commitment = check_code_presence(url, code)
 
@@ -544,4 +547,7 @@ class PublicCodeVerifyApi(APIView):
             tool.save()
             return Response({"detail": "Verified successfully!"})
 
-        return Response({"detail": "Verification failed. Something went wrong!"})
+        return Response(
+            {"detail": "Verification failed. Something went wrong!"},
+            status=500, 
+        )
