@@ -7,7 +7,7 @@ from versatileimagefield.fields import VersatileImageField
 
 from common.models import BaseModelWithUID
 
-from .choices import RequestToolStatus, ToolKind, ToolStatus
+from .choices import RequestToolStatus, ToolKind, ToolStatus, PricingKind
 from .utils import (
     get_category_media_path_prefix,
     get_subategory_media_path_prefix,
@@ -23,8 +23,10 @@ User = get_user_model()
 class Tool(BaseModelWithUID):
     name = models.CharField(max_length=255)
     is_verified = models.BooleanField(default=False)
-    pricing = models.DecimalField(
-        decimal_places=3, max_digits=19, blank=True, null=True
+    pricing = models.CharField(
+        max_length=30,
+        choices=PricingKind.choices,
+        default=PricingKind.CONTACT_FOR_PRICING,
     )
     categories = models.JSONField(default=list, null=False, blank=True)
     description = models.TextField(blank=True)
@@ -64,7 +66,6 @@ class Tool(BaseModelWithUID):
     youtube_url = models.URLField(blank=True)
     discoard_url = models.URLField(blank=True)
 
-
     objects = ToolQuerySet.as_manager()
 
     class Meta:
@@ -73,7 +74,6 @@ class Tool(BaseModelWithUID):
 
     def __str__(self):
         return f"Slug: {self.slug}, Created: {self.created_at}"
-
 
     def save(self, *args, **kwargs):
         if self.pk is None:
@@ -93,8 +93,10 @@ class Rating(BaseModelWithUID):
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
 
-    # FKs 
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)  # Add this line to link ratings to users
+    # FKs
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True
+    )  # Add this line to link ratings to users
 
     def __str__(self):
         return f"UID: {self.uid}"
@@ -223,7 +225,6 @@ class ToolRequest(models.Model):
 
     def __str__(self):
         return f"User: {self.user.get_name()}-Tool: {self.tool.name}"
-    
 
 
 class FeatureTool(BaseModelWithUID):
