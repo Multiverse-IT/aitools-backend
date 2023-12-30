@@ -58,3 +58,4 @@ class RatingSlimSerializer(serializers.Serializer):
     user = UserSerializerList(source="rating.user", read_only=True)
     # Links to other external urls
     canonical_url = serializers.URLField(source="rating.canonical_url", read_only=True)
+    created_at = serializers.DateTimeField(source="rating.created_at", read_only=True)
