@@ -185,6 +185,9 @@ class PublicToolList(generics.ListCreateAPIView):
 
             elif ordering_param == "created_at":
                 queryset = queryset.order_by("-created_at")
+            
+            elif ordering_param == "verified":
+                queryset = queryset.order_by("-is_verified", "-created_at")
 
         return queryset.distinct()
 
