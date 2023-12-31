@@ -7,7 +7,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from catalogio.choices import ToolStatus
+from catalogio.choices import ToolStatus,PricingKind
 from catalogio.models import SavedTool, Tool, SubCategory
 from common.utils import CustomPagination10
 from meapi.rest.scrape.link_find import check_code_presence
@@ -41,6 +41,7 @@ class PublicToolList(generics.ListCreateAPIView):
         ordering_param = self.request.query_params.get("ordering", None)
         time_range = self.request.query_params.get("time_range", None)
         trending = self.request.query_params.get("trending", None)
+        pricing = self.request.query_params.get("pricing", None)
 
         if search is not None:
             search_words = [
@@ -188,6 +189,16 @@ class PublicToolList(generics.ListCreateAPIView):
             
             elif ordering_param == "verified":
                 queryset = queryset.order_by("-is_verified", "-created_at")
+
+        pricing_options = {
+            "free": PricingKind.FREE,
+            "freemium": PricingKind.FREEMIUM,
+            "free_trial": PricingKind.FREE_TRIAL,
+            "premium": PricingKind.PREMIUM,
+            "contact_for_pricing": PricingKind.CONTACT_FOR_PRICING,
+        }
+        if pricing and pricing in pricing_options:
+            queryset = queryset.filter(pricing=pricing_options[pricing]).order_by("-created_at")
 
         return queryset.distinct()
 
