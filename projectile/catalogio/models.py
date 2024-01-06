@@ -34,6 +34,7 @@ class Tool(BaseModelWithUID):
     is_editor = models.BooleanField(default=False)
     is_trending = models.BooleanField(default=False)
     is_new = models.BooleanField(default=True)
+    do_follow_website = models.BooleanField(default=False)
     save_count = models.PositiveBigIntegerField(default=0)
     image = VersatileImageField(
         "Avatar",
@@ -65,6 +66,7 @@ class Tool(BaseModelWithUID):
     github_url = models.URLField(blank=True)
     youtube_url = models.URLField(blank=True)
     discoard_url = models.URLField(blank=True)
+    pricing_url = models.URLField(blank=True)
 
     objects = ToolQuerySet.as_manager()
 
@@ -229,8 +231,9 @@ class ToolRequest(models.Model):
 
 class FeatureTool(BaseModelWithUID):
     slug = AutoSlugField(populate_from=get_feature_slug, unique=True, db_index=True)
-    feature_tools = models.JSONField(default=list, null=False, blank=True)
+    feature_tool= models.ForeignKey(Tool, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    custom_field = models.CharField(max_length=255, blank=True)
 
     class Meta:
         ordering = ["-created_at"]

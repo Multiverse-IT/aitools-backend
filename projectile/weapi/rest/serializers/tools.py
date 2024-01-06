@@ -56,6 +56,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "is_trending",
             "is_new",
             "is_featured",
+            "do_follow_website",
             "save_count",
             "meta_title",
             "meta_description",
@@ -84,6 +85,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "github_url",
             "youtube_url",
             "discoard_url",
+            "pricing_url",
             "created_at",
         ]
 

@@ -48,6 +48,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
     sub_category = SubCategorySlimSerializer(
         source="toolscategoryconnector_set", many=True, read_only=True
     )
+
     feature = FeatureSlimSerializer(
         source="toolsconnector_set", many=True, read_only=True
     )
@@ -74,6 +75,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "is_new",
             "is_loved",
             "is_featured",
+            "do_follow_website",
             "save_count",
             "meta_title",
             "meta_description",
@@ -102,6 +104,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "github_url",
             "youtube_url",
             "discoard_url",
+            "pricing_url",
             "created_at",
             "most_loved",
         ]
@@ -117,6 +120,18 @@ class PublicToolListSerializer(serializers.ModelSerializer):
         else:
             return False
 
+    def get_sub_category(self, instance):
+        connectors = instance.toolscategoryconnector_set.all()
+
+        # Extract subcategories that are not None
+        sub_categories = [connector.subcategory for connector in connectors if connector.subcategory is not None]
+
+        # If subcategories exist, serialize them using SubCategorySlimSerializer
+        if sub_categories:
+            return SubCategorySlimSerializer(sub_categories, many=True).data
+
+        return None
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
 
@@ -125,6 +140,9 @@ class PublicToolListSerializer(serializers.ModelSerializer):
 
         # Filter out empty ratings
         data["ratings"] = [rating for rating in data["ratings"] if rating]
+
+        # Check if sub_category exists and is not empty
+        data["sub_category"] = [sub_category for sub_category in data["sub_category"] if sub_category]
 
         return data
 
@@ -203,7 +221,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
     is_loved = serializers.SerializerMethodField(read_only=True)
     ratings_distribution = serializers.SerializerMethodField(read_only=True)
     related_tools = serializers.SerializerMethodField(read_only=True)
-    
+
     class Meta:
         model = Tool
         fields = [
@@ -218,6 +236,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "is_new",
             "is_featured",
             "is_loved",
+            "do_follow_website",
             "save_count",
             "meta_title",
             "meta_description",
@@ -244,6 +263,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "github_url",
             "youtube_url",
             "discoard_url",
+            "pricing_url",
             "created_at",
             "related_tools",
         ]
@@ -259,6 +279,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "is_trending",
             "is_new",
             "is_featured",
+            "do_follow_website",
             "meta_title",
             "meta_description",
             "image",
@@ -279,6 +300,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "github_url",
             "youtube_url",
             "discoard_url",
+            "pricing_url",
             "created_at",
         ]
 
