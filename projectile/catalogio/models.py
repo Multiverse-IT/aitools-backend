@@ -234,6 +234,7 @@ class FeatureTool(BaseModelWithUID):
     feature_tool= models.ForeignKey(Tool, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     custom_field = models.CharField(max_length=255, blank=True)
+    in_pages = models.JSONField(default=list)
 
     class Meta:
         ordering = ["-created_at"]
