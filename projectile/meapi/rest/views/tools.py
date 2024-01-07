@@ -532,10 +532,14 @@ class PublicSubCategoryToolListExtraField(APIView):
         subcategory = generics.get_object_or_404(
             SubCategory.objects.filter(), slug=slug
         )
+        total_tool = (
+            Tool.objects.filter(toolscategoryconnector__subcategory__slug=slug)
+        )
 
         return Response({
             "title": subcategory.title,
-            "description": subcategory.description
+            "description": subcategory.description,
+            "total": total_tool.count()
         })
 
 class PublicCodeVerifyApi(APIView):
