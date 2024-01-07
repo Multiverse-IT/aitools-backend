@@ -9,8 +9,11 @@ from rest_framework.views import APIView
 
 from catalogio.choices import ToolStatus,PricingKind
 from catalogio.models import SavedTool, Tool, SubCategory
+
 from common.utils import CustomPagination10
+
 from meapi.rest.scrape.link_find import check_code_presence
+
 from search.models import Keyword, KeywordSearch
 
 from ..permissions import CustomIdentityHeaderPermission
@@ -186,7 +189,7 @@ class PublicToolList(generics.ListCreateAPIView):
 
             elif ordering_param == "created_at":
                 queryset = queryset.order_by("-created_at")
-            
+
             elif ordering_param == "verified":
                 queryset = queryset.order_by("-is_verified", "-created_at")
 
@@ -237,7 +240,7 @@ class PublicToolDetail(generics.RetrieveUpdateAPIView):
 
     def get_alternative_tool(self, current_tool):
         try:
-            # current tool category 
+            # current tool category
             category = current_tool.toolscategoryconnector_set.first().category
             queryset = (
                 Tool.objects.annotate(total_save_count=Count("save_tool"))
@@ -252,7 +255,7 @@ class PublicToolDetail(generics.RetrieveUpdateAPIView):
                 alternative_tool = queryset[alternative_position]
                 return alternative_tool
             return None
-        
+
         except:
             return None
 
@@ -368,7 +371,6 @@ class PublicSubCategoryToolList(generics.ListAPIView):
 
     def get_queryset(self):
         slug = self.kwargs.get("subcategory_slug", None)
-        subcategory = SubCategory.objects.filter(slug=slug).first()
 
         queryset = (
             self.queryset.filter(toolscategoryconnector__subcategory__slug=slug)
@@ -521,19 +523,20 @@ class PublicSubCategoryToolList(generics.ListAPIView):
                     .order_by("-total_saved_tools")
                 )
 
-        return queryset.distinct(), subcategory
-    
-    def list(self, request, *args, **kwargs):
-        queryset, subcategory = self.get_queryset()
+        return queryset.distinct()
 
-        serialized_tools = self.serializer_class(queryset, many=True, context={'request':request}).data
+
+class PublicSubCategoryToolListExtraField(APIView):
+    def get(self, request, *args, **kwargs):
+        slug = self.kwargs.get("subcategory_slug", None)
+        subcategory = generics.get_object_or_404(
+            SubCategory.objects.filter(), slug=slug
+        )
 
         return Response({
-            "tools": serialized_tools,
-            "name": subcategory.title if subcategory else None,
-            "description": subcategory.description if subcategory else None
+            "title": subcategory.title,
+            "description": subcategory.description
         })
-    
 
 class PublicCodeVerifyApi(APIView):
     def get(self, request, *args, **kwargs):
