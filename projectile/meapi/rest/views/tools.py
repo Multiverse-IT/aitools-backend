@@ -44,7 +44,7 @@ class PublicToolList(generics.ListCreateAPIView):
         ordering_param = self.request.query_params.get("ordering", None)
         time_range = self.request.query_params.get("time_range", None)
         trending = self.request.query_params.get("trending", None)
-        pricing = self.request.query_params.get("pricing", None)
+        pricing = self.request.query_params.get("pricing", [])
 
         if search is not None:
             search_words = [
@@ -200,8 +200,12 @@ class PublicToolList(generics.ListCreateAPIView):
             "premium": PricingKind.PREMIUM,
             "contact_for_pricing": PricingKind.CONTACT_FOR_PRICING,
         }
-        if pricing and pricing in pricing_options:
-            queryset = queryset.filter(pricing=pricing_options[pricing]).order_by("-created_at")
+
+        pricing_list = [option.strip() for option in pricing.split(',')]
+        valid_pricing_filters = [pricing_options.get(option) for option in pricing_list if option in pricing_options]
+
+        if valid_pricing_filters:
+            queryset = queryset.filter(pricing__in=valid_pricing_filters)
 
         return queryset.distinct()
 
