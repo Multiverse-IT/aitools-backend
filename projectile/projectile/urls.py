@@ -78,6 +78,7 @@ urlpatterns = [
     path("api/v1/we", include("weapi.rest.urls")),
     path("api/v1/me", include("meapi.rest.urls")),
     path("api/v1/posts", include("contentio.rest.urls")),
+    path("api/v1/storage", include("meapi.rest.urls.storage")),
     path("adminium/", admin.site.urls),
 
     # # social auth
