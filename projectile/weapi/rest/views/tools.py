@@ -1,8 +1,10 @@
+from django.db.models import Q
+
 from catalogio.choices import ToolStatus
-from catalogio.models import Tool, ToolRequest
+from catalogio.models import Tool
 from rest_framework import generics
 
-from ..serializers.tools import ToolListSerializer, ToolRequestDetalSerializer
+from ..serializers.tools import ToolListSerializer, ToolRequestDetailSerializer
 
 
 class ToolList(generics.ListCreateAPIView):
@@ -20,7 +22,10 @@ class ToolList(generics.ListCreateAPIView):
 
         if search is not None:
             queryset = queryset.filter(
-                toolscategoryconnector__subcategory__title__icontains=search
+                Q(name__icontains=search)
+                | Q(description__icontains=search)
+                | Q(toolscategoryconnector__subcategory__title__icontains=search)
+                | Q(toolscategoryconnector__category__title__icontains=search)
             )
 
         if subcategory:
@@ -51,6 +56,6 @@ class ToolDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class RequestToolResponseDetail(generics.RetrieveUpdateAPIView):
     queryset = Tool.objects.get_status_requested()
-    serializer_class = ToolRequestDetalSerializer
+    serializer_class = ToolRequestDetailSerializer
     permission_classes = []
     lookup_field = "slug"

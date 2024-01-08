@@ -189,7 +189,7 @@ class ToolListSerializer(serializers.ModelSerializer):
         ToolsConnector.objects.bulk_create(connectors)
 
 
-class ToolRequestDetalSerializer(serializers.ModelSerializer):
+class ToolRequestDetailSerializer(serializers.ModelSerializer):
     request_status = serializers.ChoiceField(
         choices=RequestToolStatus.choices, write_only=True
     )
