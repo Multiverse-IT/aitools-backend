@@ -8,5 +8,6 @@ urlpatterns = [
     path("/counts", include("meapi.rest.urls.count")),
     path("/posts", include("meapi.rest.urls.posts")),
     path("/feature-tools", include("meapi.rest.urls.feature_tool")),
+    path("/storage", include("weapi.rest.urls.storage")),
     path("", include("meapi.rest.urls.me")),
 ]

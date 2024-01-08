@@ -47,3 +47,9 @@ class Post(BaseModelWithUID):
         return f"UID: {self.uid}-slug: {self.slug}"
 
 
+
+class CommonStorage(BaseModelWithUID):
+    storage = models.JSONField(default=list)
+
+    def __str__(self) -> str:
+        return f"UID: {self.uid}"
