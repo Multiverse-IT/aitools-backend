@@ -48,7 +48,7 @@ class PublicToolList(generics.ListCreateAPIView):
 
         if search is not None:
             search_words = [
-                word.strip() for word in search.split(",") if len(word.strip()) >= 2
+                word.strip() for word in search.split(" ") if len(word.strip()) >= 2
             ]
 
             q_object = Q()
