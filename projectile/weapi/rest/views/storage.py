@@ -7,7 +7,7 @@ from core.permissions import IsAdmin
 
 from ..serializers.storage import PrivateCommonStorageSerializer
 
-class PrivateCommonStorageList(generics.ListAPIView):
+class PrivateCommonStorageList(generics.ListCreateAPIView):
     queryset = CommonStorage.objects.filter()
     serializer_class = PrivateCommonStorageSerializer
     permission_classes = [IsAdmin]
