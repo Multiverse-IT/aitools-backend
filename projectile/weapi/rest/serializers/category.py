@@ -66,6 +66,7 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
             "image",
             "alt",
             "is_indexed",
+            "focus_keyword",
             "canonical_url",
             "created_at",
             "updated_at",

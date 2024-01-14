@@ -44,8 +44,9 @@ class Tool(BaseModelWithUID):
     alt = models.CharField(max_length=255, blank=True)
     requested = models.BooleanField(default=False)
     verification_code = models.CharField(max_length=50, blank=True)
-
-    is_indexed = models.BooleanField(default=True)
+    is_noindex = models.BooleanField(default=False)
+    do_sponsor_website = models.BooleanField(default=False)
+    focus_keyword = models.CharField(max_length=255, blank=True)
     short_description = models.CharField(max_length=255, blank=True)
     status = models.CharField(
         max_length=30, choices=ToolStatus.choices, default=ToolStatus.ACTIVE
@@ -177,6 +178,7 @@ class SubCategory(BaseModelWithUID):
     )
     alt = models.CharField(max_length=255, blank=True)
     is_indexed = models.BooleanField(default=True)
+    focus_keyword = models.CharField(max_length=255, blank=True)
 
     # Links to other external urls
     canonical_url = models.URLField(blank=True)

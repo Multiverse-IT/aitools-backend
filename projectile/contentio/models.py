@@ -36,6 +36,8 @@ class Post(BaseModelWithUID):
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
     is_indexed = models.BooleanField(default=True)
+    focus_keyword = models.CharField(max_length=255, blank=True)
+
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
 

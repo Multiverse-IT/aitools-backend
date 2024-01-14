@@ -28,6 +28,7 @@ class SubCategorySlimSerializer(serializers.Serializer):
     meta_description = serializers.CharField(
         source="subcategory.meta_description", read_only=True, required=False
     )
+    focus_keyword = serializers.CharField(source="subcategory.focus_keyword")
     is_indexed = serializers.CharField(source="subcategory.is_indexed", read_only=True)
     canonical_url = serializers.CharField(
         source="subcategory.canonical_url", read_only=True, required=False
