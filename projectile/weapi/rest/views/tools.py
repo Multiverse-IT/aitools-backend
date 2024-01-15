@@ -1,10 +1,17 @@
 from django.db.models import Q
 
-from catalogio.choices import ToolStatus
-from catalogio.models import Tool
 from rest_framework import generics
 
-from ..serializers.tools import ToolListSerializer, ToolRequestDetailSerializer
+from catalogio.choices import ToolStatus, VerifiedStatus
+from catalogio.models import Tool
+
+from core.permissions import IsAdmin
+
+from ..serializers.tools import (
+    ToolListSerializer,
+    ToolRequestDetailSerializer,
+    ToolWithVerifiedStatus,
+)
 
 
 class ToolList(generics.ListCreateAPIView):
@@ -13,12 +20,12 @@ class ToolList(generics.ListCreateAPIView):
     permission_classes = []
 
     def get_queryset(self):
-        queryset = self.queryset.exclude(requested=True, status = ToolStatus.PENDING)
+        queryset = self.queryset.exclude(requested=True, status=ToolStatus.PENDING)
         search = self.request.query_params.get("search", None)
         subcategory = self.request.query_params.get("subcategory", [])
         requested = self.request.query_params.get("requested", None)
         features = self.request.query_params.get("features", [])
-        trending = self.request.query_params.get("trending",None)
+        trending = self.request.query_params.get("trending", None)
 
         if search is not None:
             queryset = queryset.filter(
@@ -35,7 +42,9 @@ class ToolList(generics.ListCreateAPIView):
             )
 
         if requested:
-            queryset = Tool.objects.filter(requested=requested, status = ToolStatus.PENDING)
+            queryset = Tool.objects.filter(
+                requested=requested, status=ToolStatus.PENDING
+            )
 
         if trending:
             queryset = queryset.filter(is_trending=trending)
@@ -59,3 +68,25 @@ class RequestToolResponseDetail(generics.RetrieveUpdateAPIView):
     serializer_class = ToolRequestDetailSerializer
     permission_classes = []
     lookup_field = "slug"
+
+
+class PrivateCodeVerifyList(generics.ListAPIView):
+    queryset = Tool.objects.get_status_active()
+    serializer_class = ToolListSerializer
+    permission_classes = [IsAdmin]
+
+    def get_queryset(self):
+        queryset = self.queryset.filter(verified_status=VerifiedStatus.PENDING)
+        return queryset
+
+
+class PrivateCodeVerifyDetail(generics.RetrieveUpdateAPIView):
+    queryset = Tool.objects.get_status_active()
+    serializer_class = ToolWithVerifiedStatus
+    permission_classes = [IsAdmin]
+
+    def get_object(self):
+        slug = self.kwargs.get("slug", None)
+        return generics.get_object_or_404(
+            self.queryset.filter(), verified_status=VerifiedStatus.PENDING, slug=slug
+        )

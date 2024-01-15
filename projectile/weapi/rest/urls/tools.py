@@ -10,4 +10,14 @@ urlpatterns = [
         tools.RequestToolResponseDetail.as_view(),
         name="accept-tool",
     ),
+    path(
+        "/verification/list",
+        tools.PrivateCodeVerifyList.as_view(),
+        name="verification-list",
+    ),
+    path(
+        "/verification/list/<slug:slug>",
+        tools.PrivateCodeVerifyDetail.as_view(),
+        name="verification-detail",
+    ),
 ]

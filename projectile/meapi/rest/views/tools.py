@@ -7,7 +7,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from catalogio.choices import ToolStatus,PricingKind
+from catalogio.choices import ToolStatus,PricingKind, VerifiedStatus
 from catalogio.models import SavedTool, Tool, SubCategory
 
 from common.utils import CustomPagination10
@@ -553,29 +553,23 @@ class PublicCodeVerifyApi(APIView):
         if url == "":
             return Response(
                 {"detail": "Wrong URL or you didn't fill up your website link!"},
-                status=400, 
+                status=400,
             )
 
         if tool.is_verified:
             return Response(
                 {"detail": "You have already been verified!"},
-                status=400, 
+                status=400,
             )
 
         commitment = check_code_presence(url, code)
 
         if commitment:
-            tool.is_verified = True
+            tool.verified_status = VerifiedStatus.PENDING
             tool.save()
-            return Response({"detail": "Verified successfully!"})
+            return Response({"detail": "Verification request has sent!"})
 
         return Response(
             {"detail": "Verification failed. Something went wrong!"},
-            status=500, 
+            status=500,
         )
-        
-# pricing_list = [option.strip() for option in pricing.split(',')]
-# valid_pricing_filters = [pricing_options.get(option) for option in pricing_list if option in pricing_options]
-
-# if valid_pricing_filters:
-#    queryset = queryset.filter(pricing__in=valid_pricing_filters)

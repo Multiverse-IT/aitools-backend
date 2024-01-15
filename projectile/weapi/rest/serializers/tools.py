@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from catalogio.choices import RequestToolStatus, ToolKind, ToolStatus
+from catalogio.choices import RequestToolStatus, ToolKind, ToolStatus, VerifiedStatus
 from catalogio.models import (
     Category,
     Feature,
@@ -49,6 +49,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "slug",
             "name",
             "is_verified",
+            "verified_status",
             "pricing",
             "categories",
             "description",
@@ -210,3 +211,19 @@ class ToolRequestDetailSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
+class ToolWithVerifiedStatus(serializers.ModelSerializer):
+    class Meta:
+        model = Tool
+        fields = [
+            "is_verified",
+            "verified_status",
+            "created_at",
+        ]
+        read_only_fields = ["is_verified", "created_at"]
+
+    def update(self, instance, validated_data):
+        status = validated_data.get("verified_status", None)
+        if status == VerifiedStatus.APPROVED:
+            instance.is_verified = True
+            instance.save()
+        return super().update(instance, validated_data)

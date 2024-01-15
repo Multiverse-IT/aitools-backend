@@ -7,7 +7,7 @@ from versatileimagefield.fields import VersatileImageField
 
 from common.models import BaseModelWithUID
 
-from .choices import RequestToolStatus, ToolKind, ToolStatus, PricingKind
+from .choices import RequestToolStatus, ToolKind, ToolStatus, PricingKind,VerifiedStatus
 from .utils import (
     get_category_media_path_prefix,
     get_subategory_media_path_prefix,
@@ -23,6 +23,9 @@ User = get_user_model()
 class Tool(BaseModelWithUID):
     name = models.CharField(max_length=255)
     is_verified = models.BooleanField(default=False)
+    verified_status = models.CharField(
+        max_length=30, choices=VerifiedStatus.choices, blank=True
+    )
     pricing = models.CharField(
         max_length=30,
         choices=PricingKind.choices,

@@ -25,3 +25,9 @@ class PricingKind(models.TextChoices):
     FREE_TRIAL = "FREE_TRIAL", "Free Trial"
     PREMIUM = "PREMIUM", "Premium"
     CONTACT_FOR_PRICING = "CONTACT_FOR_PRICING", "Contact for Pricing"
+
+
+class VerifiedStatus(models.TextChoices):
+    PENDING = "PENDING", "Pending"
+    APPROVED = "APPROVED", "Approved"
+    REJECTED = "REJECTED", "Rejected"
