@@ -11,6 +11,7 @@ from .choices import PostStatus
 from .utils import get_post_media_path_prefix, get_post_slug
 from .managers import PostQuerySet
 
+
 class Post(BaseModelWithUID):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
@@ -49,9 +50,40 @@ class Post(BaseModelWithUID):
         return f"UID: {self.uid}-slug: {self.slug}"
 
 
-
 class CommonStorage(BaseModelWithUID):
     storage = models.JSONField(default=list)
+    home_page = models.JSONField(default=list)
+    categories_page = models.JSONField(default=list)
+    blogs_page = models.JSONField(default=list)
+    about_page = models.JSONField(default=list)
+    redirects = models.JSONField(default=list)
 
     def __str__(self) -> str:
         return f"UID: {self.uid}"
+
+
+class Redirect(BaseModelWithUID):
+    type = models.CharField(max_length=255, blank=True)
+    is_permanent = models.BooleanField(default=False)
+    old = models.CharField(max_length=255, blank=True)
+    new = models.CharField(max_length=255, blank=True)
+    extras = models.JSONField(default=list)
+
+    def __str__(self):
+        return f"ID: {self.id}"
+
+
+# TODO: 23-01-24 work
+from rest_framework import serializers
+
+
+class PrivateRedirectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Redirect
+        fields = (
+            "type",
+            "is_permanent",
+            "old",
+            "new",
+            "extras",
+        )

@@ -7,14 +7,17 @@ from core.permissions import IsAdmin
 
 from ..serializers.storage import PrivateCommonStorageSerializer
 
-class PrivateCommonStorageList(generics.ListCreateAPIView):
+# class PrivateCommonStorageList(generics.ListCreateAPIView):
+#     queryset = CommonStorage.objects.filter()
+#     serializer_class = PrivateCommonStorageSerializer
+#     permission_classes = [IsAdmin]
+
+
+class PrivateCommonStorageDetail(generics.RetrieveUpdateAPIView):
     queryset = CommonStorage.objects.filter()
     serializer_class = PrivateCommonStorageSerializer
     permission_classes = [IsAdmin]
+    pagination_class = None
 
-
-class PrivateCommonStorageDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = CommonStorage.objects.filter()
-    serializer_class = PrivateCommonStorageSerializer
-    permission_classes = [IsAdmin]
-    lookup_field = "uid"
+    def get_object(self):
+        return CommonStorage.objects.first()

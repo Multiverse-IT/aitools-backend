@@ -27,4 +27,3 @@ class PublicPostListSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context["request"].user
         return Post.objects.create(user=user, **validated_data)
-    
