@@ -71,19 +71,3 @@ class Redirect(BaseModelWithUID):
 
     def __str__(self):
         return f"ID: {self.id}"
-
-
-# TODO: 23-01-24 work
-from rest_framework import serializers
-
-
-class PrivateRedirectSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Redirect
-        fields = (
-            "type",
-            "is_permanent",
-            "old",
-            "new",
-            "extras",
-        )
