@@ -1,6 +1,5 @@
 from rest_framework import generics
 
-from ...choices import PostStatus
 from ...models import Post
 from ..serializers.posts import PublicPostListSerializer
 from core.permissions import IsAdmin
@@ -22,4 +21,3 @@ class PublicPostDetail(generics.RetrieveUpdateDestroyAPIView):
         post.view_count += 1
         post.save()
         return post
-    

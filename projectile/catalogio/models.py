@@ -180,7 +180,7 @@ class SubCategory(BaseModelWithUID):
         blank=True,
     )
     alt = models.CharField(max_length=255, blank=True)
-    is_indexed = models.BooleanField(default=True)
+    is_noindex = models.BooleanField(default=False)
     focus_keyword = models.CharField(max_length=255, blank=True)
 
     # Links to other external urls

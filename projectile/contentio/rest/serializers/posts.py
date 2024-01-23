@@ -17,7 +17,7 @@ class PublicPostListSerializer(serializers.ModelSerializer):
             "meta_title",
             "meta_description",
             "canonical_url",
-            "is_indexed",
+            "is_noindex",
             "focus_keyword",
             "created_at",
             "updated_at",
