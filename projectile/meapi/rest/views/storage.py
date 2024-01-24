@@ -7,13 +7,11 @@ from contentio.models import CommonStorage
 
 from weapi.rest.serializers.storage import PrivateCommonStorageSerializer
 
-class PublicCommonStorageList(generics.ListAPIView):
+class PublicCommonStorageList(generics.RetrieveAPIView):
     queryset = CommonStorage.objects.filter()
     serializer_class = PrivateCommonStorageSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = None
 
-class PublicCommonStorageDetail(generics.RetrieveAPIView):
-    queryset = CommonStorage.objects.filter()
-    serializer_class = PrivateCommonStorageSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    lookup_field = "uid"
+    def get_object(self):
+        return CommonStorage.objects.first()
