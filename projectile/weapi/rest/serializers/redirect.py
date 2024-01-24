@@ -5,6 +5,7 @@ class PrivateRedirectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Redirect
         fields = (
+            "uid",
             "type",
             "is_permanent",
             "old",
