@@ -15,6 +15,7 @@ class PrivateRedirectList(generics.ListCreateAPIView):
 
 
 class PrivateRedirectDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Redirect.objects.filter()
     serializer_class = PrivateRedirectSerializer
     permission_classes = [IsAdmin]
     lookup_field = "uid"
