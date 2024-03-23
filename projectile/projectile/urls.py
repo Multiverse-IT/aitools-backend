@@ -80,7 +80,7 @@ urlpatterns = [
     path("api/v1/posts", include("contentio.rest.urls")),
     path("api/v1/storage", include("meapi.rest.urls.storage")),
     path("adminium/", admin.site.urls),
-
+    path("api/v1/sponsors", include("contentio.rest.urls.sponsors"))
     # # social auth
     # path("auth/", include("drf_social_oauth2.urls")),
     # path("social/", include("social_django.urls")),
