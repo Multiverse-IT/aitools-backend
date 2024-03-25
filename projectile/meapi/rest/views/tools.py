@@ -7,7 +7,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from catalogio.choices import ToolStatus,PricingKind, VerifiedStatus
+from catalogio.choices import ToolStatus, PricingKind, VerifiedStatus
 from catalogio.models import SavedTool, Tool, SubCategory
 
 from common.utils import CustomPagination10
@@ -45,6 +45,8 @@ class PublicToolList(generics.ListCreateAPIView):
         time_range = self.request.query_params.get("time_range", None)
         trending = self.request.query_params.get("trending", None)
         pricing = self.request.query_params.get("pricing", None)
+        min_love_count = self.request.query_params.get("min_love", None)
+        max_love_count = self.request.query_params.get("max_love", None)
 
         if search is not None:
             search_words = [
@@ -202,7 +204,16 @@ class PublicToolList(generics.ListCreateAPIView):
         }
 
         if pricing and pricing in pricing_options:
-            queryset = queryset.filter(pricing=pricing_options[pricing]).order_by("-created_at")
+            queryset = queryset.filter(pricing=pricing_options[pricing]).order_by(
+                "-created_at"
+            )
+
+        if min_love_count and max_love_count:
+            queryset = queryset.filter(save_count__range=(min_love_count, max_love_count))
+        if min_love_count and not max_love_count:
+            queryset = queryset.filter(save_count__gte=min_love_count)
+        if max_love_count and not min_love_count:
+            queryset = queryset.filter(save_count__lte=max_love_count)
 
         return queryset.distinct()
 
@@ -533,15 +544,16 @@ class PublicSubCategoryToolListExtraField(APIView):
         subcategory = generics.get_object_or_404(
             SubCategory.objects.filter(), slug=slug
         )
-        total_tool = (
-            Tool.objects.filter(toolscategoryconnector__subcategory__slug=slug)
+        total_tool = Tool.objects.filter(toolscategoryconnector__subcategory__slug=slug)
+
+        return Response(
+            {
+                "title": subcategory.title,
+                "description": subcategory.description,
+                "total": total_tool.count(),
+            }
         )
 
-        return Response({
-            "title": subcategory.title,
-            "description": subcategory.description,
-            "total": total_tool.count()
-        })
 
 class PublicCodeVerifyApi(APIView):
     def get(self, request, *args, **kwargs):
