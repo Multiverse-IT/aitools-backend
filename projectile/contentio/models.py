@@ -74,9 +74,11 @@ class Redirect(BaseModelWithUID):
 
 
 class Sponsor(BaseModelWithUID):
-    name = models.CharField(max_length=255)
-    link = models.URLField(blank=True)
-    description = models.TextField(blank=True)
+    # name = models.CharField(max_length=255)
+    # link = models.URLField(blank=True)
+    # description = models.TextField(blank=True)
+
+    field = models.JSONField(default=list)
 
     def __str__(self):
-        return f"UID: {self.uid}-Name: {self.name}"
+        return f"UID: {self.uid}"

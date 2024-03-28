@@ -14,3 +14,11 @@ class PublicSponsorList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return Sponsor.objects.filter()
+
+class PublicSponsorDetail(generics.RetrieveUpdateAPIView):
+    serializer_class = PublicSponsorListSerializer
+    permission_classes = []
+    lookup_field = "uid"
+
+    def get_queryset(self):
+        return Sponsor.objects.filter()

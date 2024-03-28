@@ -55,6 +55,7 @@ class Tool(BaseModelWithUID):
         max_length=30, choices=ToolStatus.choices, default=ToolStatus.ACTIVE
     )
     is_featured = models.BooleanField(default=False)
+    is_suggession = models.BooleanField(default=False)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
     # Links to other external urls

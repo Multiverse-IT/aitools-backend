@@ -36,5 +36,9 @@ urlpatterns = [
         tools.PublicRandomSearch.as_view(),
         name = "new-search-api"
     ),
+    path("/suggession/list",
+        tools.PublicSuggessionList.as_view(),
+        name="suggession-list-api"
+        ),
     path("", tools.PublicToolList.as_view(), name="tool-list"),
 ]

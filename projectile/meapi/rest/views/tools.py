@@ -638,3 +638,8 @@ class PublicCodeVerifyApi(APIView):
             {"detail": "Verification failed. Something went wrong!"},
             status=500,
         )
+
+class PublicSuggessionList(generics.ListAPIView):
+    queryset = Tool.objects.filter(status=ToolStatus.ACTIVE, is_suggession=True)
+    serializer_class = PublicToolListSerializer
+    permission_classes = []
