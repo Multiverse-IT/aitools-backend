@@ -26,6 +26,59 @@ from ..serializers.tools import (
 
 User = get_user_model()
 
+class PublicRandomSearch(generics.ListAPIView):
+    queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
+    serializer_class = PublicToolListSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset.order_by("-created_at")
+        search = self.request.query_params.get("search", None)
+
+        if search is not None:
+            search_words = [
+                word.strip() for word in search.split(" ") if len(word.strip()) >= 2
+            ]
+
+            q_object = Q()
+            for word in search_words:
+                q_object |= (
+                    Q(name__icontains=word)
+                    | Q(toolscategoryconnector__subcategory__title__icontains=word)
+                    | Q(toolscategoryconnector__category__title__icontains=word)
+                )
+
+            # Filter tools based on the search words in multiple fields
+            if search_words:
+                queryset = queryset.filter(q_object)
+
+                # Save the search keyword and associate it with the user if authenticated
+                user = self.request.user
+                keyword, created = Keyword.objects.get_or_create(name=search)
+
+                if user.is_authenticated:
+                    keyword_search = KeywordSearch.objects.filter(
+                        keyword=keyword
+                    ).first()
+
+                    if not keyword_search:
+                        keyword_search = KeywordSearch.objects.create(
+                            keyword=keyword, user=user
+                        )
+                    keyword_search.search_count += 1
+                    keyword_search.save()
+
+                else:
+                    keyword_search = KeywordSearch.objects.filter(
+                        keyword=keyword
+                    ).first()
+                    if not keyword_search:
+                        keyword_search = KeywordSearch.objects.create(keyword=keyword)
+                    keyword_search.search_count += 1
+                    keyword_search.save()
+
+        return queryset.distinct()
+
+
 
 class PublicToolList(generics.ListCreateAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)

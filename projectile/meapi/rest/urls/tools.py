@@ -32,5 +32,9 @@ urlpatterns = [
         PublicSubcategoryToolsCountList.as_view(),
         name="subcategory-tool-counts",
     ),
+    path("/new/random",
+        tools.PublicRandomSearch.as_view(),
+        name = "new-search-api"
+    ),
     path("", tools.PublicToolList.as_view(), name="tool-list"),
 ]
