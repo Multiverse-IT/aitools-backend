@@ -44,6 +44,14 @@ class Tool(BaseModelWithUID):
         upload_to=get_tools_media_path_prefix,
         blank=True,
     )
+    logo = VersatileImageField(
+        "Logo",
+        upload_to=get_tools_media_path_prefix,
+        blank=True,
+        null=True
+    )
+    price = models.CharField(max_length=255, blank=True)
+
     alt = models.CharField(max_length=255, blank=True)
     requested = models.BooleanField(default=False)
     verification_code = models.CharField(max_length=50, blank=True)
