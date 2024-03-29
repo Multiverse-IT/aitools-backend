@@ -65,6 +65,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "logo",
             "logo_alt",
             "price",
+            "is_suggession",
             "alt",
             "verification_code",
             "is_noindex",
