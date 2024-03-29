@@ -50,6 +50,7 @@ class Tool(BaseModelWithUID):
         blank=True,
         null=True
     )
+    logo_alt = models.CharField(max_length=255, blank=True)
     price = models.CharField(max_length=255, blank=True)
 
     alt = models.CharField(max_length=255, blank=True)

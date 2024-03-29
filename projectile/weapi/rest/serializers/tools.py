@@ -63,6 +63,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "meta_description",
             "image",
             "logo",
+            "logo_alt",
             "price",
             "alt",
             "verification_code",
