@@ -117,7 +117,13 @@ class PublicToolList(generics.ListCreateAPIView):
 
             # Filter tools based on the search words in multiple fields
             if search_words:
-                queryset = queryset.filter(q_object)
+                from django.db.models import Exists, OuterRef
+                from catalogio.models import ToolsConnector
+
+                queryset = queryset.filter(q_object).annotate(
+                    connected_feature_tools = Exists(
+                        ToolsConnector.objects.filter(tool_id=OuterRef("id"),feature_id__isnull=False)
+                )).order_by("-connected_feature_tools", "-created_at")
 
                 # Save the search keyword and associate it with the user if authenticated
                 user = self.request.user
