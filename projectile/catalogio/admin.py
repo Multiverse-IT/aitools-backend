@@ -11,7 +11,8 @@ from .models import (
     ToolsCategoryConnector,
     ToolRequest,
     SavedTool,
-    FeatureTool
+    FeatureTool,
+    TopHundredTools
 )
 
 
@@ -36,7 +37,7 @@ class SubCategoryAdmin(admin.ModelAdmin):
 @admin.register(ToolsCategoryConnector)
 class ToolsCategoryAdmin(admin.ModelAdmin):
     list_display = ["id", "created_at"]
-    
+
 
 
 @admin.register(Rating)
@@ -65,3 +66,4 @@ class FeatureAdmin(admin.ModelAdmin):
 admin.site.register(ToolRequest)
 admin.site.register(SavedTool)
 admin.site.register(FeatureTool)
+admin.site.register(TopHundredTools)

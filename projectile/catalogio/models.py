@@ -256,3 +256,16 @@ class FeatureTool(BaseModelWithUID):
 
     def __str__(self):
         return f"UID: {self.uid}-SLUG: {self.slug}"
+
+
+class TopHundredTools(BaseModelWithUID):
+    slug = AutoSlugField(populate_from=get_feature_slug, unique=True, db_index=True)
+    feature_tool= models.ForeignKey(Tool, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    is_add = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"UID: {self.uid}-SLUG: {self.slug}"
