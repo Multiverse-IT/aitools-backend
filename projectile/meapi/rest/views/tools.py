@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from catalogio.choices import ToolStatus, PricingKind, VerifiedStatus
-from catalogio.models import SavedTool, Tool, SubCategory, TopHundredTools
+from catalogio.models import SavedTool, Tool, SubCategory, TopHundredTools, BestAlternativeTool
 
 from common.utils import CustomPagination10
 
@@ -24,6 +24,7 @@ from ..serializers.tools import (
     PublicTrendingToolListSerializer,
 )
 from weapi.rest.serializers.tools import PrivateTopHundredToolsSerializer
+from weapi.rest.serializers.feature_tool import PrivateBestAlternativeToolSerializer
 
 User = get_user_model()
 
@@ -660,5 +661,18 @@ class PublicTopHundredToolsList(generics.ListAPIView):
 class PublicTopHundredToolsDetail(generics.RetrieveAPIView):
     queryset = TopHundredTools.objects.select_related("feature_tool").filter().order_by("-is_add", "-created_at")
     serializer_class = PrivateTopHundredToolsSerializer
+    permission_classes = []
+    lookup_field = "slug"
+
+
+class PublicBestAlternativeToolList(generics.ListAPIView):
+    queryset = BestAlternativeTool.objects.filter()
+    serializer_class = PrivateBestAlternativeToolSerializer
+    permission_classes = []
+
+
+class PublicBestAlternativeToolDetail(generics.RetrieveAPIView):
+    queryset = BestAlternativeTool.objects.filter()
+    serializer_class = PrivateBestAlternativeToolSerializer
     permission_classes = []
     lookup_field = "slug"

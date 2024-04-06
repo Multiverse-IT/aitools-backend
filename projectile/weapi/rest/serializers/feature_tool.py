@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
-from catalogio.models import FeatureTool, Tool
+from catalogio.models import FeatureTool, Tool, BestAlternativeTool
 
 from ..serializers.tools import ToolListSerializer
 
@@ -22,3 +23,52 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
             **validated_data
         )
         return feature_tool
+
+
+class PrivateBestAlternativeToolSerializer(serializers.ModelSerializer):
+    tool_uids = serializers.ListField(
+        write_only = True,
+        child =serializers.UUIDField()
+    )
+    tool = ToolListSerializer(read_only=True)
+
+    class Meta:
+        model = BestAlternativeTool
+        fields = [
+            "uid",
+            "slug",
+            "tool",
+            "tool_uids",
+            "remarks",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["slug", "tool", "created_at", "updated_at"]
+
+
+    def create(self, validated_data):
+        request = self.context["request"]
+        tool_uids = validated_data.pop("tool_uids")
+
+        removal_tools = BestAlternativeTool.objects.filter(tool__uid__in = tool_uids)
+        removal_tools.delete()
+
+        tools_to_add_to_best_alternative = Tool.objects.filter(uid__in = tool_uids).distinct()
+
+        tools_list = []
+        try:
+            for item in tools_to_add_to_best_alternative:
+                tools_list.append(
+                    BestAlternativeTool(
+                        tool=item,
+                        user = request.user,
+                        **validated_data
+                    )
+                )
+            BestAlternativeTool.objects.bulk_create(tools_list)
+
+        except Exception as e:
+            raise ValidationError({"error": str(e)})
+
+
+        return validated_data

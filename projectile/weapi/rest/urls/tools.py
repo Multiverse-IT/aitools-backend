@@ -1,6 +1,6 @@
 from django.urls import path
 
-from ..views import tools
+from ..views import tools, best_alternative
 
 urlpatterns = [
     path(
@@ -25,6 +25,14 @@ urlpatterns = [
     path("/top/hundred/<slug:slug>",
         tools.PrivateTopHundredToolsDetail.as_view(),
         name="top-hundred-tool-detail"
+    ),
+    path("/best/alternative",
+        best_alternative.PrivateBestAlternativeToolList.as_view(),
+        name="best-alternative-tool-list"
+    ),
+    path("/best/alternative/<uuid:uid>",
+        best_alternative.PrivateBestAlternativeToolDetail.as_view(),
+        name="best-alternative-tool-detail"
     ),
     path("/<slug:slug>", tools.ToolDetail.as_view(), name="my-tool-detail"),
     path("", tools.ToolList.as_view(), name="my-tool-list"),
