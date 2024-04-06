@@ -653,12 +653,12 @@ class PublicSuggessionList(generics.ListAPIView):
 
 
 class PublicTopHundredToolsList(generics.ListAPIView):
-    queryset = TopHundredTools.objects.filter().order_by("-is_add", "-created_at")
+    queryset = TopHundredTools.objects.select_related("feature_tool").filter().order_by("-is_add", "-created_at")
     serializer_class = PrivateTopHundredToolsSerializer
     permission_classes = []
 
 class PublicTopHundredToolsDetail(generics.RetrieveAPIView):
-    queryset = TopHundredTools.objects.filter().order_by("-is_add", "-created_at")
+    queryset = TopHundredTools.objects.select_related("feature_tool").filter().order_by("-is_add", "-created_at")
     serializer_class = PrivateTopHundredToolsSerializer
     permission_classes = []
     lookup_field = "slug"

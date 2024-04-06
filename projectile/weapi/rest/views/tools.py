@@ -94,12 +94,12 @@ class PrivateCodeVerifyDetail(generics.RetrieveUpdateAPIView):
 
 
 class PrivateTopHundredToolsList(generics.ListCreateAPIView):
-    queryset = TopHundredTools.objects.filter().order_by("-is_add", "-created_at")
+    queryset = TopHundredTools.objects.select_related("feature_tool").filter().order_by("-is_add", "-created_at")
     serializer_class = PrivateTopHundredToolsSerializer
     permission_classes = [IsAdmin]
 
 class PrivateTopHundredToolsDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = TopHundredTools.objects.filter().order_by("-is_add", "-created_at")
+    queryset = TopHundredTools.objects.select_related("feature_tool").filter().order_by("-is_add", "-created_at")
     serializer_class = PrivateTopHundredToolsSerializer
     permission_classes = [IsAdmin]
     lookup_field = "slug"
