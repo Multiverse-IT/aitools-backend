@@ -3,7 +3,7 @@ from django.db.models import Q
 from rest_framework import generics
 
 from catalogio.choices import ToolStatus, VerifiedStatus
-from catalogio.models import Tool
+from catalogio.models import Tool, TopHundredTools
 
 from core.permissions import IsAdmin
 
@@ -11,6 +11,7 @@ from ..serializers.tools import (
     ToolListSerializer,
     ToolRequestDetailSerializer,
     ToolWithVerifiedStatus,
+    PrivateTopHundredToolsSerializer
 )
 
 
@@ -90,3 +91,15 @@ class PrivateCodeVerifyDetail(generics.RetrieveUpdateAPIView):
         return generics.get_object_or_404(
             self.queryset.filter(), verified_status=VerifiedStatus.PENDING, slug=slug
         )
+
+
+class PrivateTopHundredToolsList(generics.ListCreateAPIView):
+    queryset = TopHundredTools.objects.filter().order_by("-is_add", "-created_at")
+    serializer_class = PrivateTopHundredToolsSerializer
+    permission_classes = [IsAdmin]
+
+class PrivateTopHundredToolsDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = TopHundredTools.objects.filter().order_by("-is_add", "-created_at")
+    serializer_class = PrivateTopHundredToolsSerializer
+    permission_classes = [IsAdmin]
+    lookup_field = "slug"

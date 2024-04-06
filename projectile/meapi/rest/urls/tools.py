@@ -40,5 +40,13 @@ urlpatterns = [
         tools.PublicSuggessionList.as_view(),
         name="suggession-list-api"
         ),
+    path("/top/hundred",
+        tools.PublicTopHundredToolsList.as_view(),
+        name="public-top-hundred-tool-list"
+    ),
+    path("/top/hundred/<slug:slug>",
+        tools.PublicTopHundredToolsDetail.as_view(),
+        name="public-top-hundred-tool-detail"
+    ),
     path("", tools.PublicToolList.as_view(), name="tool-list"),
 ]

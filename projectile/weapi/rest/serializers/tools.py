@@ -8,6 +8,7 @@ from catalogio.models import (
     Tool,
     ToolsCategoryConnector,
     ToolsConnector,
+    TopHundredTools
 )
 from common.serializers import (
     CategorySlimSerializer,
@@ -231,3 +232,16 @@ class ToolWithVerifiedStatus(serializers.ModelSerializer):
             instance.is_verified = True
             instance.save()
         return super().update(instance, validated_data)
+
+
+class PrivateTopHundredToolsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TopHundredTools
+        fields = [
+            "uid",
+            "slug",
+            "feature_tool",
+            "is_add",
+            "created_at",
+            "updated_at"
+        ]
