@@ -7,8 +7,9 @@ class PublicSponsorListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sponsor
         fields = [
-            # "uid",
             "field",
+            "nofollow",
+            "dofollow"
             # "created_at",
             # "updated_at",
         ]

@@ -269,3 +269,16 @@ class TopHundredTools(BaseModelWithUID):
 
     def __str__(self):
         return f"UID: {self.uid}-SLUG: {self.slug}"
+
+
+class BestAlternativeTool(BaseModelWithUID):
+    slug = AutoSlugField(populate_from=get_feature_slug, unique=True, db_index=True)
+    tool= models.ForeignKey(Tool, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    remarks = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"UID: {self.uid}-SLUG: {self.slug}"
