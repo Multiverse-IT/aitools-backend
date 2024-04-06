@@ -28,7 +28,7 @@ class RatingDetail(generics.RetrieveUpdateAPIView):
     queryset = Rating.objects.filter()
     serializer_class = MeRatingListDetaliSerializer
     permission_classes = [CustomIdentityHeaderPermission]
-    lookup_field = "slug"
+    lookup_field = "uid"
 
     def get_queryset(self):
         identity = self.request.headers.get("identity")
