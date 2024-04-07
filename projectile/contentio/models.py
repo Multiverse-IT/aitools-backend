@@ -8,7 +8,7 @@ from versatileimagefield.fields import VersatileImageField
 from common.models import BaseModelWithUID
 
 from .choices import PostStatus
-from .utils import get_post_media_path_prefix, get_post_slug
+from .utils import get_post_media_path_prefix, get_post_slug, get_faq_media_path_prefix
 from .managers import PostQuerySet
 
 
@@ -80,3 +80,17 @@ class Sponsor(BaseModelWithUID):
 
     def __str__(self):
         return f"UID: {self.uid}"
+
+
+
+class FAQ(BaseModelWithUID):
+    title = models.CharField(max_length=200)
+    slug = AutoSlugField(populate_from=get_post_slug, unique=True, db_index=True)
+    image = VersatileImageField(upload_to=get_faq_media_path_prefix, blank=True)
+    summary = models.TextField(blank=True)
+    priority = models.IntegerField(
+        default=0, help_text="Higher number is higher priority."
+    )
+
+    def __str__(self):
+        return f"UID: {self.uid} - Title: {self.title}"

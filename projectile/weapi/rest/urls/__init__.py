@@ -12,5 +12,6 @@ urlpatterns = [
     path("/users", include("weapi.rest.urls.admin_user")),
     path("/feature-tools", include("weapi.rest.urls.feature_tool")),
     path("/storage", include("weapi.rest.urls.storage")),
-    path("/redirect", include("weapi.rest.urls.redirect"))
+    path("/redirect", include("weapi.rest.urls.redirect")),
+    path("/faqs", include("weapi.rest.urls.faq")),
 ]

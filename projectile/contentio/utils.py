@@ -5,3 +5,7 @@ def get_post_slug(instance):
 
 def get_post_media_path_prefix(instance, filename):
     return f"post/{instance.slug}/filename"
+
+
+def get_faq_media_path_prefix(instance, filename):
+    return f"faq/{instance.slug}/filename"
