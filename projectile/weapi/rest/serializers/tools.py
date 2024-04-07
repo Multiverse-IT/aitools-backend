@@ -8,7 +8,8 @@ from catalogio.models import (
     Tool,
     ToolsCategoryConnector,
     ToolsConnector,
-    TopHundredTools
+    TopHundredTools,
+    FeatureTool
 )
 from common.serializers import (
     CategorySlimSerializer,
@@ -235,13 +236,48 @@ class ToolWithVerifiedStatus(serializers.ModelSerializer):
 
 
 class PrivateTopHundredToolsSerializer(serializers.ModelSerializer):
+    tool_slugs = serializers.ListField(
+        write_only=True, child=serializers.CharField()
+    )
+    tool = ToolListSerializer(source="feature_tool", read_only=True)
+
     class Meta:
         model = TopHundredTools
         fields = [
             "uid",
             "slug",
-            "feature_tool",
+            "tool",
+            "tool_slugs",
             "is_add",
             "created_at",
             "updated_at"
         ]
+
+    def create(self, validated_data):
+        request = self.context["request"]
+        tool_slugs = validated_data.pop("tool_slugs")
+
+        removable_tools = FeatureTool.objects.filter(tool__slug__in = tool_slugs)
+        removable_tools.delete()
+
+        tools_to_add_to_top_hundred_tools = Tool.objects.filter(slug__in = tool_slugs).distinct()
+
+        tools_list = []
+        try:
+            for item in tools_to_add_to_top_hundred_tools:
+                tools_list.append(
+                    TopHundredTools(
+                        feature_tool=item,
+                        user = request.user,
+                        **validated_data
+                    )
+                )
+            TopHundredTools.objects.bulk_create(tools_list)
+
+        except Exception as e:
+            from rest_framework.exceptions import ValidationError
+
+            raise ValidationError({"error": str(e)})
+
+
+        return validated_data
