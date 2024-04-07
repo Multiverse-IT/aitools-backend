@@ -152,6 +152,13 @@ class PublicToolList(generics.ListCreateAPIView):
                     keyword_search.search_count += 1
                     keyword_search.save()
 
+        if search is None or search == "":
+            from catalogio.models import FeatureTool
+            feature_tools_ids = FeatureTool.objects.select_related("feature_tool").values_list("feature_tool_id", flat=True)
+            queryset = queryset.exclude(
+                id__in=feature_tools_ids
+            )
+
         if time_range:
             now = timezone.now()
 
