@@ -60,3 +60,18 @@ class RatingSlimSerializer(serializers.Serializer):
     # Links to other external urls
     canonical_url = serializers.URLField(source="rating.canonical_url", read_only=True)
     created_at = serializers.DateTimeField(source="rating.created_at", read_only=True)
+
+
+class CategorySlimSerializerForBestAlternative(serializers.Serializer):
+    slug = serializers.CharField(read_only=True)
+    title = serializers.CharField(read_only=True)
+    meta_title = serializers.CharField(
+        read_only=True, required=False
+    )
+    meta_description = serializers.CharField(
+       read_only=True, required=False
+    )
+    is_indexed = serializers.CharField(read_only=True)
+    canonical_url = serializers.CharField(
+        read_only=True, required=False
+    )

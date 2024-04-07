@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from catalogio.models import FeatureTool, Tool, BestAlternativeTool
+from catalogio.models import FeatureTool, Tool, BestAlternativeTool, Category
 
 from ..serializers.tools import ToolListSerializer
+from common.serializers import CategorySlimSerializerForBestAlternative
 
 class PrivateFeatureToolSerializer(serializers.ModelSerializer):
     tool_slug = serializers.SlugRelatedField(
@@ -31,7 +32,12 @@ class PrivateBestAlternativeToolSerializer(serializers.ModelSerializer):
         child =serializers.UUIDField()
     )
     tool = ToolListSerializer(read_only=True)
-
+    category_slug = serializers.SlugRelatedField(
+        slug_field="slug",
+        queryset=Category.objects.filter(),
+        write_only=True,
+    )
+    category = CategorySlimSerializerForBestAlternative(read_only=True)
     class Meta:
         model = BestAlternativeTool
         fields = [
@@ -39,6 +45,8 @@ class PrivateBestAlternativeToolSerializer(serializers.ModelSerializer):
             "slug",
             "tool",
             "tool_uids",
+            "category_slug",
+            "category",
             "remarks",
             "created_at",
             "updated_at",
@@ -49,6 +57,8 @@ class PrivateBestAlternativeToolSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context["request"]
         tool_uids = validated_data.pop("tool_uids")
+        category = validated_data.pop("category_slug")
+        print("category ;;;;;;;;;;;;;;;:", category)
 
         removal_tools = BestAlternativeTool.objects.filter(tool__uid__in = tool_uids)
         removal_tools.delete()
@@ -62,6 +72,7 @@ class PrivateBestAlternativeToolSerializer(serializers.ModelSerializer):
                     BestAlternativeTool(
                         tool=item,
                         user = request.user,
+                        category = category,
                         **validated_data
                     )
                 )

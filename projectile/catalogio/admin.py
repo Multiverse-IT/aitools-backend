@@ -19,7 +19,7 @@ from .models import (
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ["id", "title"]
+    list_display = ["id", "slug", "uid", "title"]
     search_fields = ["title"]
 
 

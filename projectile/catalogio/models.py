@@ -276,7 +276,9 @@ class BestAlternativeTool(BaseModelWithUID):
     tool= models.ForeignKey(Tool, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     remarks = models.CharField(max_length=255, blank=True)
-
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, blank=True, null=True
+    )
     class Meta:
         ordering = ["-created_at"]
 
