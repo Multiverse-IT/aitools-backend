@@ -64,6 +64,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
         fields = [
+            "uid",
             "slug",
             "name",
             "is_verified",
@@ -231,6 +232,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
         fields = [
+            "uid",
             "slug",
             "name",
             "is_verified",
@@ -428,6 +430,7 @@ class PublicTrendingToolListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
         fields = [
+            "uid",
             "slug",
             "name",
             "is_verified",
@@ -517,6 +520,7 @@ class PublicSubCategoryToolSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
         fields = [
+            "uid",
             "slug",
             "name",
             "is_verified",
