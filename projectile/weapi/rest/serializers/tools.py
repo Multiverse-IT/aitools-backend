@@ -257,7 +257,7 @@ class PrivateTopHundredToolsSerializer(serializers.ModelSerializer):
         request = self.context["request"]
         tool_slugs = validated_data.pop("tool_slugs")
 
-        removable_tools = FeatureTool.objects.filter(tool__slug__in = tool_slugs)
+        removable_tools = TopHundredTools.objects.filter(feature_tool__slug__in = tool_slugs)
         removable_tools.delete()
 
         tools_to_add_to_top_hundred_tools = Tool.objects.filter(slug__in = tool_slugs).distinct()
