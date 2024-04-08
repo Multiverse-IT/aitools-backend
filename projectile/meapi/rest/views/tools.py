@@ -93,7 +93,7 @@ class PublicToolList(generics.ListCreateAPIView):
         queryset = queryset.annotate(
             average_ratings=Avg("toolsconnector__rating__rating")
         ).order_by("-created_at")
-        print("-------------------------::", queryset)
+
         search = self.request.query_params.get("search", None)
         subcategory = self.request.query_params.get("subcategory", [])
         features = self.request.query_params.get("features", [])
