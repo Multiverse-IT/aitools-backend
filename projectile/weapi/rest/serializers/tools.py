@@ -249,6 +249,7 @@ class PrivateTopHundredToolsSerializer(serializers.ModelSerializer):
             "tool",
             "tool_slugs",
             "is_add",
+            "priority",
             "created_at",
             "updated_at"
         ]

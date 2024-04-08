@@ -263,6 +263,7 @@ class TopHundredTools(BaseModelWithUID):
     feature_tool= models.ForeignKey(Tool, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     is_add = models.BooleanField(default=False)
+    priority = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ["-created_at"]

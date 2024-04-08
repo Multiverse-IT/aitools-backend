@@ -93,6 +93,7 @@ class PublicToolList(generics.ListCreateAPIView):
         queryset = queryset.annotate(
             average_ratings=Avg("toolsconnector__rating__rating")
         ).order_by("-created_at")
+        print("-------------------------::", queryset)
         search = self.request.query_params.get("search", None)
         subcategory = self.request.query_params.get("subcategory", [])
         features = self.request.query_params.get("features", [])
@@ -102,6 +103,28 @@ class PublicToolList(generics.ListCreateAPIView):
         pricing = self.request.query_params.get("pricing", None)
         min_love_count = self.request.query_params.get("min_love", None)
         max_love_count = self.request.query_params.get("max_love", None)
+        top_tools = self.request.query_params.get("top_tools", False)
+
+
+        if top_tools:
+            from django.db.models import Case, When, Value, IntegerField
+
+            top_hundred_tools_ids = TopHundredTools.objects.values_list("feature_tool_id", flat=True)
+            queryset = queryset.filter(id__in=top_hundred_tools_ids).annotate(
+                priority_gt_zero=Case(
+                    When(tophundredtools__priority__gt=0, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+                ).order_by(
+                    # Order by is_add=True
+                    '-tophundredtools__is_add',
+                    # Then by priority greater than 0
+                    '-priority_gt_zero',
+                    # Then by is_add=False and priority=0
+                    'tophundredtools__is_add',
+                    'tophundredtools__priority'
+                )
 
         if search is not None:
             search_words = [
@@ -660,16 +683,16 @@ class PublicSuggessionList(generics.ListAPIView):
     permission_classes = []
 
 
-class PublicTopHundredToolsList(generics.ListAPIView):
-    queryset = TopHundredTools.objects.select_related("feature_tool").filter().order_by("-is_add", "-created_at")
-    serializer_class = PrivateTopHundredToolsSerializer
-    permission_classes = []
+# class PublicTopHundredToolsList(generics.ListAPIView):
+#     queryset = TopHundredTools.objects.select_related("feature_tool").filter().order_by("-is_add", "-created_at")
+#     serializer_class = PrivateTopHundredToolsSerializer
+#     permission_classes = []
 
-class PublicTopHundredToolsDetail(generics.RetrieveAPIView):
-    queryset = TopHundredTools.objects.select_related("feature_tool").filter().order_by("-is_add", "-created_at")
-    serializer_class = PrivateTopHundredToolsSerializer
-    permission_classes = []
-    lookup_field = "slug"
+# class PublicTopHundredToolsDetail(generics.RetrieveAPIView):
+#     queryset = TopHundredTools.objects.select_related("feature_tool").filter().order_by("-is_add", "-created_at")
+    # serializer_class = PrivateTopHundredToolsSerializer
+#     permission_classes = []
+#     lookup_field = "slug"
 
 
 class PublicBestAlternativeToolList(generics.ListAPIView):

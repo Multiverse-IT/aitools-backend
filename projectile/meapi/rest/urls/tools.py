@@ -40,14 +40,14 @@ urlpatterns = [
         tools.PublicSuggessionList.as_view(),
         name="suggession-list-api"
         ),
-    path("/top/hundred",
-        tools.PublicTopHundredToolsList.as_view(),
-        name="public-top-hundred-tool-list"
-    ),
-    path("/top/hundred/<slug:slug>",
-        tools.PublicTopHundredToolsDetail.as_view(),
-        name="public-top-hundred-tool-detail"
-    ),
+    # path("/top/hundred",
+    #     tools.PublicTopHundredToolsList.as_view(),
+    #     name="public-top-hundred-tool-list"
+    # ),
+    # path("/top/hundred/<slug:slug>",
+    #     tools.PublicTopHundredToolsDetail.as_view(),
+    #     name="public-top-hundred-tool-detail"
+    # ),
     path("/best/alternative",
         tools.PublicBestAlternativeToolList.as_view(),
         name="public-best-tool-list",
