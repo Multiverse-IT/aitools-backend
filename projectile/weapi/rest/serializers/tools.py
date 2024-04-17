@@ -237,7 +237,7 @@ class ToolWithVerifiedStatus(serializers.ModelSerializer):
 
 class PrivateTopHundredToolsSerializer(serializers.ModelSerializer):
     tool_slugs = serializers.ListField(
-        write_only=True, child=serializers.CharField()
+        write_only=True, child=serializers.CharField(), required=False
     )
     tool = ToolListSerializer(source="feature_tool", read_only=True)
 
