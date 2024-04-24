@@ -86,7 +86,6 @@ class Sponsor(BaseModelWithUID):
 class FAQ(BaseModelWithUID):
     title = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from=get_post_slug, unique=True, db_index=True)
-    image = VersatileImageField(upload_to=get_faq_media_path_prefix, blank=True)
     summary = models.TextField(blank=True)
     priority = models.IntegerField(
         default=0, help_text="Higher number is higher priority."

@@ -9,7 +9,6 @@ class GlobalFaqListSerializer(serializers.ModelSerializer):
            "uid",
            "title",
            "slug",
-           "image",
            "summary",
            "priority",
            "created_at",
