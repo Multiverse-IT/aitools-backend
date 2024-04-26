@@ -9,5 +9,6 @@ urlpatterns = [
     path("/posts", include("meapi.rest.urls.posts")),
     path("/feature-tools", include("meapi.rest.urls.feature_tool")),
     path("/redirect", include("meapi.rest.urls.redirect")),
+    path("/deals", include("meapi.rest.urls.deals")),
     path("", include("meapi.rest.urls.me")),
 ]
