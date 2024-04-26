@@ -30,7 +30,7 @@ urlpatterns = [
         best_alternative.PrivateBestAlternativeToolList.as_view(),
         name="best-alternative-tool-list"
     ),
-    path("/best/alternative/<slug:slug>",
+    path("/best/alternative/<uuid:uid>",
         best_alternative.PrivateBestAlternativeToolDetail.as_view(),
         name="best-alternative-tool-detail"
     ),

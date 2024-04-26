@@ -25,7 +25,7 @@ class PrivateBestAlternativeToolDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = BestAlternativeTool.objects.filter()
     serializer_class = PrivateBestAlternativeToolSerializer
     permission_classes = [IsAdmin]
-    lookup_field = "slug"
+    lookup_field = "uid"
 
     # def get_object(self):
     #     from rest_framework.generics import get_object_or_404
