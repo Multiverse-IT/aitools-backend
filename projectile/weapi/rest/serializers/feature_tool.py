@@ -29,7 +29,8 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
 class PrivateBestAlternativeToolSerializer(serializers.ModelSerializer):
     tool_uids = serializers.ListField(
         write_only = True,
-        child =serializers.UUIDField()
+        child =serializers.UUIDField(),
+        required=False,
     )
     tool = ToolListSerializer(read_only=True)
     category_slug = serializers.SlugRelatedField(
@@ -56,9 +57,11 @@ class PrivateBestAlternativeToolSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context["request"]
-        tool_uids = validated_data.pop("tool_uids")
+        tool_uids = validated_data.pop("tool_uids", None)
+        if tool_uids is None:
+            raise ValidationError({"error": "tool uids are required."})
+
         category = validated_data.pop("category_slug")
-        print("category ;;;;;;;;;;;;;;;:", category)
 
         removal_tools = BestAlternativeTool.objects.filter(tool__uid__in = tool_uids)
         removal_tools.delete()
@@ -83,3 +86,9 @@ class PrivateBestAlternativeToolSerializer(serializers.ModelSerializer):
 
 
         return validated_data
+
+
+    def update(self, instance, validated_data):
+        category = validated_data.pop("category_slug")
+        validated_data['category'] = category
+        return super().update(instance, validated_data)
