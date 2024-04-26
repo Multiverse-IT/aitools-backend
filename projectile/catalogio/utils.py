@@ -24,3 +24,8 @@ def get_verification_code(instance):
     characters = string.ascii_letters + string.digits
     code = "".join(random.choice(characters) for _ in range(32))
     return code
+
+def get_deal_slug(instance):
+    characters = string.ascii_letters + string.digits
+    random_slug = "".join(random.choice(characters) for _ in range(6))
+    return random_slug

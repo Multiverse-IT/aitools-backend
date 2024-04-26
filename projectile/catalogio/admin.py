@@ -14,6 +14,7 @@ from .models import (
     FeatureTool,
     TopHundredTools,
     BestAlternativeTool,
+    Deal
 )
 
 
@@ -69,3 +70,4 @@ admin.site.register(SavedTool)
 admin.site.register(FeatureTool)
 admin.site.register(TopHundredTools)
 admin.site.register(BestAlternativeTool)
+admin.site.register(Deal)

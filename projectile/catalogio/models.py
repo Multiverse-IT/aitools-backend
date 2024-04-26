@@ -14,6 +14,7 @@ from .utils import (
     get_tools_media_path_prefix,
     get_feature_slug,
     get_verification_code,
+    get_deal_slug
 )
 from .managers import ToolQuerySet
 
@@ -280,6 +281,22 @@ class BestAlternativeTool(BaseModelWithUID):
     category = models.ForeignKey(
         Category, on_delete=models.CASCADE, blank=True, null=True
     )
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"UID: {self.uid}-SLUG: {self.slug}"
+
+
+
+class Deal(BaseModelWithUID):
+    slug = AutoSlugField(populate_from=get_deal_slug, unique=True, db_index=True)
+    deal_tool= models.ForeignKey(Tool, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    coupon = models.IntegerField(default=0)
+    is_top = models.BooleanField(default=False)
+    discout = models.IntegerField(default=0)
+
     class Meta:
         ordering = ["-created_at"]
 

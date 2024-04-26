@@ -14,4 +14,5 @@ urlpatterns = [
     path("/storage", include("weapi.rest.urls.storage")),
     path("/redirect", include("weapi.rest.urls.redirect")),
     path("/faqs", include("weapi.rest.urls.faq")),
+    path("/deals", include("weapi.rest.urls.deals"))
 ]
