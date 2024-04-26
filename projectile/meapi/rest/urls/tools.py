@@ -48,11 +48,11 @@ urlpatterns = [
         tools.PublicTopHundredToolsDetail.as_view(),
         name="public-top-hundred-tool-detail"
     ),
-    path("/best/alternative",
+    path("/best/alternative/<slug:category_slug>",
         tools.PublicBestAlternativeToolList.as_view(),
         name="public-best-tool-list",
     ),
-    path("/best/alternative/<slug:slug>",
+    path("/best/alternative/<slug:category_slug>/detail/<slug:slug>",
         tools.PublicBestAlternativeToolDetail.as_view(),
         name="public-best-tool-detail",
     ),

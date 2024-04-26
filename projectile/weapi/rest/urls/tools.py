@@ -26,11 +26,11 @@ urlpatterns = [
         tools.PrivateTopHundredToolsDetail.as_view(),
         name="top-hundred-tool-detail"
     ),
-    path("/best/alternative/<slug:category_slug>",
+    path("/best/alternative",
         best_alternative.PrivateBestAlternativeToolList.as_view(),
         name="best-alternative-tool-list"
     ),
-    path("/best/alternative/<slug:category_slug>/detail/<slug:slug>",
+    path("/best/alternative/<slug:slug>",
         best_alternative.PrivateBestAlternativeToolDetail.as_view(),
         name="best-alternative-tool-detail"
     ),
