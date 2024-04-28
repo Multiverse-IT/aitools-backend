@@ -20,17 +20,28 @@ class PrivateDealsSerializer(serializers.ModelSerializer):
         if not "tool_slug" in validated_data:
             raise ValidationError({"detail":"tool slug nedded to be provide!"})
         tool = validated_data.pop("tool_slug")
+        discout = validated_data.get("discout", 0)
 
         feature_tool = Deal.objects.create(
             deal_tool=tool,
             user=self.context["request"].user,
             **validated_data
         )
+
+        if discout > 0:
+            tool.discout = discout
+            tool.save()
+
         return feature_tool
 
     def update(self, instance, validated_data):
         if "tool_slug" in validated_data:
             tool = validated_data.pop("tool_slug")
             validated_data["deal_tool"] = tool
+
+        discout = validated_data.get("discout", 0)
+        if discout > 0:
+            instance.deal_tool.discout = discout
+            instance.deal_tool.save()
 
         return super().update(instance, validated_data)

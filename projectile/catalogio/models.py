@@ -83,6 +83,8 @@ class Tool(BaseModelWithUID):
     discoard_url = models.URLField(blank=True)
     pricing_url = models.URLField(blank=True)
 
+    discout = models.IntegerField(default=0)
+
     objects = ToolQuerySet.as_manager()
 
     class Meta:
