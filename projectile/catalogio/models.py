@@ -293,7 +293,7 @@ class Deal(BaseModelWithUID):
     slug = AutoSlugField(populate_from=get_deal_slug, unique=True, db_index=True)
     deal_tool= models.ForeignKey(Tool, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    coupon = models.IntegerField(default=0)
+    coupon = models.CharField(max_length=255, blank=True)
     is_top = models.BooleanField(default=False)
     discout = models.IntegerField(default=0)
 
