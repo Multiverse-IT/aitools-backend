@@ -93,6 +93,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "feature_slugs",
             "feature",
             "status",
+            "discout",
             "ratings",
             "average_ratings",
             "short_description",
@@ -116,7 +117,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "most_loved",
         ]
 
-        read_only_fields = ["uid", "status", "requested", "most_loved", "created_at"]
+        read_only_fields = ["uid", "status", "requested", "discout", "most_loved", "created_at"]
 
     def get_is_loved(self, instance):
         identity = self.context["request"].headers.get("identity")
@@ -260,6 +261,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "focus_keyword",
             "feature",
             "status",
+            "discout",
             "ratings",
             "average_ratings",
             "short_description",
@@ -300,6 +302,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "is_noindex",
             "feature",
             "status",
+            "discout",
             "short_description",
             "category",
             "sub_category",
@@ -455,6 +458,7 @@ class PublicTrendingToolListSerializer(serializers.ModelSerializer):
             "is_noindex",
             "feature",
             "status",
+            "discout",
             "ratings",
             "average_ratings",
             "short_description",
@@ -545,6 +549,7 @@ class PublicSubCategoryToolSerializer(serializers.ModelSerializer):
             "is_noindex",
             "feature",
             "status",
+            "discout",
             "ratings",
             "average_ratings",
             "short_description",

@@ -77,6 +77,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "feature_slugs",
             "feature",
             "status",
+            "discout",
             "requested",
             "short_description",
             "category_slug",
