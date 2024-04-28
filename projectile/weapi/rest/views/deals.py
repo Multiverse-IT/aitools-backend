@@ -16,3 +16,9 @@ class PrivateDealsList(generics.ListCreateAPIView):
             queryset = self.queryset.filter(is_top=is_top)
             return queryset
         return self.queryset
+
+class PrivateDealsDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Deal.objects.filter()
+    serializer_class = PrivateDealsSerializer
+    permission_classes = [IsAdmin]
+    lookup_field = "slug"
