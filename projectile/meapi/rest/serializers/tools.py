@@ -94,6 +94,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "feature",
             "status",
             "discout",
+            "coupon",
             "ratings",
             "average_ratings",
             "short_description",
@@ -117,7 +118,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "most_loved",
         ]
 
-        read_only_fields = ["uid", "status", "requested", "discout", "most_loved", "created_at"]
+        read_only_fields = ["uid", "status", "requested", "discout", "coupon", "most_loved", "created_at"]
 
     def get_is_loved(self, instance):
         identity = self.context["request"].headers.get("identity")
@@ -262,6 +263,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "feature",
             "status",
             "discout",
+            "coupon",
             "ratings",
             "average_ratings",
             "short_description",
@@ -303,6 +305,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "feature",
             "status",
             "discout",
+            "coupon",
             "short_description",
             "category",
             "sub_category",
@@ -459,6 +462,7 @@ class PublicTrendingToolListSerializer(serializers.ModelSerializer):
             "feature",
             "status",
             "discout",
+            "coupon",
             "ratings",
             "average_ratings",
             "short_description",
@@ -479,7 +483,7 @@ class PublicTrendingToolListSerializer(serializers.ModelSerializer):
             "total_saved_tools",
         ]
 
-        read_only_fields = ["uid", "status", "requested", "created_at"]
+        read_only_fields = ["uid", "status", "coupon", "requested", "created_at"]
 
     def get_is_loved(self, instance):
         identity = self.context["request"].headers.get("identity")
@@ -550,6 +554,7 @@ class PublicSubCategoryToolSerializer(serializers.ModelSerializer):
             "feature",
             "status",
             "discout",
+            "coupon",
             "ratings",
             "average_ratings",
             "short_description",
@@ -570,7 +575,7 @@ class PublicSubCategoryToolSerializer(serializers.ModelSerializer):
             "most_loved",
         ]
 
-        read_only_fields = ["uid", "status", "requested", "most_loved", "created_at"]
+        read_only_fields = ["uid", "status", "requested", "coupon", "most_loved", "created_at"]
 
     def get_is_loved(self, instance):
         identity = self.context["request"].headers.get("identity")

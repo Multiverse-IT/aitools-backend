@@ -84,6 +84,7 @@ class Tool(BaseModelWithUID):
     pricing_url = models.URLField(blank=True)
 
     discout = models.IntegerField(default=0)
+    coupon = models.CharField(max_length=255, blank=True)
 
     objects = ToolQuerySet.as_manager()
 

@@ -21,6 +21,7 @@ class PrivateDealsSerializer(serializers.ModelSerializer):
             raise ValidationError({"detail":"tool slug nedded to be provide!"})
         tool = validated_data.pop("tool_slug")
         discout = validated_data.get("discout", 0)
+        coupon = validated_data.get("coupon", None)
 
         feature_tool = Deal.objects.create(
             deal_tool=tool,
@@ -32,12 +33,22 @@ class PrivateDealsSerializer(serializers.ModelSerializer):
             tool.discout = discout
             tool.save()
 
+        if coupon is not None:
+            tool.coupon = coupon
+            tool.save()
+
         return feature_tool
 
     def update(self, instance, validated_data):
         if "tool_slug" in validated_data:
             tool = validated_data.pop("tool_slug")
             validated_data["deal_tool"] = tool
+
+        if "coupon" in validated_data:
+            coupon = validated_data.get("coupon", None)
+            if coupon is not None:
+                instance.deal_tool.coupon = coupon
+                instance.deal_tool.save()
 
         discout = validated_data.get("discout", 0)
         if discout > 0:

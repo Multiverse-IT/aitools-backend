@@ -78,6 +78,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "feature",
             "status",
             "discout",
+            "coupon",
             "requested",
             "short_description",
             "category_slug",
@@ -100,7 +101,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-        read_only_fields = ["uid", "created_at"]
+        read_only_fields = ["uid", "created_at", "coupon","discout"]
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
