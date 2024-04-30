@@ -39,7 +39,7 @@ class PrivateDealsSerializer(serializers.ModelSerializer):
 
         # Check if the tool exists
         try:
-            tool = Tool.objects.get(slug=tool_slug)
+            tool = tool_slug
         except Tool.DoesNotExist:
             raise ValidationError({"detail": f"Tool with slug '{tool_slug}' does not exist!"})
 
