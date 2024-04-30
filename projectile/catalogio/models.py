@@ -85,6 +85,7 @@ class Tool(BaseModelWithUID):
 
     discout = models.IntegerField(default=0)
     coupon = models.CharField(max_length=255, blank=True)
+    is_deal = models.BooleanField(default=False)
 
     objects = ToolQuerySet.as_manager()
 

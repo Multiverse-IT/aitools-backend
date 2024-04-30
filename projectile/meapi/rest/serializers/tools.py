@@ -84,6 +84,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "logo",
             "logo_alt",
             "price",
+            "is_deal",
             "is_suggession",
             "alt",
             "requested",
@@ -118,7 +119,7 @@ class PublicToolListSerializer(serializers.ModelSerializer):
             "most_loved",
         ]
 
-        read_only_fields = ["uid", "status", "requested", "discout", "coupon", "most_loved", "created_at"]
+        read_only_fields = ["uid", "status","is_deal", "requested", "discout", "coupon", "most_loved", "created_at"]
 
     def get_is_loved(self, instance):
         identity = self.context["request"].headers.get("identity")
@@ -254,6 +255,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "logo",
             "logo_alt",
             "price",
+            "is_deal",
             "is_suggession",
             "alt",
             "verification_code",
@@ -301,6 +303,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "meta_title",
             "meta_description",
             "image",
+            "is_deal",
             "is_noindex",
             "feature",
             "status",
@@ -455,6 +458,7 @@ class PublicTrendingToolListSerializer(serializers.ModelSerializer):
             "logo",
             "logo_alt",
             "price",
+            "is_deal",
             "is_suggession",
             "alt",
             "requested",
@@ -547,6 +551,7 @@ class PublicSubCategoryToolSerializer(serializers.ModelSerializer):
             "logo",
             "logo_alt",
             "price",
+            "is_deal",
             "is_suggession",
             "alt",
             "requested",
@@ -575,7 +580,7 @@ class PublicSubCategoryToolSerializer(serializers.ModelSerializer):
             "most_loved",
         ]
 
-        read_only_fields = ["uid", "status", "requested", "coupon", "most_loved", "created_at"]
+        read_only_fields = ["uid", "status", "is_deal", "requested", "coupon", "most_loved", "created_at"]
 
     def get_is_loved(self, instance):
         identity = self.context["request"].headers.get("identity")
