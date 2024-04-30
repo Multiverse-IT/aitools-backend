@@ -104,7 +104,7 @@ class PublicToolList(generics.ListCreateAPIView):
         min_love_count = self.request.query_params.get("min_love", None)
         max_love_count = self.request.query_params.get("max_love", None)
         top_tools = self.request.query_params.get("top_tools", False)
-        deals = self.request.query_params.get("deal", None)
+        deals = self.request.query_params.get("deals", None)
 
         if  deals and deals == "true":
             queryset = queryset.filter(is_deal=True)
