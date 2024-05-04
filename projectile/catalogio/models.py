@@ -2,19 +2,26 @@ from autoslug import AutoSlugField
 
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.db.models.signals import pre_delete, post_save
 
 from versatileimagefield.fields import VersatileImageField
 
 from common.models import BaseModelWithUID
 
-from .choices import RequestToolStatus, ToolKind, ToolStatus, PricingKind,VerifiedStatus
+from .choices import (
+    RequestToolStatus,
+    ToolKind,
+    ToolStatus,
+    PricingKind,
+    VerifiedStatus,
+)
 from .utils import (
     get_category_media_path_prefix,
     get_subategory_media_path_prefix,
     get_tools_media_path_prefix,
     get_feature_slug,
     get_verification_code,
-    get_deal_slug
+    get_deal_slug,
 )
 from .managers import ToolQuerySet
 
@@ -46,10 +53,7 @@ class Tool(BaseModelWithUID):
         blank=True,
     )
     logo = VersatileImageField(
-        "Logo",
-        upload_to=get_tools_media_path_prefix,
-        blank=True,
-        null=True
+        "Logo", upload_to=get_tools_media_path_prefix, blank=True, null=True
     )
     logo_alt = models.CharField(max_length=255, blank=True)
     price = models.CharField(max_length=255, blank=True)
@@ -251,7 +255,7 @@ class ToolRequest(models.Model):
 
 class FeatureTool(BaseModelWithUID):
     slug = AutoSlugField(populate_from=get_feature_slug, unique=True, db_index=True)
-    feature_tool= models.ForeignKey(Tool, on_delete=models.CASCADE)
+    feature_tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     custom_field = models.CharField(max_length=255, blank=True)
     in_pages = models.JSONField(default=list)
@@ -265,7 +269,7 @@ class FeatureTool(BaseModelWithUID):
 
 class TopHundredTools(BaseModelWithUID):
     slug = AutoSlugField(populate_from=get_feature_slug, unique=True, db_index=True)
-    feature_tool= models.ForeignKey(Tool, on_delete=models.CASCADE)
+    feature_tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     is_add = models.BooleanField(default=False)
     priority = models.PositiveIntegerField(default=0)
@@ -279,12 +283,13 @@ class TopHundredTools(BaseModelWithUID):
 
 class BestAlternativeTool(BaseModelWithUID):
     slug = AutoSlugField(populate_from=get_feature_slug, unique=True, db_index=True)
-    tool= models.ForeignKey(Tool, on_delete=models.CASCADE)
+    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     remarks = models.CharField(max_length=255, blank=True)
     category = models.ForeignKey(
         Category, on_delete=models.CASCADE, blank=True, null=True
     )
+
     class Meta:
         ordering = ["-created_at"]
 
@@ -292,10 +297,9 @@ class BestAlternativeTool(BaseModelWithUID):
         return f"UID: {self.uid}-SLUG: {self.slug}"
 
 
-
 class Deal(BaseModelWithUID):
     slug = AutoSlugField(populate_from=get_deal_slug, unique=True, db_index=True)
-    deal_tool= models.ForeignKey(Tool, on_delete=models.CASCADE)
+    deal_tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     coupon = models.CharField(max_length=255, blank=True)
     is_top = models.BooleanField(default=False)
@@ -306,3 +310,9 @@ class Deal(BaseModelWithUID):
 
     def __str__(self):
         return f"UID: {self.uid}-SLUG: {self.slug}"
+
+
+from .signals import update_tool_on_deal_save, delete_deal_tool
+
+pre_delete.connect(delete_deal_tool, sender=Deal)
+post_save.connect(update_tool_on_deal_save, sender=Deal)
