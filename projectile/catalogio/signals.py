@@ -15,6 +15,6 @@ def delete_deal_tool(sender, instance, **kwargs):
     """
     connected_tool = instance.deal_tool
     connected_tool.discout = 0
-    connected_tool.coupon = None
+    connected_tool.coupon = ""
     connected_tool.is_deal = False
     connected_tool.save()
