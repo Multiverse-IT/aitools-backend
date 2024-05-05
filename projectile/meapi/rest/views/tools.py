@@ -1,14 +1,22 @@
 from datetime import date, datetime, timedelta
 
 from django.contrib.auth import get_user_model
-from django.db.models import Avg, Count, F, Q
+from django.db.models import Avg, Count, F, Q, Prefetch
 from django.utils import timezone
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from catalogio.choices import ToolStatus, PricingKind, VerifiedStatus
-from catalogio.models import SavedTool, Tool, SubCategory, TopHundredTools, BestAlternativeTool
+from catalogio.models import (
+    SavedTool,
+    Tool,
+    SubCategory,
+    TopHundredTools,
+    BestAlternativeTool,
+    ToolsCategoryConnector,
+    ToolsConnector,
+)
 
 from common.utils import CustomPagination10
 
@@ -89,7 +97,21 @@ class PublicToolList(generics.ListCreateAPIView):
     pagination_class = CustomPagination10
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = (
+            self.queryset.prefetch_related(
+                Prefetch(
+                    "toolsconnector_set",
+                    queryset=ToolsConnector.objects.select_related("rating", "feature"),
+                ),
+                Prefetch(
+                    "toolscategoryconnector_set",
+                    queryset=ToolsCategoryConnector.objects.select_related(
+                        "category", "subcategory"
+                    ),
+                ),
+            )
+        )
+
         queryset = queryset.annotate(
             average_ratings=Avg("toolsconnector__rating__rating")
         ).order_by("-created_at")
@@ -106,28 +128,34 @@ class PublicToolList(generics.ListCreateAPIView):
         top_tools = self.request.query_params.get("top_tools", False)
         deals = self.request.query_params.get("deals", None)
 
-        if  deals and deals == "true":
+        if deals and deals == "true":
             queryset = queryset.filter(is_deal=True)
 
         if top_tools:
             from django.db.models import Case, When, Value, IntegerField
 
-            top_hundred_tools_ids = TopHundredTools.objects.values_list("feature_tool_id", flat=True)
-            queryset = queryset.filter(id__in=top_hundred_tools_ids).annotate(
-                priority_gt_zero=Case(
-                    When(tophundredtools__priority__gt=0, then=Value(1)),
-                    default=Value(0),
-                    output_field=IntegerField(),
-                ),
-                ).order_by(
-                    # Order by is_add=True
-                    '-tophundredtools__is_add',
-                    # Then by priority greater than 0
-                    '-priority_gt_zero',
-                    # Then by is_add=False and priority=0
-                    'tophundredtools__is_add',
-                    'tophundredtools__priority'
+            top_hundred_tools_ids = TopHundredTools.objects.values_list(
+                "feature_tool_id", flat=True
+            )
+            queryset = (
+                queryset.filter(id__in=top_hundred_tools_ids)
+                .annotate(
+                    priority_gt_zero=Case(
+                        When(tophundredtools__priority__gt=0, then=Value(1)),
+                        default=Value(0),
+                        output_field=IntegerField(),
+                    ),
                 )
+                .order_by(
+                    # Order by is_add=True
+                    "-tophundredtools__is_add",
+                    # Then by priority greater than 0
+                    "-priority_gt_zero",
+                    # Then by is_add=False and priority=0
+                    "tophundredtools__is_add",
+                    "tophundredtools__priority",
+                )
+            )
 
         if search is not None:
             search_words = [
@@ -146,12 +174,18 @@ class PublicToolList(generics.ListCreateAPIView):
             # Filter tools based on the search words in multiple fields
             if search_words:
                 from django.db.models import Exists, OuterRef
-                from catalogio.models import ToolsConnector
 
-                queryset = queryset.filter(q_object).annotate(
-                    connected_feature_tools = Exists(
-                        ToolsConnector.objects.filter(tool_id=OuterRef("id"),feature_id__isnull=False)
-                )).order_by("-connected_feature_tools", "-created_at")
+                queryset = (
+                    queryset.filter(q_object)
+                    .annotate(
+                        connected_feature_tools=Exists(
+                            ToolsConnector.objects.filter(
+                                tool_id=OuterRef("id"), feature_id__isnull=False
+                            )
+                        )
+                    )
+                    .order_by("-connected_feature_tools", "-created_at")
+                )
 
                 # Save the search keyword and associate it with the user if authenticated
                 user = self.request.user
@@ -180,10 +214,11 @@ class PublicToolList(generics.ListCreateAPIView):
 
         if search is None or search == "":
             from catalogio.models import FeatureTool
-            feature_tools_ids = FeatureTool.objects.select_related("feature_tool").values_list("feature_tool_id", flat=True)
-            queryset = queryset.exclude(
-                id__in=feature_tools_ids
-            )
+
+            feature_tools_ids = FeatureTool.objects.select_related(
+                "feature_tool"
+            ).values_list("feature_tool_id", flat=True)
+            queryset = queryset.exclude(id__in=feature_tools_ids)
 
         if time_range:
             now = timezone.now()
@@ -303,7 +338,9 @@ class PublicToolList(generics.ListCreateAPIView):
             )
 
         if min_love_count and max_love_count:
-            queryset = queryset.filter(save_count__range=(min_love_count, max_love_count))
+            queryset = queryset.filter(
+                save_count__range=(min_love_count, max_love_count)
+            )
         if min_love_count and not max_love_count:
             queryset = queryset.filter(save_count__gte=min_love_count)
         if max_love_count and not min_love_count:
@@ -680,6 +717,7 @@ class PublicCodeVerifyApi(APIView):
             status=500,
         )
 
+
 class PublicSuggessionList(generics.ListAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE, is_suggession=True)
     serializer_class = PublicToolListSerializer
@@ -687,12 +725,21 @@ class PublicSuggessionList(generics.ListAPIView):
 
 
 class PublicTopHundredToolsList(generics.ListAPIView):
-    queryset = TopHundredTools.objects.select_related("feature_tool").filter().order_by("-is_add", "-created_at")
+    queryset = (
+        TopHundredTools.objects.select_related("feature_tool")
+        .filter()
+        .order_by("-is_add", "-created_at")
+    )
     serializer_class = PrivateTopHundredToolsSerializer
     permission_classes = []
 
+
 class PublicTopHundredToolsDetail(generics.RetrieveAPIView):
-    queryset = TopHundredTools.objects.select_related("feature_tool").filter().order_by("-is_add", "-created_at")
+    queryset = (
+        TopHundredTools.objects.select_related("feature_tool")
+        .filter()
+        .order_by("-is_add", "-created_at")
+    )
     serializer_class = PrivateTopHundredToolsSerializer
     permission_classes = []
     lookup_field = "slug"
@@ -707,11 +754,13 @@ class PublicBestAlternativeToolList(generics.ListAPIView):
         from rest_framework import status
         from rest_framework.response import Response
 
-        category_slug = self.kwargs.get('category_slug', None)
+        category_slug = self.kwargs.get("category_slug", None)
         if category_slug is None:
-            return Response({"detail": "Category slug is missing"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"detail": "Category slug is missing"}, status=status.HTTP_404_NOT_FOUND
+            )
 
-        return self.queryset.filter(category__slug = category_slug)
+        return self.queryset.filter(category__slug=category_slug)
 
 
 class PublicBestAlternativeToolDetail(generics.RetrieveAPIView):
@@ -723,9 +772,11 @@ class PublicBestAlternativeToolDetail(generics.RetrieveAPIView):
     def get_object(self):
         from rest_framework.generics import get_object_or_404
 
-        category_slug = self.kwargs.get('category_slug', None)
+        category_slug = self.kwargs.get("category_slug", None)
         slug = self.kwargs.get("slug", None)
 
-        best_al_tool = get_object_or_404(self.queryset, category__slug=category_slug, slug=slug)
+        best_al_tool = get_object_or_404(
+            self.queryset, category__slug=category_slug, slug=slug
+        )
 
         return best_al_tool
