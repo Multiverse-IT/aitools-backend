@@ -44,7 +44,7 @@ class User(AbstractUser, BaseModelWithUID):
         max_length=30, choices=UserRole.choices, default=UserRole.INITIATOR
     )
     image = models.CharField(max_length=255, blank=True)
-    # extra field 
+    # extra field
     exp = models.CharField(max_length=255, blank=True)
     sub = models.CharField(max_length=255, blank=True)
     iat = models.CharField(max_length=255, blank=True)

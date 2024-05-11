@@ -149,7 +149,7 @@ class Feature(BaseModelWithUID):
 
 
 class ToolsConnector(BaseModelWithUID):
-    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
+    tool = models.ForeignKey(Tool, on_delete=models.CASCADE, null=True, blank=True)
     rating = models.ForeignKey(Rating, on_delete=models.CASCADE, blank=True, null=True)
     feature = models.ForeignKey(
         Feature, on_delete=models.CASCADE, blank=True, null=True
@@ -228,7 +228,7 @@ class ToolsCategoryConnector(BaseModelWithUID):
 
 
 class SavedTool(BaseModelWithUID):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     love_tool = models.ForeignKey(
         Tool, on_delete=models.SET_NULL, null=True, blank=True, related_name="love_tool"
     )
@@ -241,8 +241,8 @@ class SavedTool(BaseModelWithUID):
 
 
 class ToolRequest(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    tool = models.ForeignKey(Tool, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(
         choices=RequestToolStatus.choices,
         default=RequestToolStatus.PENDING,
@@ -255,7 +255,7 @@ class ToolRequest(models.Model):
 
 class FeatureTool(BaseModelWithUID):
     slug = AutoSlugField(populate_from=get_feature_slug, unique=True, db_index=True)
-    feature_tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
+    feature_tool = models.ForeignKey(Tool, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     custom_field = models.CharField(max_length=255, blank=True)
     in_pages = models.JSONField(default=list)
@@ -269,7 +269,7 @@ class FeatureTool(BaseModelWithUID):
 
 class TopHundredTools(BaseModelWithUID):
     slug = AutoSlugField(populate_from=get_feature_slug, unique=True, db_index=True)
-    feature_tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
+    feature_tool = models.ForeignKey(Tool, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     is_add = models.BooleanField(default=False)
     priority = models.PositiveIntegerField(default=0)
@@ -283,7 +283,7 @@ class TopHundredTools(BaseModelWithUID):
 
 class BestAlternativeTool(BaseModelWithUID):
     slug = AutoSlugField(populate_from=get_feature_slug, unique=True, db_index=True)
-    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
+    tool = models.ForeignKey(Tool, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     remarks = models.CharField(max_length=255, blank=True)
     category = models.ForeignKey(
@@ -299,7 +299,7 @@ class BestAlternativeTool(BaseModelWithUID):
 
 class Deal(BaseModelWithUID):
     slug = AutoSlugField(populate_from=get_deal_slug, unique=True, db_index=True)
-    deal_tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
+    deal_tool = models.ForeignKey(Tool, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     coupon = models.CharField(max_length=255, blank=True)
     is_top = models.BooleanField(default=False)
