@@ -22,6 +22,6 @@ class BaseModelWithUID(DirtyFieldsMixin, models.Model):
         return [
             "updated_at",
         ]
-    
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

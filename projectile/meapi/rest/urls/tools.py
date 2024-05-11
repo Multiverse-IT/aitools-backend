@@ -1,6 +1,6 @@
 from django.urls import path
 
-from ..views import tools
+from ..views import tools, ratings
 from ..views.count import PublicSubcategoryToolsCountList
 
 urlpatterns = [
@@ -23,38 +23,42 @@ urlpatterns = [
         tools.PublicSubCategoryToolList.as_view(),
         name="subcategory-tool-list",
     ),
-    path("/subcategory/<slug:subcategory_slug>/extra-fields",
+    path(
+        "/subcategory/<slug:subcategory_slug>/extra-fields",
         tools.PublicSubCategoryToolListExtraField.as_view(),
-        name="subcategory-extra-fields"
+        name="subcategory-extra-fields",
     ),
     path(
         "/subcategory/<slug:subcategory_slug>/counts",
         PublicSubcategoryToolsCountList.as_view(),
         name="subcategory-tool-counts",
     ),
-    path("/new/random",
-        tools.PublicRandomSearch.as_view(),
-        name = "new-search-api"
-    ),
-    path("/suggession/list",
+    path("/new/random", tools.PublicRandomSearch.as_view(), name="new-search-api"),
+    path(
+        "/suggession/list",
         tools.PublicSuggessionList.as_view(),
-        name="suggession-list-api"
-        ),
-    path("/top/hundred",
+        name="suggession-list-api",
+    ),
+    path(
+        "/top/hundred",
         tools.PublicTopHundredToolsList.as_view(),
-        name="public-top-hundred-tool-list"
+        name="public-top-hundred-tool-list",
     ),
-    path("/top/hundred/<slug:slug>",
+    path(
+        "/top/hundred/<slug:slug>",
         tools.PublicTopHundredToolsDetail.as_view(),
-        name="public-top-hundred-tool-detail"
+        name="public-top-hundred-tool-detail",
     ),
-    path("/best/alternative/<slug:category_slug>",
+    path(
+        "/best/alternative/<slug:category_slug>",
         tools.PublicBestAlternativeToolList.as_view(),
         name="public-best-tool-list",
     ),
-    path("/best/alternative/<slug:category_slug>/detail/<slug:slug>",
+    path(
+        "/best/alternative/<slug:category_slug>/detail/<slug:slug>",
         tools.PublicBestAlternativeToolDetail.as_view(),
         name="public-best-tool-detail",
     ),
+    path("/<slug:tool_slug>/ratings", ratings.SingleToolRatingDetail.as_view(), name="tools-ratings"),
     path("", tools.PublicToolList.as_view(), name="tool-list"),
 ]

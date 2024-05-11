@@ -24,7 +24,7 @@ class RatingList(generics.ListCreateAPIView):
 
         return self.queryset.filter(user=user)
 
-class RatingDetail(generics.RetrieveUpdateAPIView):
+class RatingDetail(generics.RetrieveAPIView):
     queryset = Rating.objects.filter()
     serializer_class = MeRatingListDetaliSerializer
     permission_classes = [CustomIdentityHeaderPermission]
@@ -36,3 +36,18 @@ class RatingDetail(generics.RetrieveUpdateAPIView):
         if not user:
             return Rating.objects.none()
         return Rating.objects.filter(user=user)
+
+
+class SingleToolRatingDetail(generics.ListAPIView):
+    queryset = Rating.objects.filter()
+    serializer_class = MeRatingListDetaliSerializer
+    # permission_classes = [CustomIdentityHeaderPermission]
+
+    def get_queryset(self):
+        # identity = self.request.headers.get("identity")
+        # user = User.objects.filter(id=identity).first()
+        slug = self.kwargs.get("tool_slug", None)
+
+        # if not user:
+        #     return Rating.objects.none()
+        return Rating.objects.filter(toolsconnector__tool__slug=slug)
