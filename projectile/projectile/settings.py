@@ -133,23 +133,34 @@ WSGI_APPLICATION = 'projectile.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
 #         'NAME': 'aitools',
-#         'USER': 'bappi',
-#         'PASSWORD': 'bappi',
+#         'USER': 'postgres',
+#         'PASSWORD': '12345678',
 #         'HOST': 'localhost',
 #         'PORT': '5432',
 #     }
 # }
+
+# for production
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'aitools',
+        'USER': 'bappi',
+        'PASSWORD': 'bappi',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
