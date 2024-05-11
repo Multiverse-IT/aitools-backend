@@ -285,6 +285,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "discoard_url",
             "pricing_url",
             "created_at",
+            "updated_at",
             "related_tools",
         ]
 
@@ -325,6 +326,7 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "discoard_url",
             "pricing_url",
             "created_at",
+            "updated_at",
         ]
 
     def get_is_loved(self, instance):
