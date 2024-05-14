@@ -12,3 +12,4 @@ class PrivateRedirectSerializer(serializers.ModelSerializer):
             "new",
             "extras",
         )
+
