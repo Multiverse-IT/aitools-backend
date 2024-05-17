@@ -7,6 +7,9 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from ..permissions import CustomIdentityHeaderPermission
 from ..serializers.ratings import MeRatingListDetaliSerializer
+from rest_framework.pagination import PageNumberPagination
+class CustomPaginationFor3Item(PageNumberPagination):
+    page_size = 3
 
 User = get_user_model()
 
@@ -38,16 +41,13 @@ class RatingDetail(generics.RetrieveAPIView):
         return Rating.objects.filter(user=user)
 
 
+
 class SingleToolRatingDetail(generics.ListAPIView):
     queryset = Rating.objects.filter()
     serializer_class = MeRatingListDetaliSerializer
-    # permission_classes = [CustomIdentityHeaderPermission]
+    pagination_class = CustomPaginationFor3Item
+
 
     def get_queryset(self):
-        # identity = self.request.headers.get("identity")
-        # user = User.objects.filter(id=identity).first()
         slug = self.kwargs.get("tool_slug", None)
-
-        # if not user:
-        #     return Rating.objects.none()
         return Rating.objects.filter(toolsconnector__tool__slug=slug)
