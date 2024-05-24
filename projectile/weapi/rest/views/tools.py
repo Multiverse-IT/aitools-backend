@@ -15,10 +15,18 @@ from ..serializers.tools import (
 )
 
 
+from rest_framework.pagination import PageNumberPagination
+
+
+class CustomPaginationFor15Item(PageNumberPagination):
+    page_size = 15
+
+
 class ToolList(generics.ListCreateAPIView):
     queryset = Tool.objects.get_status_editable()
     serializer_class = ToolListSerializer
     permission_classes = []
+    pagination_class = CustomPaginationFor15Item
 
     def get_queryset(self):
         queryset = self.queryset.exclude(requested=True, status=ToolStatus.PENDING)
