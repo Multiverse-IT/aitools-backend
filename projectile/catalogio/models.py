@@ -69,6 +69,7 @@ class Tool(BaseModelWithUID):
         max_length=30, choices=ToolStatus.choices, default=ToolStatus.ACTIVE
     )
     is_featured = models.BooleanField(default=False)
+    is_category_featured = models.BooleanField(default=False)
     is_suggession = models.BooleanField(default=False)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
@@ -259,7 +260,10 @@ class FeatureTool(BaseModelWithUID):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     custom_field = models.CharField(max_length=255, blank=True)
     in_pages = models.JSONField(default=list)
-
+    # sub category
+    subcategory = models.ForeignKey(
+        SubCategory, on_delete=models.CASCADE, blank=True, null=True
+    )
     class Meta:
         ordering = ["-created_at"]
 

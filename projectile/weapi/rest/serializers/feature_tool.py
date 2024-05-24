@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from catalogio.models import FeatureTool, Tool, BestAlternativeTool, Category
+from catalogio.models import FeatureTool, Tool, BestAlternativeTool, Category, SubCategory
 
 from ..serializers.tools import ToolListSerializer
 from common.serializers import CategorySlimSerializerForBestAlternative
@@ -9,6 +9,11 @@ from common.serializers import CategorySlimSerializerForBestAlternative
 class PrivateFeatureToolSerializer(serializers.ModelSerializer):
     tool_slug = serializers.SlugRelatedField(
         slug_field="slug", queryset=Tool.objects.filter(), write_only = True,
+    )
+    sub_category_slug = serializers.SlugRelatedField(
+        slug_field="slug",
+        queryset=SubCategory.objects.filter(),
+        write_only=True, required=False
     )
     feature_tool = ToolListSerializer(read_only=True)
     class Meta:
@@ -18,11 +23,20 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tool = validated_data.pop("tool_slug")
+        sub_category = validated_data.pop("sub_category_slug", None)
+
         feature_tool = FeatureTool.objects.create(
             feature_tool=tool,
             user=self.context["request"].user,
             **validated_data
         )
+        if sub_category is not None:
+            feature_tool.subcategory = sub_category
+            feature_tool.save()
+
+            feature_tool.feature_tool.is_category_featured = True
+            feature_tool.feature_tool.save()
+
         return feature_tool
 
 
