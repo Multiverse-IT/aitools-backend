@@ -18,7 +18,7 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
     feature_tool = ToolListSerializer(read_only=True)
     class Meta:
         model = FeatureTool
-        fields = ("slug", "feature_tool","custom_field", "in_pages", "created_at", "updated_at", "tool_slug")
+        fields = ("slug", "feature_tool","custom_field", "in_pages", "created_at", "updated_at","sub_category_slug", "tool_slug")
         read_only_fields = ["slug","created_at", "updated_at"]
 
     def create(self, validated_data):
