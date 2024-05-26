@@ -13,7 +13,7 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
     sub_category_slug = serializers.SlugRelatedField(
         slug_field="slug",
         queryset=SubCategory.objects.filter(),
-        write_only=True, required=False
+        write_only=True, required=False, allow_null=True, allow_empty=True
     )
     feature_tool = ToolListSerializer(read_only=True)
     class Meta:
