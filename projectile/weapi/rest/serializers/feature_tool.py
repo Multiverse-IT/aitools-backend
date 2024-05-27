@@ -30,6 +30,9 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
             user=self.context["request"].user,
             **validated_data
         )
+        tool.is_featured = True
+        tool.save()
+
         if sub_category is not None:
             feature_tool.subcategory = sub_category
             feature_tool.save()
