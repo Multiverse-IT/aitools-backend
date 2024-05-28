@@ -130,41 +130,39 @@ class PublicToolList(generics.ListCreateAPIView):
         top_tools = self.request.query_params.get("top_tools", False)
         deals = self.request.query_params.get("deals", None)
 
-        filters_applied = any([search, subcategory, features, ordering_param, time_range, trending, pricing, min_love_count, max_love_count, top_tools, deals])
-        print("filter-------------:", filters_applied)
-        if filters_applied:
-            from django.db.models import OuterRef, Exists
-            featured_subquery = FeatureTool.objects.filter(
-                feature_tool=OuterRef('pk')
-            ).values('pk')
-            category_featured_subquery = FeatureTool.objects.filter(
-                feature_tool=OuterRef('pk'),
-                subcategory__isnull=False
-            ).values('pk')
+        # if filters_applied:
+        #     from django.db.models import OuterRef, Exists
+        #     featured_subquery = FeatureTool.objects.filter(
+        #         feature_tool=OuterRef('pk')
+        #     ).values('pk')
+        #     category_featured_subquery = FeatureTool.objects.filter(
+        #         feature_tool=OuterRef('pk'),
+        #         subcategory__isnull=False
+        #     ).values('pk')
 
-            queryset = queryset.annotate(
-                annotated_is_featured=Case(
-                    When(
-                        Exists(featured_subquery),
-                        then=Value(True)
-                    ),
-                    default=Value(False),
-                    output_field=BooleanField(),
-                ),
-                annotated_is_category_featured=Case(
-                    When(
-                        Exists(category_featured_subquery),
-                        then=Value(True)
-                    ),
-                    default=Value(False),
-                    output_field=BooleanField(),
-                )
-            ).order_by(
-                "-annotated_is_featured",
-                "-annotated_is_category_featured",
-                "-created_at"
-            )
-            print("queryset", queryset)
+        #     queryset = queryset.annotate(
+        #         annotated_is_featured=Case(
+        #             When(
+        #                 Exists(featured_subquery),
+        #                 then=Value(True)
+        #             ),
+        #             default=Value(False),
+        #             output_field=BooleanField(),
+        #         ),
+        #         annotated_is_category_featured=Case(
+        #             When(
+        #                 Exists(category_featured_subquery),
+        #                 then=Value(True)
+        #             ),
+        #             default=Value(False),
+        #             output_field=BooleanField(),
+        #         )
+        #     ).order_by(
+        #         "-annotated_is_featured",
+        #         "-annotated_is_category_featured",
+        #         "-created_at"
+        #     )
+        #     print("queryset", queryset)
 
 
         if deals and deals == "true":
@@ -248,14 +246,6 @@ class PublicToolList(generics.ListCreateAPIView):
                         keyword_search = KeywordSearch.objects.create(keyword=keyword)
                     keyword_search.search_count += 1
                     keyword_search.save()
-
-        # if search is None or search == "":
-        #     from catalogio.models import FeatureTool
-
-        #     feature_tools_ids = FeatureTool.objects.select_related(
-        #         "feature_tool"
-        #     ).values_list("feature_tool_id", flat=True)
-        #     queryset = queryset.exclude(id__in=feature_tools_ids)
 
         if time_range:
             now = timezone.now()
@@ -382,6 +372,14 @@ class PublicToolList(generics.ListCreateAPIView):
             queryset = queryset.filter(save_count__gte=min_love_count)
         if max_love_count and not min_love_count:
             queryset = queryset.filter(save_count__lte=max_love_count)
+
+        filters_applied = any([search, subcategory, features, ordering_param, time_range, trending, pricing, min_love_count, max_love_count, top_tools, deals])
+        if filters_applied:
+            queryset = queryset.order_by(
+                "-is_featured",
+                "-is_category_featured",
+                "-created_at"
+            )
 
         return queryset.distinct()
 

@@ -18,3 +18,14 @@ def delete_deal_tool(sender, instance, **kwargs):
     connected_tool.coupon = ""
     connected_tool.is_deal = False
     connected_tool.save()
+
+
+def updated_feature_tool_related_values(sender, instance, **kwargs):
+    try:
+        feature_tool = instance.feature_tool
+        feature_tool.is_featured = False
+        feature_tool.is_category_featured = False
+        feature_tool.save()
+        print("deleted feature tool and updated tool values accordingly.")
+    except:
+        print("feature tool deleted but not updated tool instance values.")

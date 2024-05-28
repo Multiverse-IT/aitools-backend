@@ -316,7 +316,8 @@ class Deal(BaseModelWithUID):
         return f"UID: {self.uid}-SLUG: {self.slug}"
 
 
-from .signals import update_tool_on_deal_save, delete_deal_tool
+from .signals import update_tool_on_deal_save, delete_deal_tool, updated_feature_tool_related_values
 
 pre_delete.connect(delete_deal_tool, sender=Deal)
 post_save.connect(update_tool_on_deal_save, sender=Deal)
+pre_delete.connect(updated_feature_tool_related_values, sender=FeatureTool)
