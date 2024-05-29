@@ -130,40 +130,6 @@ class PublicToolList(generics.ListCreateAPIView):
         top_tools = self.request.query_params.get("top_tools", False)
         deals = self.request.query_params.get("deals", None)
 
-        # if filters_applied:
-        #     from django.db.models import OuterRef, Exists
-        #     featured_subquery = FeatureTool.objects.filter(
-        #         feature_tool=OuterRef('pk')
-        #     ).values('pk')
-        #     category_featured_subquery = FeatureTool.objects.filter(
-        #         feature_tool=OuterRef('pk'),
-        #         subcategory__isnull=False
-        #     ).values('pk')
-
-        #     queryset = queryset.annotate(
-        #         annotated_is_featured=Case(
-        #             When(
-        #                 Exists(featured_subquery),
-        #                 then=Value(True)
-        #             ),
-        #             default=Value(False),
-        #             output_field=BooleanField(),
-        #         ),
-        #         annotated_is_category_featured=Case(
-        #             When(
-        #                 Exists(category_featured_subquery),
-        #                 then=Value(True)
-        #             ),
-        #             default=Value(False),
-        #             output_field=BooleanField(),
-        #         )
-        #     ).order_by(
-        #         "-annotated_is_featured",
-        #         "-annotated_is_category_featured",
-        #         "-created_at"
-        #     )
-        #     print("queryset", queryset)
-
 
         if deals and deals == "true":
             queryset = queryset.filter(is_deal=True)
@@ -380,6 +346,8 @@ class PublicToolList(generics.ListCreateAPIView):
                 "-is_category_featured",
                 "-created_at"
             )
+        else:
+            queryset = queryset.order_by("-is_featured","-created_at")
 
         return queryset.distinct()
 
