@@ -60,6 +60,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "is_trending",
             "is_new",
             "is_featured",
+            "is_category_featured",
             "do_follow_website",
             "save_count",
             "meta_title",

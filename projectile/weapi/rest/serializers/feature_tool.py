@@ -6,6 +6,11 @@ from catalogio.models import FeatureTool, Tool, BestAlternativeTool, Category, S
 from ..serializers.tools import ToolListSerializer
 from common.serializers import CategorySlimSerializerForBestAlternative
 
+class SubCategorySlimSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = SubCategory
+        fields = ["slug", "title","meta_title", "meta_description","focus_keyword", "is_noindex","canonical_url"]
+
 class PrivateFeatureToolSerializer(serializers.ModelSerializer):
     tool_slug = serializers.SlugRelatedField(
         slug_field="slug", queryset=Tool.objects.filter(), write_only = True,
@@ -15,10 +20,11 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
         queryset=SubCategory.objects.filter(),
         write_only=True, required=False, allow_null=True, allow_empty=True
     )
+    subcategory = SubCategorySlimSerializers(read_only=True)
     feature_tool = ToolListSerializer(read_only=True)
     class Meta:
         model = FeatureTool
-        fields = ("slug", "feature_tool","custom_field", "in_pages", "created_at", "updated_at","sub_category_slug", "tool_slug")
+        fields = ("slug", "subcategory", "feature_tool","custom_field", "in_pages", "created_at", "updated_at","sub_category_slug", "tool_slug")
         read_only_fields = ["slug","created_at", "updated_at"]
 
     def create(self, validated_data):
@@ -41,6 +47,12 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
             tool.is_featured = True
             tool.save()
         return feature_tool
+
+    def update(self, instance, validated_data):
+        sub_category = validated_data.pop("sub_category_slug", None)
+        instance.subcategory = sub_category
+        instance.save()
+        return super().update(instance, validated_data)
 
 
 class PrivateBestAlternativeToolSerializer(serializers.ModelSerializer):

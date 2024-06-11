@@ -11,7 +11,14 @@ class PublicDealsList(generics.ListAPIView):
 
     def get_queryset(self):
         is_top = self.request.query_params.get("is_top", False)
+        is_hot_deal = self.request.query_params.get("is_hot_deal", False)
+
         if is_top:
             queryset = self.queryset.filter(is_top=is_top)
             return queryset
+
+        if is_hot_deal:
+            queryset = self.queryset.filter(is_hot_deal=is_hot_deal)
+            return queryset
+
         return self.queryset

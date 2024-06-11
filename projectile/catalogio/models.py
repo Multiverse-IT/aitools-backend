@@ -308,7 +308,7 @@ class Deal(BaseModelWithUID):
     coupon = models.CharField(max_length=255, blank=True)
     is_top = models.BooleanField(default=False)
     discout = models.IntegerField(default=0)
-
+    is_hot_deal = models.BooleanField(default=False)
     class Meta:
         ordering = ["-created_at"]
 

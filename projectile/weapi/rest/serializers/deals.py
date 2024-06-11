@@ -21,6 +21,7 @@ class PrivateDealsSerializer(serializers.ModelSerializer):
             "slug",
             "deal_tool",
             "is_top",
+            "is_hot_deal",
             "coupon",
             "discout",
             "created_at",
@@ -34,9 +35,6 @@ class PrivateDealsSerializer(serializers.ModelSerializer):
             raise ValidationError({"detail": "Tool slug needs to be provided!"})
 
         tool_slug = validated_data.pop("tool_slug")
-        # discout = validated_data.get("discout", 0)
-        coupon = validated_data.get("coupon", None)
-
         # Check if the tool exists
         try:
             tool = tool_slug
@@ -50,13 +48,6 @@ class PrivateDealsSerializer(serializers.ModelSerializer):
             deal_tool=tool, user=self.context["request"].user, defaults=validated_data
         )
 
-        # tool.discout = validated_data.get("discout", 0)
-        # if coupon is not None:
-        #     tool.coupon = coupon
-
-        # tool.is_deal = True
-        # tool.save()
-
         return deal_tool
 
     def update(self, instance, validated_data):
@@ -64,11 +55,5 @@ class PrivateDealsSerializer(serializers.ModelSerializer):
             tool = validated_data.pop("tool_slug")
             validated_data["deal_tool"] = tool
 
-        # if "coupon" in validated_data:
-        #     instance.deal_tool.coupon = validated_data["coupon"]
-        # if "discout" in validated_data:
-        #     instance.deal_tool.discout = validated_data["discout"]
-
-        # instance.deal_tool.save()
 
         return super().update(instance, validated_data)
