@@ -51,6 +51,8 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         sub_category = validated_data.pop("sub_category_slug", None)
         instance.subcategory = sub_category
+        if sub_category is None:
+            instance.feature_tool.is_category_featured = False
         instance.save()
         return super().update(instance, validated_data)
 
