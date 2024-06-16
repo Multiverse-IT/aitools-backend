@@ -202,7 +202,7 @@ class SubCategory(BaseModelWithUID):
     alt = models.CharField(max_length=255, blank=True)
     is_noindex = models.BooleanField(default=False)
     focus_keyword = models.CharField(max_length=255, blank=True)
-
+    faq = models.ForeignKey("contentio.FAQ", on_delete=models.SET_NULL, null=True, blank=True)
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
 

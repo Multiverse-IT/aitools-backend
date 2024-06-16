@@ -9,7 +9,7 @@ from ..permissions import CustomIdentityHeaderPermission
 from ..serializers.ratings import MeRatingListDetaliSerializer
 from rest_framework.pagination import PageNumberPagination
 class CustomPaginationFor3Item(PageNumberPagination):
-    page_size = 3
+    page_size = 10
 
 User = get_user_model()
 
