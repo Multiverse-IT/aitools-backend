@@ -22,9 +22,10 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
     )
     subcategory = SubCategorySlimSerializers(read_only=True)
     feature_tool = ToolListSerializer(read_only=True)
+    is_featured = serializers.BooleanField(required=False)
     class Meta:
         model = FeatureTool
-        fields = ("slug", "subcategory", "feature_tool","custom_field", "in_pages", "created_at", "updated_at","sub_category_slug", "tool_slug")
+        fields = ("slug", "subcategory","is_featured", "feature_tool","custom_field", "in_pages", "created_at", "updated_at","sub_category_slug", "tool_slug")
         read_only_fields = ["slug","created_at", "updated_at"]
 
     def create(self, validated_data):
@@ -50,9 +51,16 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         sub_category = validated_data.pop("sub_category_slug", None)
+        is_featured = validated_data.pop("is_featured", None)
+        if is_featured is not None:
+            instance.feature_tool.is_featured = is_featured
+            instance.feature_tool.save()
         instance.subcategory = sub_category
         if sub_category is None:
             instance.feature_tool.is_category_featured = False
+            instance.feature_tool.save()
+        if sub_category is not None:
+            instance.feature_tool.is_category_featured = True
             instance.feature_tool.save()
         instance.save()
         return super().update(instance, validated_data)
