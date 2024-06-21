@@ -31,7 +31,7 @@ class PrivateFeatureToolSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tool = validated_data.pop("tool_slug")
         sub_category = validated_data.pop("sub_category_slug", None)
-
+        is_featured = validated_data.pop("is_featured")
         feature_tool = FeatureTool.objects.create(
             feature_tool=tool,
             user=self.context["request"].user,
