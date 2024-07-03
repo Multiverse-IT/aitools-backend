@@ -3,7 +3,7 @@ from rest_framework import serializers
 from catalogio.models import Category, SubCategory, ToolsCategoryConnector
 from common.serializers import CategorySlimSerializer, SubCategorySlimSerializer
 from contentio.models import FAQ, FaqCategoryConnector
-from contentio.rest.serializers.faq import GlobalFaqListSerializer
+from contentio.rest.serializers.faq import GlobalFaqListSerializer, GlobalFaqListSlimSerializer
 
 class SubCategoriesSlimSerializer(serializers.ModelSerializer):
     total_tools = serializers.SerializerMethodField(read_only=True)
@@ -57,7 +57,7 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
         write_only=True, required=False, child=serializers.CharField()
     )
 
-    faqs = GlobalFaqListSerializer(
+    faqs = GlobalFaqListSlimSerializer(
         source="faqcategoryconnector_set", many=True, read_only=True
     )
     class Meta:

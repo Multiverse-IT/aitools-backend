@@ -2,7 +2,22 @@ from rest_framework import serializers
 
 from ...models import FAQ
 
+
 class GlobalFaqListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FAQ
+        fields = [
+           "uid",
+           "title",
+           "slug",
+           "summary",
+           "priority",
+           "created_at",
+           "updated_at",
+        ]
+
+
+class GlobalFaqListSlimSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='faq.title', read_only=True)
     uid = serializers.CharField(source="faq.uid", read_only=True)
     slug = serializers.CharField(source='faq.slug', read_only=True)
