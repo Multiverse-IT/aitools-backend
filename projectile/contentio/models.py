@@ -93,3 +93,7 @@ class FAQ(BaseModelWithUID):
 
     def __str__(self):
         return f"UID: {self.uid} - Title: {self.title}"
+
+class FaqCategoryConnector(BaseModelWithUID):
+    faq = models.ForeignKey(FAQ, on_delete=models.SET_NULL, null=True, blank=True)
+    sub_category = models.ForeignKey("catalogio.SubCategory", on_delete=models.CASCADE, blank=True, null=True)

@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from catalogio.models import Category, SubCategory, ToolsCategoryConnector
 from common.serializers import CategorySlimSerializer, SubCategorySlimSerializer
+from contentio.models import FAQ, FaqCategoryConnector
 from contentio.rest.serializers.faq import GlobalFaqListSerializer
 
 class SubCategoriesSlimSerializer(serializers.ModelSerializer):
@@ -52,10 +53,13 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
     category = CategorySlimSerializer(
         source="toolscategoryconnector_set.first", read_only=True
     )
-    faq_title = serializers.CharField(max_length=255, required=False, write_only=True, allow_blank=True)
-    faq_summary = serializers.CharField(max_length=400, required=False, write_only=True)
-    priority = serializers.IntegerField(required=False)
-    faq = GlobalFaqListSerializer(read_only=True)
+    faq_uids = serializers.ListField(
+        write_only=True, required=False, child=serializers.CharField()
+    )
+
+    faqs = GlobalFaqListSerializer(
+        source="faqcategoryconnector_set", many=True, read_only=True
+    )
     class Meta:
         model = SubCategory
         fields = [
@@ -68,10 +72,8 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
             "meta_description",
             "image",
             "alt",
-            "faq",
-            "faq_title",
-            "faq_summary",
-            "priority",
+            "faq_uids",
+            "faqs",
             "is_noindex",
             "focus_keyword",
             "canonical_url",
@@ -86,29 +88,31 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         category = validated_data.pop("category_slug", None)
-        faq_title = validated_data.pop("faq_title", None)
-        faq_summary = validated_data.pop("faq_summary", None)
-        priority = validated_data.pop("priority", 0)
+        faq_uids = validated_data.pop("faq_uids", None)
 
         sub_category = SubCategory.objects.create(**validated_data)
         category_connector, _ = ToolsCategoryConnector.objects.get_or_create(
             category=category, subcategory=sub_category
         )
-        if faq_title is not None:
-            from contentio.models import FAQ
-            faq = FAQ.objects.create(
-                title = faq_title,
-                summary= faq_summary,
-                priority=priority
-            )
-            sub_category.faq = faq
-            sub_category.save()
+        if faq_uids:
+            faqs = FAQ.objects.filter(uid__in=faq_uids)
+            try:
+                connectors = [
+                    FaqCategoryConnector(
+                        faq=faq,
+                        sub_category=sub_category,
+                    )
+                    for faq in faqs
+                ]
+                FaqCategoryConnector.objects.bulk_create(connectors)
+
+            except Exception as e:
+                print("detail:", e)
 
         return sub_category
 
     def update(self, instance, validated_data):
-        faq_title = validated_data.pop("faq_title", None)
-        faq_summary = validated_data.pop("faq_summary", None)
+        faq_uids = validated_data.pop("faq_uids", None)
 
         if category := validated_data.pop("category_slug", None):
             category_connector = ToolsCategoryConnector.objects.filter(
@@ -117,11 +121,20 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
             category_connector.category = category
             category_connector.save()
 
-        if faq_title is not None:
-            instance.faq.title = faq_title
-        if faq_summary is not None:
-            instance.faq.summary = faq_summary
-        if faq_title or faq_summary is not None:
-            instance.save()
+        if faq_uids:
+            instance.faqcategoryconnector_set.all().delete()
+            faqs = FAQ.objects.filter(uid__in=faq_uids)
+            try:
+                connectors = [
+                    FaqCategoryConnector(
+                        faq=faq,
+                        sub_category=instance,
+                    )
+                    for faq in faqs
+                ]
+                FaqCategoryConnector.objects.bulk_create(connectors)
+
+            except Exception as e:
+                print("detail:", e)
 
         return super().update(instance, validated_data)
