@@ -5,6 +5,7 @@ import dotenv
 from celery import Celery
 from django.conf import settings
 from datetime import timedelta
+from celery.schedules import crontab
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,8 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.conf.beat_schedule = {
     'update-new-tool-status': {
         'task': 'catalogio.tasks.update_new_tool_status',
-        'schedule': timedelta(hours=12),  # Run twice a day
+        # 'schedule': timedelta(hours=12),  # Run twice a day
+        'schedule': crontab(minute='*'),
     },
 }
 
