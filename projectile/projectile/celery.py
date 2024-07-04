@@ -28,8 +28,8 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.conf.beat_schedule = {
     'update-new-tool-status': {
         'task': 'catalogio.tasks.update_new_tool_status',
-        # 'schedule': timedelta(hours=12),  # Run twice a day
-        'schedule': crontab(minute='*'),
+        'schedule': timedelta(hours=12),  # Run twice a day
+        # 'schedule': crontab(minute='*'),
     },
 }
 
