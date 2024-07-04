@@ -17,7 +17,9 @@ class GlobalFaqList(generics.ListAPIView):
         queryset = self.queryset
         sub_category_slug = self.request.query_params.get("sub_category_slug", None)
         if sub_category_slug is not None:
-            queryset = queryset.filter(subcategory__slug=sub_category_slug)
+            queryset = queryset.filter(
+                faqcategoryconnector__sub_category__slug=sub_category_slug
+            )
         return queryset
 
 
