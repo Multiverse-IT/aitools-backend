@@ -306,12 +306,12 @@ class PublicToolList(generics.ListCreateAPIView):
             queryset = queryset.filter(toolsconnector__feature__slug__in=features)
 
         if ordering_param:
-            if ordering_param == "most_loved":
+            if ordering_param == "most_popular":
                 queryset = queryset.order_by("-save_count")
-            elif ordering_param == "average_ratings":
+            elif ordering_param == "most_rated":
                 queryset = queryset.order_by("-average_ratings")
 
-            elif ordering_param == "created_at":
+            elif ordering_param == "newest":
                 queryset = queryset.order_by("-created_at")
 
             elif ordering_param == "verified":
