@@ -214,9 +214,12 @@ class ToolRequestDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ["status"]
 
     def update(self, instance, validated_data):
+        from django.utils import timezone
         status = validated_data.pop("request_status", None)
         if status == RequestToolStatus.APPROVED:
             instance.status = ToolStatus.ACTIVE
+            instance.is_new = True
+            instance.created_at = timezone.now()
             instance.save()
 
         return super().update(instance, validated_data)

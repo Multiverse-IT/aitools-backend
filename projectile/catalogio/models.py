@@ -205,6 +205,7 @@ class SubCategory(BaseModelWithUID):
     faq = models.ForeignKey("contentio.FAQ", on_delete=models.SET_NULL, null=True, blank=True)
     # Links to other external urls
     canonical_url = models.URLField(blank=True)
+    text = models.TextField(blank=True)
 
     def __str__(self):
         return f"Slug: {self.slug}"

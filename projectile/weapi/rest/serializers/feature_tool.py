@@ -9,7 +9,7 @@ from common.serializers import CategorySlimSerializerForBestAlternative
 class SubCategorySlimSerializers(serializers.ModelSerializer):
     class Meta:
         model = SubCategory
-        fields = ["slug", "title","meta_title", "meta_description","focus_keyword", "is_noindex","canonical_url"]
+        fields = ["slug", "title","meta_title", "meta_description","focus_keyword","text", "is_noindex","canonical_url"]
 
 class PrivateFeatureToolSerializer(serializers.ModelSerializer):
     tool_slug = serializers.SlugRelatedField(

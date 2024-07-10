@@ -33,6 +33,7 @@ class SubCategorySlimSerializer(serializers.Serializer):
     canonical_url = serializers.CharField(
         source="subcategory.canonical_url", read_only=True, required=False
     )
+    text = serializers.CharField(source="subcategory.text", read_only=True)
 
 
 class FeatureSlimSerializer(serializers.Serializer):

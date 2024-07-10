@@ -75,6 +75,7 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
             "faq_uids",
             "faqs",
             "is_noindex",
+            "text",
             "focus_keyword",
             "canonical_url",
             "created_at",
