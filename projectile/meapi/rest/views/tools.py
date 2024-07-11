@@ -683,6 +683,7 @@ class PublicSubCategoryToolListExtraField(APIView):
         return Response(
             {
                 "title": subcategory.title,
+                "text": subcategory.text,
                 "description": subcategory.description,
                 "total": total_tool.count(),
             }
