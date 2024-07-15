@@ -668,7 +668,11 @@ class PublicSubCategoryToolList(generics.ListAPIView):
                     .filter(total_saved_tools__gt=3)
                     .order_by("-total_saved_tools")
                 )
-
+        queryset = queryset.order_by(
+                "-is_featured",
+                "-is_category_featured",
+                "-created_at"
+            )
         return queryset.distinct()
 
 
