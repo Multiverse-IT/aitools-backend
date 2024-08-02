@@ -24,6 +24,17 @@ from .utils import (
     get_deal_slug,
 )
 from .managers import ToolQuerySet
+from django.core.exceptions import ValidationError
+from django.utils.deconstruct import deconstructible
+
+@deconstructible
+class FileExtensionValidator:
+    allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'svg']
+
+    def __call__(self, value):
+        ext = value.name.split('.')[-1].lower()
+        if ext not in self.allowed_extensions:
+            raise ValidationError(f'Unsupported file extension: {ext}.')
 
 User = get_user_model()
 
@@ -47,13 +58,14 @@ class Tool(BaseModelWithUID):
     is_new = models.BooleanField(default=True)
     do_follow_website = models.BooleanField(default=False)
     save_count = models.PositiveBigIntegerField(default=0)
-    image = VersatileImageField(
+    image = models.FileField(
         "Avatar",
         upload_to=get_tools_media_path_prefix,
         blank=True,
+        validators=[FileExtensionValidator()]
     )
-    logo = VersatileImageField(
-        "Logo", upload_to=get_tools_media_path_prefix, blank=True, null=True
+    logo = models.FileField(
+        "Logo", upload_to=get_tools_media_path_prefix, blank=True, null=True, validators=[FileExtensionValidator()]
     )
     logo_alt = models.CharField(max_length=255, blank=True)
     price = models.CharField(max_length=255, blank=True)
@@ -170,10 +182,11 @@ class Category(BaseModelWithUID):
     slug = models.CharField(max_length=55, unique=True, db_index=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
-    image = VersatileImageField(
+    image = models.FileField(
         "Avatar",
         upload_to=get_category_media_path_prefix,
         blank=True,
+        validators=[FileExtensionValidator()]
     )
     alt = models.CharField(max_length=255, blank=True)
     is_indexed = models.BooleanField(default=True)
@@ -194,10 +207,11 @@ class SubCategory(BaseModelWithUID):
     description = models.TextField(blank=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
-    image = VersatileImageField(
+    image = models.FileField(
         "Avatar",
         upload_to=get_subategory_media_path_prefix,
         blank=True,
+        validators=[FileExtensionValidator()]
     )
     alt = models.CharField(max_length=255, blank=True)
     is_noindex = models.BooleanField(default=False)

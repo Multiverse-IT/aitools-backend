@@ -274,3 +274,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_RESULT_EXTENDED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
+
+import mimetypes
+mimetypes.add_type("image/svg+xml", ".svg", True)

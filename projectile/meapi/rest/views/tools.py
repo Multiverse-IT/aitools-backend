@@ -315,7 +315,7 @@ class PublicToolList(generics.ListCreateAPIView):
                 queryset = queryset.order_by("-created_at")
 
             elif ordering_param == "verified":
-                queryset = queryset.order_by("-is_verified", "-created_at")
+                queryset = queryset.filter(is_verified=True).order_by("-is_verified", "-created_at")
 
         pricing_options = {
             "free": PricingKind.FREE,
@@ -513,7 +513,7 @@ class PublicSubCategoryToolList(generics.ListAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
     serializer_class = PublicSubCategoryToolSerializer
     permission_classes = [CustomIdentityHeaderPermission]
-    # pagination_class = CustomPagination10
+    pagination_class = CustomPagination10
 
     def get_queryset(self):
         slug = self.kwargs.get("subcategory_slug", None)
@@ -610,6 +610,9 @@ class PublicSubCategoryToolList(generics.ListAPIView):
 
             elif ordering_param == "created_at":
                 queryset = queryset.order_by("-created_at")
+
+            elif ordering_param == "verified":
+                queryset = queryset.filter(is_verified=True).order_by("-is_verified", "-created_at")
 
         if trending:
             now = timezone.now()

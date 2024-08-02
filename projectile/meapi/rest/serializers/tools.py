@@ -304,7 +304,6 @@ class PublicTooDetailSerializer(serializers.ModelSerializer):
             "do_follow_website",
             "meta_title",
             "meta_description",
-            "image",
             "is_deal",
             "is_noindex",
             "feature",

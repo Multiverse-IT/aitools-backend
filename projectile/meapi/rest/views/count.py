@@ -56,7 +56,7 @@ class PublicSubcategoryToolsCountList(generics.RetrieveAPIView):
         start_date = now - timedelta(days=now.weekday())
 
         queryset = Tool.objects.filter(
-            toolscategoryconnector__subcategory__slug=slug, status=ToolStatus.ACTIVE).distinct()
+            toolscategoryconnector__subcategory__slug=slug, status=ToolStatus.ACTIVE).distinct().exclude(is_new=False)
 
         trending_tools_count = (
                     queryset.annotate(
