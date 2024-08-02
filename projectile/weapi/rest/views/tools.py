@@ -35,6 +35,10 @@ class ToolList(generics.ListCreateAPIView):
         requested = self.request.query_params.get("requested", None)
         features = self.request.query_params.get("features", [])
         trending = self.request.query_params.get("trending", None)
+        status = self.request.query_params.get("status", None)
+
+        if status:
+            queryset = queryset.filter(status=status)
 
         if search is not None:
             queryset = queryset.filter(

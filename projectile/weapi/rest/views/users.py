@@ -28,13 +28,13 @@ class PrivateGoogleUserDetail(generics.RetrieveAPIView):
     lookup_field = "slug"
 
 class PrivateUserList(generics.ListCreateAPIView):
-    queryset = User.objects.filter(role=UserRole.ADMIN)
+    queryset = User.objects.filter(role__in=[UserRole.ADMIN, UserRole.STAFF])
     serializer_class = PrivateUserSerializer
     permission_classes = [IsAdmin]
-    
+
 class PrivateUserDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.filter(role=UserRole.ADMIN)
+    queryset = User.objects.filter(role__in=[UserRole.ADMIN, UserRole.STAFF])
     serializer_class = PrivateUserDetailSerializer
     permission_classes = [IsAdmin]
     lookup_field = 'slug'
-    
+

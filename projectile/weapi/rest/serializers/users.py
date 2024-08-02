@@ -20,6 +20,7 @@ class PrivateUserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "avatar",
+            "role",
             "description",
             "status",
             "gender",
