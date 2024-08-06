@@ -277,3 +277,5 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 import mimetypes
 mimetypes.add_type("image/svg+xml", ".svg", True)
+mimetypes.add_type("image/webp", ".webp", True)
+

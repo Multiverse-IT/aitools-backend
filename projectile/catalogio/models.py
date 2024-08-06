@@ -29,7 +29,7 @@ from django.utils.deconstruct import deconstructible
 
 @deconstructible
 class FileExtensionValidator:
-    allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'svg']
+    allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp']
 
     def __call__(self, value):
         ext = value.name.split('.')[-1].lower()

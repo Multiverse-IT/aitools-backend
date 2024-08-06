@@ -530,7 +530,8 @@ class PublicSubCategoryToolList(generics.ListAPIView):
         ordering_param = self.request.query_params.get("ordering", None)
         time_range = self.request.query_params.get("time_range", None)
         trending = self.request.query_params.get("trending", None)
-
+        pricing = self.request.query_params.get("pricing", None)
+    
         if search is not None:
             search_words = [
                 word.strip() for word in search.split(",") if len(word.strip()) >= 2
@@ -613,6 +614,19 @@ class PublicSubCategoryToolList(generics.ListAPIView):
 
             elif ordering_param == "verified":
                 queryset = queryset.filter(is_verified=True).order_by("-is_verified", "-created_at")
+
+        pricing_options = {
+            "free": PricingKind.FREE,
+            "freemium": PricingKind.FREEMIUM,
+            "free_trial": PricingKind.FREE_TRIAL,
+            "premium": PricingKind.PREMIUM,
+            "contact_for_pricing": PricingKind.CONTACT_FOR_PRICING,
+        }
+
+        if pricing and pricing in pricing_options:
+            queryset = queryset.filter(pricing=pricing_options[pricing]).order_by(
+                "-created_at"
+            )
 
         if trending:
             now = timezone.now()
