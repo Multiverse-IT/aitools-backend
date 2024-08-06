@@ -101,6 +101,7 @@ class ToolListSerializer(serializers.ModelSerializer):
             "discoard_url",
             "pricing_url",
             "created_at",
+            "updated_at"
         ]
 
         read_only_fields = ["uid", "is_deal", "created_at", "coupon","discout"]
@@ -135,6 +136,9 @@ class ToolListSerializer(serializers.ModelSerializer):
 
             except Exception as e:
                 print("detail:", e)
+
+        tool.updated_at = tool.created_at
+        tool.save()
 
         return tool
 
@@ -220,6 +224,8 @@ class ToolRequestDetailSerializer(serializers.ModelSerializer):
             instance.status = ToolStatus.ACTIVE
             instance.is_new = True
             instance.created_at = timezone.now()
+            instance.save()
+            instance.updated_at = instance.created_at
             instance.save()
 
         return super().update(instance, validated_data)
