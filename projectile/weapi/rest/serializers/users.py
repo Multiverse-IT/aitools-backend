@@ -51,7 +51,7 @@ class PrivateUserSerializer(serializers.ModelSerializer):
         email = validated_data.get("email").lower()
         user = User.objects.create(
             username=email,
-            role=UserRole.ADMIN,
+            # role=UserRole.ADMIN,
             status=UserStatus.ACTIVE,
             **validated_data
         )
