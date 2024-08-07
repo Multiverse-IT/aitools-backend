@@ -5,10 +5,10 @@ def update_tool_on_deal_save(sender, instance, **kwargs):
     connected_tool = instance.deal_tool
     connected_tool.discout = instance.discout
     connected_tool.coupon = instance.coupon
-    if instance.is_top == True:
-        connected_tool.is_deal = True
-    if instance.is_top == False:
-        connected_tool.is_deal = False
+    # if instance.is_top == True:  # request from sazzad to remove condition 060824
+    connected_tool.is_deal = True
+    # if instance.is_top == False:
+    #     connected_tool.is_deal = False
     connected_tool.save()
 
 def delete_deal_tool(sender, instance, **kwargs):
