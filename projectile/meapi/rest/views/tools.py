@@ -316,7 +316,10 @@ class PublicToolList(generics.ListCreateAPIView):
                 queryset = queryset.order_by("-created_at")
 
             elif ordering_param == "verified":
-                queryset = queryset.filter(is_verified=True).order_by("-is_verified", "-created_at")
+                qs = queryset.filter(is_verified=True)
+                if qs.exists():
+                    queryset = qs.order_by("-is_verified", "-created_at")
+                queryset = queryset
 
         pricing_options = {
             "free": PricingKind.FREE,
