@@ -308,6 +308,7 @@ class PublicToolList(generics.ListCreateAPIView):
         if ordering_param:
             if ordering_param == "most_popular":
                 queryset = queryset.order_by("-save_count")
+
             elif ordering_param == "most_rated":
                 queryset = queryset.order_by("-average_ratings")
 
@@ -348,6 +349,10 @@ class PublicToolList(generics.ListCreateAPIView):
             )
         else:
             queryset = queryset.order_by("-is_featured","-created_at")
+
+        if ordering_param:
+            if ordering_param == "most_popular":
+                queryset = queryset.order_by("-save_count")
 
         return queryset.distinct()
 
