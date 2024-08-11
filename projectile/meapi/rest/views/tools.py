@@ -611,18 +611,6 @@ class PublicSubCategoryToolList(generics.ListAPIView):
             features = features.split(",")
             queryset = queryset.filter(toolsconnector__feature__slug__in=features)
 
-        if ordering_param:
-            if ordering_param == "most_loved":
-                queryset = queryset.order_by("-save_count")
-            elif ordering_param == "average_ratings":
-                queryset = queryset.order_by("-average_ratings")
-
-            elif ordering_param == "created_at":
-                queryset = queryset.order_by("-created_at")
-
-            elif ordering_param == "verified":
-                queryset = queryset.filter(is_verified=True).order_by("-is_verified", "-created_at")
-
         pricing_options = {
             "free": PricingKind.FREE,
             "freemium": PricingKind.FREEMIUM,
@@ -698,6 +686,19 @@ class PublicSubCategoryToolList(generics.ListAPIView):
                 "-is_category_featured",
                 "-created_at"
             )
+
+        if ordering_param:
+            if ordering_param == "most_loved":
+                queryset = queryset.order_by("-save_count")
+            elif ordering_param == "average_ratings":
+                queryset = queryset.order_by("-average_ratings")
+
+            elif ordering_param == "created_at":
+                queryset = queryset.order_by("-created_at")
+
+            elif ordering_param == "verified":
+                queryset = queryset.filter(is_verified=True).order_by("-is_verified", "-created_at")
+
         return queryset.distinct()
 
 
