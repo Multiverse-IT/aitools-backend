@@ -688,7 +688,7 @@ class PublicSubCategoryToolList(generics.ListAPIView):
             )
 
         if ordering_param:
-            if ordering_param == "most_loved":
+            if ordering_param == "most_popular":
                 queryset = queryset.order_by("-save_count")
             elif ordering_param == "average_ratings":
                 queryset = queryset.order_by("-average_ratings")
