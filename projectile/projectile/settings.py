@@ -227,7 +227,8 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://aitools-staging.vercel.app"
+    "https://aitools-staging.vercel.app",
+    "https://100-tool-frontend.vercel.app",
 ]
 
 
