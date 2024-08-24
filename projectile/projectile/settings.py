@@ -229,6 +229,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "https://aitools-staging.vercel.app",
     "https://100-tool-frontend.vercel.app",
+    "https://100aitools.io",
 ]
 
 
