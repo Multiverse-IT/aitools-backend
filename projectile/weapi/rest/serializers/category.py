@@ -119,8 +119,14 @@ class SubCatetoryListDetailSerializer(serializers.ModelSerializer):
             category_connector = ToolsCategoryConnector.objects.filter(
                 subcategory=instance
             ).first()
-            category_connector.category = category
-            category_connector.save()
+            if category_connector:
+                category_connector.category = category
+                category_connector.save()
+            else:
+                ToolsCategoryConnector.objects.create(
+                subcategory=instance,
+                category=category
+            )
 
         if faq_uids:
             instance.faqcategoryconnector_set.all().delete()
