@@ -57,6 +57,8 @@ class CommonStorage(BaseModelWithUID):
     blogs_page = models.JSONField(default=list)
     about_page = models.JSONField(default=list)
     redirects = models.JSONField(default=list)
+    privacy_policy = models.JSONField(default=list)
+    terms_of_use = models.JSONField(default=list)
 
     def __str__(self) -> str:
         return f"UID: {self.uid}"
@@ -80,7 +82,6 @@ class Sponsor(BaseModelWithUID):
 
     def __str__(self):
         return f"UID: {self.uid}"
-
 
 
 class FAQ(BaseModelWithUID):

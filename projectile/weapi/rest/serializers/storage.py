@@ -14,6 +14,8 @@ class PrivateCommonStorageSerializer(serializers.ModelSerializer):
             "blogs_page",
             "about_page",
             "redirects",
+            "privacy_policy",
+            "terms_of_use",
             "created_at",
             "updated_at",
         ]
