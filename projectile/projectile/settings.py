@@ -192,7 +192,6 @@ USE_I18N = True
 USE_TZ = True
 
 
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -231,6 +230,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://100-tool-frontend.vercel.app",
     "https://100aitools.io",
     "https://www.100aitools.io",
+    "https://www.100ai.tools",
 ]
 
 
@@ -281,4 +281,3 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 import mimetypes
 mimetypes.add_type("image/svg+xml", ".svg", True)
 mimetypes.add_type("image/webp", ".webp", True)
-
