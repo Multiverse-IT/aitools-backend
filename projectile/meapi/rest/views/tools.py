@@ -91,7 +91,6 @@ class PublicRandomSearch(generics.ListAPIView):
         return queryset.distinct()
 
 
-
 class PublicToolList(generics.ListCreateAPIView):
     queryset = Tool.objects.filter(status=ToolStatus.ACTIVE)
     serializer_class = PublicToolListSerializer
@@ -129,7 +128,6 @@ class PublicToolList(generics.ListCreateAPIView):
         max_love_count = self.request.query_params.get("max_love", None)
         top_tools = self.request.query_params.get("top_tools", False)
         deals = self.request.query_params.get("deals", None)
-
 
         if deals and deals == "true":
             queryset = queryset.filter(is_deal=True)
@@ -361,7 +359,7 @@ class PublicToolList(generics.ListCreateAPIView):
 
 
 class PublicToolDetail(generics.RetrieveUpdateAPIView):
-    queryset = Tool.objects.filter()
+    queryset = Tool.objects.filter().exclude(status=ToolStatus.DRAFT)
     serializer_class = PublicTooDetailSerializer
     permission_classes = [CustomIdentityHeaderPermission]
     lookup_field = "slug"
