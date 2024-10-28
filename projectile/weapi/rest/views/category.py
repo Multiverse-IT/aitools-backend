@@ -2,7 +2,7 @@ from catalogio.models import Category, SubCategory
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from core.permissions import IsAdmin
 from ..serializers.category import (
     CatetoryListSerializer,
     SubCatetoryListDetailSerializer,
@@ -12,7 +12,7 @@ from ..serializers.category import (
 class CatetoryList(generics.ListCreateAPIView):
     queryset = Category.objects.filter()
     serializer_class = CatetoryListSerializer
-    permission_classes = []
+    permission_classes = [IsAdmin]
 
     def get_queryset(self):
         return self.queryset
@@ -21,13 +21,13 @@ class CatetoryList(generics.ListCreateAPIView):
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.filter()
     serializer_class = CatetoryListSerializer
-    permission_classes = []
+    permission_classes = [IsAdmin]
     lookup_field = "slug"
 
 
 class SubCategoryList(generics.ListCreateAPIView):
     serializer_class = SubCatetoryListDetailSerializer
-    permission_classes = []
+    permission_classes = [IsAdmin]
 
     def get_queryset(self):
         return SubCategory.objects.filter()
@@ -37,11 +37,11 @@ class SubcategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = SubCategory.objects.filter()
     serializer_class = SubCatetoryListDetailSerializer
     lookup_field = "slug"
-    permission_classes = []
+    permission_classes = [IsAdmin]
 
 
 class SubCategoryListWithCategoryTitle(APIView):
-    permission_classes = []
+    permission_classes = [IsAdmin]
 
     def get(self, request):
         subcategory_dict = {}

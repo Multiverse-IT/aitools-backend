@@ -25,7 +25,7 @@ class CustomPaginationFor15Item(PageNumberPagination):
 class ToolList(generics.ListCreateAPIView):
     queryset = Tool.objects.get_status_editable()
     serializer_class = ToolListSerializer
-    permission_classes = []
+    permission_classes = [IsAdmin]
     pagination_class = CustomPaginationFor15Item
 
     def get_queryset(self):
@@ -72,14 +72,14 @@ class ToolList(generics.ListCreateAPIView):
 class ToolDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Tool.objects.get_status_editable()
     serializer_class = ToolListSerializer
-    permission_classes = []
+    permission_classes = [IsAdmin]
     lookup_field = "slug"
 
 
 class RequestToolResponseDetail(generics.RetrieveUpdateAPIView):
     queryset = Tool.objects.get_status_requested()
     serializer_class = ToolRequestDetailSerializer
-    permission_classes = []
+    permission_classes = [IsAdmin]
     lookup_field = "slug"
 
 
