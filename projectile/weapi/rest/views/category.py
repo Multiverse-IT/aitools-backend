@@ -12,7 +12,7 @@ from ..serializers.category import (
 class CatetoryList(generics.ListCreateAPIView):
     queryset = Category.objects.filter()
     serializer_class = CatetoryListSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = []
 
     def get_queryset(self):
         return self.queryset
@@ -21,7 +21,7 @@ class CatetoryList(generics.ListCreateAPIView):
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.filter()
     serializer_class = CatetoryListSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = []
     lookup_field = "slug"
 
 
